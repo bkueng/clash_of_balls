@@ -72,15 +72,20 @@ class MyGLSurfaceView extends GLSurfaceView {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        float x = e.getX(); // screen coordinates ([0,0] = lower left corner)
-        float y = e.getY();
+        
+        final MotionEvent event = e;
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_UP:
-            //TODO: send event to GameRenderer
-            
+            	//send event to the renderer
+            	queueEvent(new Runnable() {
+					@Override
+					public void run() {
+						m_renderer.handleTouchInput(event);
+					}
+            	});
         }
         return true;
     }
