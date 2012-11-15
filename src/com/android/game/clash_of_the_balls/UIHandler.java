@@ -21,26 +21,53 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private IMoveable m_fps_counter;
 	
 	private UIBase m_active_ui;
-	private int m_screen_width;
-	private int m_screen_height;
+	
+	private UIBase m_main_menu;
+	private UIBase m_game_ui;
+	
+	public enum UIChange {
+		NO_CHANGE,
+		MAIN_MENU,
+		GAME
+	}
 	
 	public UIHandler(int screen_width, int screen_height) {
-		m_screen_width = screen_width;
-		m_screen_height = screen_height;
 		m_settings = new GameSettings();
+		m_settings.m_screen_width = screen_width;
+		m_settings.m_screen_height = screen_height;
 		m_fps_counter = new FPSCounter();
+		//TODO: init menu's , game
+		
 	}
 
 	@Override
 	public void move(float dsec) {
-		// TODO Auto-generated method stub
+		if(m_active_ui != null) {
+			m_active_ui.move(dsec);
+
+			switch(m_active_ui.UIChange()) {
+			case GAME: uiChange(m_active_ui, m_game_ui);
+			break;
+			case MAIN_MENU: uiChange(m_active_ui, m_main_menu);
+			break;
+			case NO_CHANGE: //nothing to do
+			}
+		}
 		
 		m_fps_counter.move(dsec);
+	}
+	
+	private void uiChange(UIBase old_ui, UIBase new_ui) {
+		if(old_ui != new_ui) {
+			old_ui.onDeactivate();
+			new_ui.onActivate();
+			m_active_ui = new_ui;
+		}
 	}
 
 	@Override
 	public void draw(MatrixStack stack) {
-		// TODO Auto-generated method stub
+		if(m_active_ui != null) m_active_ui.draw(stack);
 	}
 
 	@Override
