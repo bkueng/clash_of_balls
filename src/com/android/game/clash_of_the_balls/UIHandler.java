@@ -18,6 +18,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	
 	
 	private GameSettings m_settings;
+	private IMoveable m_fps_counter;
 	
 	private UIBase m_active_ui;
 	private int m_screen_width;
@@ -27,12 +28,14 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_screen_width = screen_width;
 		m_screen_height = screen_height;
 		m_settings = new GameSettings();
+		m_fps_counter = new FPSCounter();
 	}
 
 	@Override
 	public void move(float dsec) {
 		// TODO Auto-generated method stub
 		
+		m_fps_counter.move(dsec);
 	}
 
 	@Override
