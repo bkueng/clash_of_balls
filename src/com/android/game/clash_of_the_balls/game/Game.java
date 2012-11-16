@@ -31,7 +31,7 @@ public class Game extends GameBase implements UIBase {
 	}
 
 	@Override
-	public void draw(MatrixStack stack) {
+	public void draw(RenderHelper renderer) {
 		// TODO Auto-generated method stub
 		
 	}

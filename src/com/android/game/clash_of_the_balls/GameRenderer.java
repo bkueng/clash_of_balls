@@ -4,8 +4,10 @@ package com.android.game.clash_of_the_balls;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import com.android.game.clash_of_the_balls.game.MatrixStack;
+import com.android.game.clash_of_the_balls.ShaderManager.ShaderType;
+import com.android.game.clash_of_the_balls.game.RenderHelper;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.SystemClock;
@@ -17,13 +19,19 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     private static final String LOG_TAG = "GameRenderer";
     
+    private Context m_activity_context;
     private int m_width;
     private int m_height;
     
     private UIHandler m_ui_handler;
-    private MatrixStack m_matrix_stack;
+    private ShaderManager m_shader_manager;
+    private RenderHelper m_renderer;
     
     private long m_last_time=0;
+    
+    public GameRenderer(Context activity_context) {
+    	m_activity_context = activity_context;
+    }
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
@@ -44,10 +52,16 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     	
     	m_last_time = SystemClock.elapsedRealtime(); //or: nanoTime()
     	
-    	m_ui_handler = new UIHandler(m_width, m_height);
-    	m_matrix_stack = new MatrixStack();
-    	//TODO: set projection matrix
+    	m_ui_handler = new UIHandler(m_width, m_height
+    			, m_activity_context);
+    	m_shader_manager = new ShaderManager(m_activity_context);
+    	m_renderer = new RenderHelper(m_shader_manager, (float)m_width
+    			, (float)m_height);
+    	m_renderer.useOrthoProjection();
     	
+    	
+    	//make sure a shader is loaded: use default shader
+    	m_shader_manager.useShader(ShaderType.TypeDefault);
     }
     
 
@@ -70,7 +84,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     		// Draw background color
     		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-    		m_ui_handler.draw(m_matrix_stack);
+    		m_ui_handler.draw(m_renderer);
 
     	} catch(Exception e) {
     		Log.e(LOG_TAG, "Exception in renderer");

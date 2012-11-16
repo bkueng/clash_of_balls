@@ -13,7 +13,7 @@ public class GameView extends GameObject {
 	//TODO: use user, GameSettings for screen size, scaling
 
 	@Override
-	public void draw(MatrixStack stack) {
+	public void draw(RenderHelper renderer) {
 		// nothing to do
 	}
 

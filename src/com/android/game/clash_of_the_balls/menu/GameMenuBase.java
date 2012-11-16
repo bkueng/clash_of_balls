@@ -2,7 +2,7 @@ package com.android.game.clash_of_the_balls.menu;
 
 
 import com.android.game.clash_of_the_balls.UIBase;
-import com.android.game.clash_of_the_balls.game.MatrixStack;
+import com.android.game.clash_of_the_balls.game.RenderHelper;
 
 /**
  * GameMenuBase
@@ -24,7 +24,7 @@ public abstract class GameMenuBase implements UIBase {
 	}
 
 	@Override
-	public void draw(MatrixStack stack) {
+	public void draw(RenderHelper stack) {
 		// TODO Auto-generated method stub
 		
 	}

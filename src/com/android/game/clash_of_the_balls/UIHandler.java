@@ -1,11 +1,12 @@
 package com.android.game.clash_of_the_balls;
 
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.IMoveable;
-import com.android.game.clash_of_the_balls.game.MatrixStack;
+import com.android.game.clash_of_the_balls.game.RenderHelper;
 
 /**
  * UIHandler
@@ -18,6 +19,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	
 	
 	private GameSettings m_settings;
+	private Context m_activity_context;
 	private IMoveable m_fps_counter;
 	
 	private UIBase m_active_ui;
@@ -31,11 +33,14 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		GAME
 	}
 	
-	public UIHandler(int screen_width, int screen_height) {
+	public UIHandler(int screen_width, int screen_height
+			, Context activity_context) {
+		
 		m_settings = new GameSettings();
 		m_settings.m_screen_width = screen_width;
 		m_settings.m_screen_height = screen_height;
 		m_fps_counter = new FPSCounter();
+		m_activity_context = activity_context;
 		//TODO: init menu's , game
 		
 	}
@@ -66,8 +71,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	}
 
 	@Override
-	public void draw(MatrixStack stack) {
-		if(m_active_ui != null) m_active_ui.draw(stack);
+	public void draw(RenderHelper renderer) {
+		if(m_active_ui != null) m_active_ui.draw(renderer);
 	}
 
 	@Override

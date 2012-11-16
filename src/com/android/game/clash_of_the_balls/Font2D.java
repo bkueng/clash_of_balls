@@ -1,7 +1,7 @@
 package com.android.game.clash_of_the_balls;
 
 import com.android.game.clash_of_the_balls.game.IDrawable;
-import com.android.game.clash_of_the_balls.game.MatrixStack;
+import com.android.game.clash_of_the_balls.game.RenderHelper;
 
 /**
  * Font2D
@@ -11,7 +11,7 @@ import com.android.game.clash_of_the_balls.game.MatrixStack;
 public class Font2D implements IDrawable {
 
 	@Override
-	public void draw(MatrixStack stack) {
+	public void draw(RenderHelper renderer) {
 		// TODO Auto-generated method stub
 		
 	}

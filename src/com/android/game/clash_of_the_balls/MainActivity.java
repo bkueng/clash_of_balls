@@ -63,7 +63,7 @@ class MyGLSurfaceView extends GLSurfaceView {
         setEGLContextClientVersion(2);
 
         // Set the Renderer for drawing on the GLSurfaceView
-        m_renderer = new GameRenderer();
+        m_renderer = new GameRenderer(this.getContext());
         setRenderer(m_renderer);
 
         
