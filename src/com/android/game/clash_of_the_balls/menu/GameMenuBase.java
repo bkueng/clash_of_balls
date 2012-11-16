@@ -47,6 +47,11 @@ public abstract class GameMenuBase implements UIBase {
 					item.onTouchUp(x, y);
 					onTouchUp(item);
 				}
+			} else {
+				if(event == MotionEvent.ACTION_UP) {
+					//if touch Up is outside the item, it must be deselected here
+					item.deselect();
+				}
 			}
 		}
 	}

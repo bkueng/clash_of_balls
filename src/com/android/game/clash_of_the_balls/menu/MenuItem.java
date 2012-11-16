@@ -42,11 +42,19 @@ public class MenuItem extends GameObject {
 	}
 	
 	public void onTouchDown(float x, float y) {
-		//TODO: select this item
-		
+		select();
 	}
 	public void onTouchUp(float x, float y) {
-		//TODO: deselect this item
+		deselect();
+	}
+	
+	public void select() {
+		//TODO
+		
+	}
+	
+	public void deselect() {
+		//TODO
 		
 	}
 
