@@ -34,22 +34,4 @@ public class TextureBase {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, m_tex_handle);
 	}
 	
-	//
-	/*
-	 * 
-
-TODO:
-RenderHelper
-sprites
-menuItem
-
-font ?
-add missing base classes: menu, background, ...
--> lock orientation
-
-level specification
-
-networking (library) + game
-
-	 */
 }
