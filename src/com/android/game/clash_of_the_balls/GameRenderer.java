@@ -107,7 +107,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     }
     
     public void handleTouchInput(MotionEvent e) {
-    	m_ui_handler.onTouchEvent(e.getX(), e.getY()
+    	//Note: y axis is mirrored
+    	m_ui_handler.onTouchEvent(e.getX(), m_height-e.getY()
     			, e.getAction());
     }
 

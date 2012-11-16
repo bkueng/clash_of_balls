@@ -2,11 +2,14 @@ package com.android.game.clash_of_the_balls;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.IMoveable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
+import com.android.game.clash_of_the_balls.menu.MainMenu;
+import com.android.game.clash_of_the_balls.menu.MenuBackground;
 
 /**
  * UIHandler
@@ -28,9 +31,14 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private UIBase m_main_menu;
 	private UIBase m_game_ui;
 	
+	private Font2D m_menu_item_font;
+	private MenuBackground m_main_menu_background;
+	
 	public enum UIChange {
 		NO_CHANGE,
 		MAIN_MENU,
+		EXIT_APPLICATION,
+		
 		GAME
 	}
 	
@@ -43,8 +51,18 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_fps_counter = new FPSCounter();
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
+		m_menu_item_font = new Font2D();
+		
+		
+		//m_main_menu_background = new MenuBackground(
+		//		m_tex_manager.get(R.raw.texture_main_menu_bg), 1.f);
+		m_main_menu = new MainMenu(m_menu_item_font, m_main_menu_background
+				, m_settings.m_screen_width, m_settings.m_screen_height);
+		
 		//TODO: init menu's , game
 		
+		
+		m_active_ui = m_main_menu; //show main menu
 	}
 
 	@Override
@@ -56,6 +74,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			case GAME: uiChange(m_active_ui, m_game_ui);
 			break;
 			case MAIN_MENU: uiChange(m_active_ui, m_main_menu);
+			break;
+			case EXIT_APPLICATION: exitApplication();
 			break;
 			case NO_CHANGE: //nothing to do
 			}
@@ -83,6 +103,14 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		if(m_active_ui != null) m_active_ui.onTouchEvent(x, y, event);
 		
+	}
+	
+	private void exitApplication() {
+		//we exit by starting home activity
+		Intent intent = new Intent(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_HOME);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		m_activity_context.startActivity(intent);
 	}
 	
 }

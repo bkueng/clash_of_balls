@@ -8,6 +8,7 @@ import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.game.GameObject;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
+import com.android.game.clash_of_the_balls.game.Vector;
 
 /**
  * Background of a Menu: spans a texture over the screen
@@ -17,8 +18,10 @@ public class MenuBackground extends GameObject {
 	
 	private Texture m_texture;
 	private float m_aspect_ratio;
+	private Vector m_size=new Vector();
 	
 	public void setAspect(float aspect) { m_aspect_ratio = aspect; }
+	public float aspect() { return m_aspect_ratio; }
 	
 	private VertexBufferFloat m_color_data;
 	private VertexBufferFloat m_position_data;
@@ -39,27 +42,15 @@ public class MenuBackground extends GameObject {
 		m_texture.useTexture(renderer);
 		
 		//position & size
-		//touch screen border from inside
-		float screen_aspect = renderer.screenWidth() / renderer.screenHeight();
-		float width, height, x, y;
-		if(screen_aspect > m_aspect_ratio) {
-			height = renderer.screenHeight();
-			y = 0.f;
-			width = m_aspect_ratio * renderer.screenHeight();
-			x = (renderer.screenWidth()-width) / 2.f;
-		} else {
-			width = renderer.screenWidth();
-			x = 0.f;
-			height = renderer.screenWidth() / m_aspect_ratio;
-			y = (renderer.screenHeight()-height) / 2.f;
-		}
+		getViewport(renderer.screenWidth(), renderer.screenHeight()
+				, m_position, m_size);
 		
 		//translate & scale to fit screen
 		int model_mat_pos = renderer.pushModelMat();
 		float model_mat[] = renderer.modelMat();
 		Matrix.setIdentityM(model_mat, model_mat_pos);
-		Matrix.translateM(model_mat, model_mat_pos, x, y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, width, height, 0.f);
+		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
+		Matrix.scaleM(model_mat, model_mat_pos, m_size.x, m_size.y, 0.f);
 		
 		
 		int position_handle = renderer.shaderManager().a_Position_handle;
@@ -79,6 +70,25 @@ public class MenuBackground extends GameObject {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 2*3);                               
         
         renderer.popModelMat();
+	}
+	
+	//get menu viewport: this depends on screen aspect ratio
+	public void getViewport(float screen_width, float screen_height
+			, Vector pos, Vector size) {
+		
+		//touch screen border from inside
+		float screen_aspect = screen_width / screen_height;
+		if(screen_aspect > m_aspect_ratio) {
+			size.y = screen_height;
+			pos.y = 0.f;
+			size.x = m_aspect_ratio * screen_height;
+			pos.x = (screen_width-size.x) / 2.f;
+		} else {
+			size.x = screen_width;
+			pos.x = 0.f;
+			size.y = screen_width / m_aspect_ratio;
+			pos.y = (screen_height-size.y) / 2.f;
+		}
 	}
 
 	@Override
