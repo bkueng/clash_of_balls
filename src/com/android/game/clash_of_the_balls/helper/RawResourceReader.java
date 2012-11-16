@@ -9,15 +9,21 @@ import android.content.Context;
 
 public class RawResourceReader
 {
-	public static String readTextFileFromRawResource(final Context context,
-			final int resourceId)
-	{
+	
+	public static BufferedReader readFromRawResource(final Context context,
+			final int resourceId) {
 		final InputStream inputStream = context.getResources().openRawResource(
 				resourceId);
 		final InputStreamReader inputStreamReader = new InputStreamReader(
 				inputStream);
-		final BufferedReader bufferedReader = new BufferedReader(
-				inputStreamReader);
+		return new BufferedReader(inputStreamReader);
+	}
+	
+	public static String readTextFileFromRawResource(final Context context,
+			final int resourceId)
+	{
+		final BufferedReader bufferedReader = readFromRawResource(context
+				, resourceId);
 
 		String nextLine;
 		final StringBuilder body = new StringBuilder();

@@ -25,6 +25,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private Context m_activity_context;
 	private IMoveable m_fps_counter;
 	private TextureManager m_tex_manager;
+	private LevelManager m_level_manager;
 	
 	private UIBase m_active_ui;
 	
@@ -53,6 +54,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_tex_manager = new TextureManager(m_activity_context);
 		m_menu_item_font = new Font2D();
 		
+		m_level_manager = new LevelManager(m_activity_context);
+		m_level_manager.loadLevels();
 		
 		//m_main_menu_background = new MenuBackground(
 		//		m_tex_manager.get(R.raw.texture_main_menu_bg), 1.f);
