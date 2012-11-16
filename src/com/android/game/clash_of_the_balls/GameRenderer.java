@@ -20,7 +20,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     private static final String LOG_TAG = "GameRenderer";
     
     private Context m_activity_context;
-    private int m_width;
+    
+    private int m_width; //screen output dimension
     private int m_height;
     
     private UIHandler m_ui_handler;

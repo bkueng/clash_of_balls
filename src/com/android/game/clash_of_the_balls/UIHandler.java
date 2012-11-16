@@ -21,6 +21,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private GameSettings m_settings;
 	private Context m_activity_context;
 	private IMoveable m_fps_counter;
+	private TextureManager m_tex_manager;
 	
 	private UIBase m_active_ui;
 	
@@ -41,6 +42,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_settings.m_screen_height = screen_height;
 		m_fps_counter = new FPSCounter();
 		m_activity_context = activity_context;
+		m_tex_manager = new TextureManager(m_activity_context);
 		//TODO: init menu's , game
 		
 	}
