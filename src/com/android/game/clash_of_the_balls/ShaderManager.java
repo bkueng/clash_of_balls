@@ -84,6 +84,10 @@ public class ShaderManager {
         GLES20.glUniform1i(u_Texture_handle, which);
 	}
 	
+	public void deactivateTexture() {
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+	}
+	
 	private int loadShader(int raw_res_id_vertex_shader
 			, int raw_res_id_fragment_shader, String[] attributes) {
 		
