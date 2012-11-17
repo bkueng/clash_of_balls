@@ -104,12 +104,12 @@ public class GameLevel {
 					//background
 					int bg = Integer.parseInt(line[x*2]);
 					assertFormat(bg >= 0 && bg <= TYPE_BG_MAX);
-					m_background[y*width+x] = bg;
+					m_background[(height-y-1)*width+x] = bg;
 					//foreground
 					int fg = Integer.parseInt(line[x*2+1]);
 					assertFormat(fg >= 0 && fg <= TYPE_FG_MAX);
 					if(fg==TYPE_PLAYER) ++player_count;
-					m_foreground[y*width+x] = fg;
+					m_foreground[(height-y-1)*width+x] = fg;
 					
 					log_line += ""+bg+", "+fg+"; ";
 				}
