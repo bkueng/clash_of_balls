@@ -45,6 +45,15 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         //GLES20.glEnable(GLES20.GL_BLEND);
         //GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         
+        // culling
+        GLES20.glEnable(GLES20.GL_CULL_FACE);
+        GLES20.glCullFace(GLES20.GL_BACK);
+        
+        //we want clockwise triangles
+        GLES20.glFrontFace(GLES20.GL_CW);
+
+        // No depth testing
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
     }
     
     private void init() throws Exception {

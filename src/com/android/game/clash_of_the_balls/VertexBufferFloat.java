@@ -22,29 +22,23 @@ public class VertexBufferFloat {
 			1.0f, 1.0f, 1.0f, 1.0f,
 			1.0f, 1.0f, 1.0f, 1.0f,
 			1.0f, 1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f, 1.0f,	
-			1.0f, 1.0f, 1.0f, 1.0f,
 			1.0f, 1.0f, 1.0f, 1.0f
 			};
 	
 	public static final float[] sprite_position_data = new float[] 
 			{
-			0.0f, 0.0f, 0.0f, // 1. triangle: bottom left, clock-wise
+			0.0f, 0.0f, 0.0f, // triangle strip: bottom left start, clockwise
 			0.0f, 1.0f, 0.0f,
-			1.0f, 0.0f, 0.0f, 
-			0.0f, 1.0f, 0.0f, // 2. triangle: top right, clock-wise
-			1.0f, 1.0f, 0.0f,
-			1.0f, 0.0f, 0.0f
+			1.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 0.0f
 			};
 	
 	public static final float[] sprite_tex_coords = new float[] 
 			{ 
-			0.0f, 0.0f, // 1. triangle: bottom left, clock-wise
+			0.0f, 0.0f, // triangle strip: bottom left start, clockwise
 			0.0f, 1.0f,
 			1.0f, 0.0f,
-			0.0f, 1.0f, // 2. triangle: top right, clock-wise
-			1.0f, 1.0f,
-			1.0f, 0.0f
+			1.0f, 1.0f
 			};
 	
 	public VertexBufferFloat(float[] data, int num_components_per_item) {

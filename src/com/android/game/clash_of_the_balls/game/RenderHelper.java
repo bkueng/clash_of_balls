@@ -49,13 +49,14 @@ public class RenderHelper {
 		m_model_mat = new float[init_model_mat_count*mat_size];
 		m_cur_model_mat_pos=0;
 		m_max_model_mat_pos = mat_size*(init_model_mat_count - 1);
+		Matrix.setIdentityM(m_model_mat, m_cur_model_mat_pos);
 	}
 	
 	
 	/* projection matrix */
 	public void useOrthoProjection() {
-		Matrix.orthoM(m_projection_mat, 0, 0.f, m_screen_width, m_screen_height
-				, 0.f, 0.f, 1.f);
+		Matrix.orthoM(m_projection_mat, 0, 0.f, m_screen_width, 0.f
+				, m_screen_height, 0.f, 1.f);
 	}
 	
 	

@@ -67,7 +67,7 @@ public class MenuBackground extends GameObject {
 		renderer.apply();
 		
         // Draw
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 2*3);                               
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);                               
         
         renderer.popModelMat();
 	}
