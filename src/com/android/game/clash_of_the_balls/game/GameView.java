@@ -23,5 +23,5 @@ public class GameView extends GameObject {
 		
 	}
 	
-	//applyView(MatrixStack stack)
+	//applyView(RenderHelper renderer)
 }

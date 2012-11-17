@@ -2,15 +2,16 @@ package com.android.game.clash_of_the_balls.game;
 
 
 import com.android.game.clash_of_the_balls.GameSettings;
+import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
 
 
 public class Game extends GameBase implements UIBase {
-
-	private GameView m_game_view;
 	
-	public Game(GameSettings s) {
+	//own player
+	
+	public Game(GameSettings s, TextureManager texture_manager) {
 		super(s);
 		// TODO Auto-generated constructor stub
 		
