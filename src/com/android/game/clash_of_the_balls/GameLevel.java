@@ -48,13 +48,29 @@ public class GameLevel {
 	
 	//field specification:
 	//fg
-	public final int TYPE_EMPTY = 0;
-	public final int TYPE_PLAYER = 1;
-	public final int TYPE_FG_MAX = 1; // max field int value foreground
-	//bg
-	public final int TYPE_NORMAL = 0;
-	public final int TYPE_BG_MAX = 0; // max field int value background
+	//when objects are added change GameField to load correct object
+	public static final int TYPE_EMPTY = 0;
+	public static final int TYPE_PLAYER = 1;
+	//TODO: add more: hole, obstacles, ...
+	public static final int TYPE_FG_MAX = 1; // max field int value foreground
 	
+	public static int rawResTexIdFromForeground(int fg_field) {
+		switch(fg_field) {
+		case TYPE_PLAYER: return -1;
+		}
+		return -1;
+	}
+	
+	//bg
+	public static final int TYPE_NORMAL = 0;
+	public static final int TYPE_BG_MAX = 0; // max field int value background
+	
+	public static int rawResTexIdFromBackground(int bg_field) {
+		switch(bg_field) {
+		case TYPE_NORMAL: return R.raw.texture_bg_normal;
+		}
+		return -1;
+	}
 	
 	public GameLevel(Context context) { 
 		m_context = context;
