@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls.menu;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 import com.android.game.clash_of_the_balls.game.Vector;
 
@@ -11,7 +12,7 @@ public class MainMenu extends GameMenuBase {
 	MenuItem m_test_button;
 	
 	public MainMenu(Font2D item_font, MenuBackground background
-			, float screen_width, float screen_height) {
+			, float screen_width, float screen_height,TextureManager m_tex_manager) {
 		super(item_font, background);
 		
 		Vector pos=new Vector(0.f, 0.f);
@@ -22,10 +23,11 @@ public class MainMenu extends GameMenuBase {
 		
 		
 		//add menu items
-		m_menu_items.add(m_test_button = new MenuItem(
+		m_menu_items.add(m_test_button = new MenuItemButton(
 				new Vector(pos.x+size.x / 2.f, pos.y),
 				new Vector(size.x / 2.f, size.y / 2.f), 
-				m_item_font));
+				m_item_font,
+				m_tex_manager));
 		
 		
 	}
