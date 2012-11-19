@@ -24,13 +24,19 @@ public class StaticGameObject extends GameObject {
 	
 	public final Type m_type;
 	
+	public final int m_id; //object id: this is unique across a game
+						   //used by the network to identify a dynamic game object
+						   //(it is not used for background objects)
+						   //the lowest id is 1
+	
 	protected Texture m_texture;
 	protected VertexBufferFloat m_color_data;
 	protected VertexBufferFloat m_position_data;
 	
-	StaticGameObject(Vector position, Type type, Texture texture) {
+	StaticGameObject(final int id, Vector position, Type type, Texture texture) {
 		super(position);
 		m_type = type;
+		m_id = id;
 		m_texture = texture;
 		
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);

@@ -17,6 +17,8 @@ public class GameField extends GameObject {
 	private int m_width;
 	private int m_height;
 	
+	private TextureManager m_texture_manager;
+	
 	public int width() { return m_width; }
 	public int height() { return m_height; }
 	
@@ -27,28 +29,35 @@ public class GameField extends GameObject {
 	public StaticGameObject foreground(int x, int y) { return m_fg_objects[y*m_width+x]; }
 	
 	
-	public GameField(GameLevel level, TextureManager texture_manager) {
+	public GameField(TextureManager texture_manager) {
+		m_texture_manager = texture_manager;
+	}
+	
+	//returns the next object id to be used
+	//for the first game call set next_object_id to 1
+	public int init(GameLevel level, int next_object_id) {
 		m_width = level.width;
 		m_height = level.height;
 		
 		//background
-		if(texture_manager != null) {
+		if(m_texture_manager != null) {
 			m_bg_objects = new StaticGameObject[m_width*m_height];
 			for(int y=0; y<m_height; ++y) {
 				for(int x=0; x<m_width; ++x) {
 					int type = level.background(x, y);
 					int raw_res_id = GameLevel.rawResTexIdFromBackground(type);
 					if(raw_res_id != -1) {
-						m_bg_objects[y*m_width+x] = new StaticGameObject(
+						m_bg_objects[y*m_width+x] = new StaticGameObject(-1,
 								new Vector((float)x+0.5f, (float)y+0.5f),
 								Type.Background,
-								texture_manager.get(raw_res_id));
+								m_texture_manager.get(raw_res_id));
 					}
 				}
 			}
 		}
 		
 		//foreground
+		int object_id=next_object_id;
 		m_fg_objects = new StaticGameObject[m_width*m_height];
 		for(int y=0; y<m_height; ++y) {
 			for(int x=0; x<m_width; ++x) {
@@ -60,13 +69,14 @@ public class GameField extends GameObject {
 					/* TODO
 					switch(type) {
 					case GameLevel.TYPE_HOLE: 
-						obj=new GameHole(pos, texture_manager.get(raw_res_id));
+						obj=new GameHole(object_id++, pos, texture_manager.get(raw_res_id));
 						break;
 					} */
 					m_fg_objects[y*m_width+x] = obj;
 				}
 			}
 		}
+		return object_id;
 	}
 	
 	@Override

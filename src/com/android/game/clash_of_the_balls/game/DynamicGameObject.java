@@ -8,11 +8,12 @@ import com.android.game.clash_of_the_balls.Texture;
  *
  */
 public class DynamicGameObject extends StaticGameObject {
-	//id, death, ..
+	
+	protected boolean m_bIs_dead = false;
 	
 	
-	DynamicGameObject(Vector position, Type type, Texture texture) {
-		super(position, type, texture);
+	DynamicGameObject(final int id, Vector position, Type type, Texture texture) {
+		super(id, position, type, texture);
 	}
 
 	@Override
