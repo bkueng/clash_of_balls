@@ -8,7 +8,7 @@ import com.android.game.clash_of_the_balls.game.Vector;
 
 public class MainMenu extends GameMenuBase {
 	
-	MenuItem m_exit_button;
+	MenuItem m_test_button;
 	
 	public MainMenu(Font2D item_font, MenuBackground background
 			, float screen_width, float screen_height) {
@@ -22,7 +22,7 @@ public class MainMenu extends GameMenuBase {
 		
 		
 		//add menu items
-		m_menu_items.add(m_exit_button = new MenuItem(
+		m_menu_items.add(m_test_button = new MenuItem(
 				new Vector(pos.x+size.x / 2.f, pos.y),
 				new Vector(size.x / 2.f, size.y / 2.f), 
 				m_item_font));
@@ -37,8 +37,8 @@ public class MainMenu extends GameMenuBase {
 
 	@Override
 	protected void onTouchUp(MenuItem item) {
-		if(item == m_exit_button) {
-			m_ui_change = UIChange.EXIT_APPLICATION;
+		if(item == m_test_button) {
+			//m_ui_change = UIChange.new_menu;
 		}
 	}
 

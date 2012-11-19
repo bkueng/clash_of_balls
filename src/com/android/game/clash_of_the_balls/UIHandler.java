@@ -38,7 +38,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	public enum UIChange {
 		NO_CHANGE,
 		MAIN_MENU,
-		EXIT_APPLICATION,
 		
 		GAME
 	}
@@ -83,8 +82,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			break;
 			case MAIN_MENU: uiChange(m_active_ui, m_main_menu);
 			break;
-			case EXIT_APPLICATION: exitApplication();
-			break;
 			case NO_CHANGE: //nothing to do
 			}
 		}
@@ -111,14 +108,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		if(m_active_ui != null) m_active_ui.onTouchEvent(x, y, event);
 		
-	}
-	
-	private void exitApplication() {
-		//we exit by starting home activity
-		Intent intent = new Intent(Intent.ACTION_MAIN);
-		intent.addCategory(Intent.CATEGORY_HOME);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		m_activity_context.startActivity(intent);
 	}
 	
 }
