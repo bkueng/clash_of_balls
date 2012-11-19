@@ -81,7 +81,6 @@ class MyGLSurfaceView extends GLSurfaceView {
             case MotionEvent.ACTION_UP:
             	//send event to the renderer
             	queueEvent(new Runnable() {
-					@Override
 					public void run() {
 						m_renderer.handleTouchInput(event);
 					}

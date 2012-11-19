@@ -35,7 +35,6 @@ public class MenuBackground extends GameObject {
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 	}
 
-	@Override
 	public void draw(RenderHelper renderer) {
 		//texture
 		renderer.shaderManager().activateTexture(0);
@@ -91,7 +90,6 @@ public class MenuBackground extends GameObject {
 		}
 	}
 
-	@Override
 	public void move(float dsec) {
 		// nothing to do
 	}

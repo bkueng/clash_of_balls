@@ -10,7 +10,6 @@ import com.android.game.clash_of_the_balls.game.RenderHelper;
  */
 public class Font2D implements IDrawable {
 
-	@Override
 	public void draw(RenderHelper renderer) {
 		// TODO Auto-generated method stub
 		

@@ -32,13 +32,11 @@ public class MenuItem extends GameObject {
 				&& y>=m_position.y && y<=m_position.y+m_size.y;
 	}
 	
-	@Override
 	public void draw(RenderHelper renderer) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void move(float dsec) {
 		// TODO Auto-generated method stub
 		

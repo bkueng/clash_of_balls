@@ -12,12 +12,10 @@ public class GameView extends GameObject {
 	private Vector m_size = new Vector();
 	//TODO: use user, GameSettings for screen size, scaling
 
-	@Override
 	public void draw(RenderHelper renderer) {
 		// nothing to do
 	}
 
-	@Override
 	public void move(float dsec) {
 		// TODO Auto-generated method stub
 		

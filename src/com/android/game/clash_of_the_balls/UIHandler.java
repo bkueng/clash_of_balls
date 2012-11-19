@@ -72,7 +72,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_tex_manager.reloadAllTextures();
 	}
 
-	@Override
 	public void move(float dsec) {
 		if(m_active_ui != null) {
 			m_active_ui.move(dsec);
@@ -97,12 +96,10 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		}
 	}
 
-	@Override
 	public void draw(RenderHelper renderer) {
 		if(m_active_ui != null) m_active_ui.draw(renderer);
 	}
 
-	@Override
 	public void onTouchEvent(float x, float y, int event) {
 		Log.v(LOG_TAG, "Touch event: x="+x+", y="+y+", event="+event);
 		

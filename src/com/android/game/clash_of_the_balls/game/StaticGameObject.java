@@ -43,7 +43,6 @@ public class StaticGameObject extends GameObject {
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 	}
 
-	@Override
 	public void draw(RenderHelper renderer) {
 		
 		drawTexture(renderer);
@@ -91,8 +90,8 @@ public class StaticGameObject extends GameObject {
 	}
 	
 
-	@Override
 	public void move(float dsec) {
+
 		// nothing to do
 	}
 }

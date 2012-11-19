@@ -34,7 +34,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     	m_activity_context = activity_context;
     }
 
-    @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
         // Set the background frame color
@@ -75,7 +74,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     }
     
 
-    @Override
     public void onDrawFrame(GL10 unused) {
 
     	try {
@@ -103,7 +101,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     	}
     }
 
-    @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         Log.d(LOG_TAG, "onSurfaceChanged: w="+width+", h="+height);
         

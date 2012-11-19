@@ -15,7 +15,6 @@ public class FPSCounter implements IMoveable {
 	private long lCTM;
 	public float m_fps;
 	
-	@Override
 	public void move(float dsec) {
 		frameCount++;
 		if (frameCount >= 100) {

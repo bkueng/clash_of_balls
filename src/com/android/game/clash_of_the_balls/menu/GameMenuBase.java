@@ -33,7 +33,6 @@ public abstract class GameMenuBase implements UIBase {
 		m_background = background;
 	}
 
-	@Override
 	public void onTouchEvent(float x, float y, int event) {
 		for(int i=0; i<m_menu_items.size(); ++i) {
 			MenuItem item = m_menu_items.get(i);
@@ -56,7 +55,6 @@ public abstract class GameMenuBase implements UIBase {
 		}
 	}
 
-	@Override
 	public void move(float dsec) {
 		for(int i=0; i<m_menu_items.size(); ++i)
 			m_menu_items.get(i).move(dsec);
@@ -64,7 +62,6 @@ public abstract class GameMenuBase implements UIBase {
 		if(m_background != null) m_background.move(dsec);
 	}
 
-	@Override
 	public void draw(RenderHelper renderer) {
 		for(int i=0; i<m_menu_items.size(); ++i)
 			m_menu_items.get(i).draw(renderer);
@@ -77,17 +74,14 @@ public abstract class GameMenuBase implements UIBase {
 	protected abstract void onTouchDown(MenuItem item);
 	protected abstract void onTouchUp(MenuItem item);
 
-	@Override
 	public UIHandler.UIChange UIChange() {
 		return m_ui_change;
 	}
 	
-	@Override
 	public void onActivate() {
 		// ignore it
 	}
 
-	@Override
 	public void onDeactivate() {
 		m_ui_change = UIChange.NO_CHANGE;
 	}

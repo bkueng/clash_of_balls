@@ -79,7 +79,6 @@ public class GameField extends GameObject {
 		return object_id;
 	}
 	
-	@Override
 	public void draw(RenderHelper renderer) {
 		//draw back- & foreground
 		if(m_bg_objects != null) drawArray(m_bg_objects, renderer);
@@ -96,7 +95,6 @@ public class GameField extends GameObject {
 		}
 	}
 
-	@Override
 	public void move(float dsec) {
 		// nothing to do
 	}
