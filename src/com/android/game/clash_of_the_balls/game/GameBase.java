@@ -14,15 +14,21 @@ public class GameBase {
 	
 	protected GameView m_game_view;
 	
+	public final boolean is_server;
+	
 	//map with dynamicGameObject (key is id)
+	protected int m_next_object_id;
 	
 	
-	public GameBase(GameSettings s) {
+	public GameBase(boolean is_server, GameSettings s) {
+		this.is_server = is_server;
 		m_settings = s;
 	}
 	
 	protected void initGame(GameLevel level, TextureManager texture_manager) {
 		//TODO: level, ...
+		//players
+		//m_next_object_id
 	}
 	//TODO: game logic
 	

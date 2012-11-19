@@ -11,7 +11,7 @@ import com.android.game.clash_of_the_balls.GameSettings;
 public class GameServer extends GameBase implements Runnable {
 
 	public GameServer(GameSettings s) {
-		super(s);
+		super(true, s);
 		// TODO Auto-generated constructor stub
 	}
 

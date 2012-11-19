@@ -12,7 +12,7 @@ public class Game extends GameBase implements UIBase {
 	//own player
 	
 	public Game(GameSettings s, TextureManager texture_manager) {
-		super(s);
+		super(false, s);
 		// TODO Auto-generated constructor stub
 		
 		//TODO: use gravity sensor
