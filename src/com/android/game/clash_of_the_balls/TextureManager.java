@@ -1,9 +1,11 @@
 package com.android.game.clash_of_the_balls;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import android.content.Context;
+import android.util.Log;
 
 /**
  * manages all textures: new textures are all generated here
@@ -20,6 +22,14 @@ public class TextureManager {
 		m_textures = new TreeMap<Integer, TextureBase>();
 	}
 	
+	
+	//reload all textures into memory: do this when context is lost
+	public void reloadAllTextures() {
+		for (Map.Entry<Integer, TextureBase> entry : m_textures.entrySet()) {
+			entry.getValue().reloadTexture();
+		}
+	}
+	
 	// this will return a texture with default tex coords (for a sprite)
 	public Texture get(int raw_res_id) {
 		return get(raw_res_id, null);
@@ -28,8 +38,9 @@ public class TextureManager {
 	public Texture get(int raw_res_id, float[] tex_coords) {
 		TextureBase texture=m_textures.get(raw_res_id);
 		if(texture == null) {
-			Texture ret = new Texture(m_activity_context, raw_res_id, tex_coords);
-			m_textures.put(raw_res_id, ret);
+			TextureBase tex = new TextureBase(m_activity_context, raw_res_id);
+			Texture ret = new Texture(tex, tex_coords);
+			m_textures.put(raw_res_id, tex);
 			return ret;
 		}
 		return new Texture(texture, tex_coords);

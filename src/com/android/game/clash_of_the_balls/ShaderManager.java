@@ -41,6 +41,11 @@ public class ShaderManager {
 		for(int i=0; i<m_programs.length; ++i) m_programs[i]=-1;
 	}
 	
+	public void onSurfaceChanged(int width, int height) {
+		//we need to reload all shader programs
+		for(int i=0; i<m_programs.length; ++i) m_programs[i]=-1;
+	}
+	
 	public void useShader(ShaderType which) {
 		
 		if(which == ShaderType.TypeN) throw new RuntimeException("invalid Shader type");

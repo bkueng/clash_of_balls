@@ -105,14 +105,22 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {
+        Log.d(LOG_TAG, "onSurfaceChanged: w="+width+", h="+height);
+        
         // Adjust the viewport based on geometry changes,
         // such as screen rotation
     	// but we disable screen rotation thus it happens only on startup
         GLES20.glViewport(0, 0, width, height);
         m_width=width;
         m_height=height;
+        
+        if(m_ui_handler != null) {
+	        m_ui_handler.onSurfaceChanged(width, height);
+	        m_renderer.onSurfaceChanged(width, height);
+	        m_shader_manager.onSurfaceChanged(width, height);
+	        m_shader_manager.useShader(ShaderType.TypeDefault);
+        }
 
-        Log.d(LOG_TAG, "onSurfaceChanged: w="+width+", h="+height);
     }
     
     public void handleTouchInput(MotionEvent e) {

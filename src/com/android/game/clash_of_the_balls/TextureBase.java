@@ -13,16 +13,16 @@ import com.android.game.clash_of_the_balls.helper.TextureHelper;
 public class TextureBase {
 	protected int m_tex_handle;
 	private Context m_activity_context;
+	private int m_raw_res_id;
 	
 	public TextureBase(Context activity_context, int raw_res_id) {
 		m_activity_context = activity_context;
 		m_tex_handle = loadTexture(raw_res_id);
+		m_raw_res_id = raw_res_id;
 	}
 	
-	//copy constructor: share handle & context
-	public TextureBase(TextureBase t) {
-		m_tex_handle = t.m_tex_handle;
-		m_activity_context = t.m_activity_context;
+	public void reloadTexture() {
+		m_tex_handle = loadTexture(m_raw_res_id);
 	}
 	
 	private int loadTexture(int raw_res_id) {

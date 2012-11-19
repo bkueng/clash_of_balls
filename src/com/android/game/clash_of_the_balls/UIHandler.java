@@ -47,8 +47,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			, Context activity_context) {
 		
 		m_settings = new GameSettings();
-		m_settings.m_screen_width = screen_width;
-		m_settings.m_screen_height = screen_height;
 		m_fps_counter = new FPSCounter();
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
@@ -60,12 +58,19 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		//m_main_menu_background = new MenuBackground(
 		//		m_tex_manager.get(R.raw.texture_main_menu_bg), 1.f);
 		m_main_menu = new MainMenu(m_menu_item_font, m_main_menu_background
-				, m_settings.m_screen_width, m_settings.m_screen_height);
+				, screen_width, screen_height);
 		
 		//TODO: init menu's , game
 		
 		
+		onSurfaceChanged(screen_width, screen_height);
 		m_active_ui = m_main_menu; //show main menu
+	}
+	
+	public void onSurfaceChanged(int width, int height) {
+		m_settings.m_screen_width = width;
+		m_settings.m_screen_height = height;
+		m_tex_manager.reloadAllTextures();
 	}
 
 	@Override

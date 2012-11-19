@@ -42,14 +42,19 @@ public class RenderHelper {
 	public RenderHelper(ShaderManager shader_manager, float screen_width, 
 			float screen_height) {
 		m_shader_manager = shader_manager;
-		m_screen_width = screen_width;
-		m_screen_height = screen_height;
 		
 		final int init_model_mat_count = 4;
 		m_model_mat = new float[init_model_mat_count*mat_size];
 		m_cur_model_mat_pos=0;
 		m_max_model_mat_pos = mat_size*(init_model_mat_count - 1);
 		Matrix.setIdentityM(m_model_mat, m_cur_model_mat_pos);
+		
+		onSurfaceChanged(screen_width, screen_height);
+	}
+	
+	public void onSurfaceChanged(float screen_width, float screen_height) {
+		m_screen_width = screen_width;
+		m_screen_height = screen_height;
 	}
 	
 	
