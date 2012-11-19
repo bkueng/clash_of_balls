@@ -39,6 +39,33 @@ public class MenuItemKeyboard extends MenuItem {
 
   		//hide keyboard : getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		 */
+
+		/*
+		 to receive key events: 
+		 	in the activity: pass the event via queueEvent (like touch event) to renderer
+				, then to UIHandler then to menu ...
+				-> add dispatchKeyEvent func to ITouchInput
+			do in the activity:
+
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent KEvent) 
+			{
+				int keyaction = KEvent.getAction();
+
+				if(keyaction == KeyEvent.ACTION_DOWN)
+				{
+					int keycode = KEvent.getKeyCode();
+					int keyunicode = KEvent.getUnicodeChar(KEvent.getMetaState() );
+					char character = (char) keyunicode;
+
+					System.out.println("DEBUG MESSAGE KEY=" + character + " KEYCODE=" +  keycode);
+				}
+
+
+				return super.dispatchKeyEvent(KEvent);
+			}
+
+		*/
 	}
 
 }
