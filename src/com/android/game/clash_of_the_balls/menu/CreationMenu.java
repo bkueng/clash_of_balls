@@ -5,12 +5,25 @@ import android.util.Log;
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.Vector;
+import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 
 public class CreationMenu extends GameMenuBase {
 	
 	private String LOG_TAG="debug";
 	
-	MenuItem m_test_button;
+	MenuItem m_create_button;
+	MenuItem m_cancel_button;
+	
+	//Grp1 of Buttons: Levels
+	MenuItemGreyButton m_first_lvl_button;
+	MenuItemGreyButton m_second_lvl_button;
+//	MenuItemGreyButton m_thrid_lvl_button;
+	
+	//Grp2 of Buttons: Rounds
+	MenuItemGreyButton m_1round_button;
+	MenuItemGreyButton m_2rounds_button;
+	MenuItemGreyButton m_4rounds_button;
+	MenuItemGreyButton m_10rounds_button;
 	
 	public CreationMenu(Font2D item_font, MenuBackground background
 			, float screen_width, float screen_height,TextureManager m_tex_manager) {
@@ -27,9 +40,64 @@ public class CreationMenu extends GameMenuBase {
 		float button_width = size.x * 0.45f;
 		float button_height=0.2f*button_width;
 		float distanceButtons = screen_height/34.f;
+
+		float grey_button_width = size.x*0.1f;
+		float grey_button_height = grey_button_width;
 		
-		m_menu_items.add(m_test_button = new MenuItemButton(
-				new Vector(pos.x+size.x/2.f, pos.y+size.y*3.f/5.f),
+		float offset_y = size.y*0.025f;
+		
+		//Group 1
+		m_menu_items.add(m_first_lvl_button = new MenuItemGreyButton(
+				new Vector(pos.x+size.x/3.f, pos.y+size.y/2.f+offset_y),
+				new Vector(grey_button_width, grey_button_height), 
+				m_item_font,
+				m_tex_manager));
+		
+		m_menu_items.add(m_second_lvl_button = new MenuItemGreyButton(
+				new Vector(pos.x+size.x/3.f+grey_button_width+distanceButtons, 
+						pos.y+size.y/2.f+offset_y),
+				new Vector(grey_button_width, grey_button_height), 
+				m_item_font,
+				m_tex_manager));
+		
+		
+		//Group 2
+		m_menu_items.add(m_1round_button = new MenuItemGreyButton(
+				new Vector(pos.x+size.x/3.f, pos.y+size.y/4.f+offset_y),
+				new Vector(grey_button_width, grey_button_height), 
+				m_item_font,
+				m_tex_manager));
+		
+		m_menu_items.add(m_2rounds_button = new MenuItemGreyButton(
+				new Vector(pos.x+size.x/3.f+grey_button_width+distanceButtons,
+						pos.y+size.y/4.f+offset_y),
+				new Vector(grey_button_width, grey_button_height), 
+				m_item_font,
+				m_tex_manager));
+		
+		m_menu_items.add(m_4rounds_button = new MenuItemGreyButton(
+				new Vector(pos.x+size.x/3.f+2*(grey_button_width+distanceButtons),
+						pos.y+size.y/4.f+offset_y),
+				new Vector(grey_button_width, grey_button_height), 
+				m_item_font,
+				m_tex_manager));
+		
+		m_menu_items.add(m_10rounds_button = new MenuItemGreyButton(
+				new Vector(pos.x+size.x/3.f+3*(grey_button_width+distanceButtons),
+						pos.y+size.y/4.f+offset_y),
+				new Vector(grey_button_width, grey_button_height), 
+				m_item_font,
+				m_tex_manager));
+		
+		//Last Line
+		m_menu_items.add(m_cancel_button = new MenuItemButton(
+				new Vector(pos.x+size.x*(1/2.f+0.025f), pos.y+offset_y),
+				new Vector(button_width, button_height), 
+				m_item_font,
+				m_tex_manager));
+		
+		m_menu_items.add(m_create_button = new MenuItemButton(
+				new Vector(pos.x+size.x * 0.025f, pos.y+offset_y),
 				new Vector(button_width, button_height), 
 				m_item_font,
 				m_tex_manager));
@@ -37,16 +105,35 @@ public class CreationMenu extends GameMenuBase {
 
 	@Override
 	protected void onTouchDown(MenuItem item) {
-		// do nothing
+		 if(item == m_first_lvl_button){
+				m_second_lvl_button.unpress();
+			}else if(item == m_second_lvl_button){
+				m_first_lvl_button.unpress();
+			}else if(item == m_1round_button){
+				m_2rounds_button.unpress();
+				m_4rounds_button.unpress();
+				m_10rounds_button.unpress();
+			}else if(item == m_2rounds_button){
+				m_1round_button.unpress();
+				m_4rounds_button.unpress();
+				m_10rounds_button.unpress();
+			}else if(item == m_4rounds_button){
+				m_1round_button.unpress();
+				m_2rounds_button.unpress();
+				m_10rounds_button.unpress();
+			}else if(item == m_10rounds_button){
+				m_2rounds_button.unpress();
+				m_4rounds_button.unpress();
+				m_1round_button.unpress();
+			}
 	}
 
 	@Override
 	protected void onTouchUp(MenuItem item) {
-		if(item == m_test_button) {
-			//m_ui_change = UIChange.new_menu;
-			Log.d(LOG_TAG,"I'm in CreationMenu");
-		}else{
-			Log.d(LOG_TAG,"No button pressed");
+		if(item == m_create_button) {
+			m_ui_change = UIChange.MAIN_MENU;
+		}else if(item == m_cancel_button){
+			m_ui_change = UIChange.MAIN_MENU;
 		}
 	}
 

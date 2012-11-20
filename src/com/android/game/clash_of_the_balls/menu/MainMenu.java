@@ -67,9 +67,9 @@ public class MainMenu extends GameMenuBase {
 
 	@Override
 	protected void onTouchUp(MenuItem item) {
-		if(item == m_join_button) {
+		if(item == m_host_button) {
 			m_ui_change = UIChange.CREATION_MENU;
-		}else if(item == m_host_button){
+		}else if(item == m_join_button){
 			
 		}else if(item == m_help_button){
 			
