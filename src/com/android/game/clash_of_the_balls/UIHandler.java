@@ -54,10 +54,10 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
 		
-		//m_main_menu_background = new MenuBackground(
-		//		m_tex_manager.get(R.raw.texture_main_menu_bg), 1.f);
+		m_main_menu_background = new MenuBackground(
+				m_tex_manager.get(R.raw.texture_main_menu_bg),1600.f/960.f);
 		m_main_menu = new MainMenu(m_menu_item_font, m_main_menu_background
-				, screen_width, screen_height);
+				, screen_width, screen_height,m_tex_manager);
 		
 		//TODO: init menu's , game
 		

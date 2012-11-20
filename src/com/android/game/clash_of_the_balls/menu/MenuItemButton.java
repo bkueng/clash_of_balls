@@ -3,7 +3,9 @@ package com.android.game.clash_of_the_balls.menu;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
@@ -17,29 +19,27 @@ public class MenuItemButton extends MenuItem {
 	
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
-	private boolean pressed=false;
-	private VertexBufferFloat m_color_data;
-	private VertexBufferFloat m_position_data;
+	private boolean m_pressed=false;
 
-	public MenuItemButton(Vector position, Vector size, Font2D font,TextureManager m_tex_manager) {
+
+	public MenuItemButton(Vector position, Vector size,
+			Font2D font,TextureManager m_tex_manager) {
 		super(position, size, font);
-		m_texture_pressed=m_tex_manager.get(com.android.game.clash_of_the_balls.R.raw.texture_main_menu_pressed_button);
-		m_texture_unpressed=m_tex_manager.get(com.android.game.clash_of_the_balls.R.raw.texture_main_menu_unpressed_button);
-		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
+		m_texture_pressed=m_tex_manager
+				.get(R.raw.texture_main_menu_pressed_button);
+		m_texture_unpressed=m_tex_manager
+				.get(R.raw.texture_main_menu_unpressed_button);
+		m_position_data = new VertexBufferFloat
+				(VertexBufferFloat.sprite_position_data, 3);
+		m_color_data = new VertexBufferFloat
+				(VertexBufferFloat.sprite_color_data_white, 4);
 	}
 
-	public boolean isPressed(){return pressed;}
+	public boolean isPressed(){return m_pressed;}
 
-	public void draw(RenderHelper renderer) {
-		
-		
-		Log.d(LOG_TAG,"drawing in: "+String.valueOf(m_position.x)+" "+String.valueOf(m_position.y));
-		Log.d(LOG_TAG,"drawing in: "+String.valueOf(this.size().x)+" "+String.valueOf(this.size().y));
-		
-		
+	public void draw(RenderHelper renderer) {		
 		Texture m_texture;
-		if(pressed){
+		if(m_pressed){
 			m_texture=m_texture_pressed;
 		}else{
 			m_texture=m_texture_unpressed;
@@ -72,6 +72,13 @@ public class MenuItemButton extends MenuItem {
 
 	public void move(float dsec) {
 		// nothing to do
+	}
+	public void select() {
+		m_pressed =true;
+	}
+	
+	public void deselect(){
+		m_pressed =false;
 	}
 
 }

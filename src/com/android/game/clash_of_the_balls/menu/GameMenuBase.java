@@ -48,7 +48,8 @@ public abstract class GameMenuBase implements UIBase {
 				}
 			} else {
 				if(event == MotionEvent.ACTION_UP) {
-					//if touch Up is outside the item, it must be deselected here
+					//if touch Up is outside the item, it must be 
+					//deselected here
 					item.deselect();
 				}
 			}
@@ -63,10 +64,10 @@ public abstract class GameMenuBase implements UIBase {
 	}
 
 	public void draw(RenderHelper renderer) {
-		for(int i=0; i<m_menu_items.size(); ++i)
-			m_menu_items.get(i).draw(renderer);
-		
 		if(m_background != null) m_background.draw(renderer);
+		
+		for(int i=0; i<m_menu_items.size(); ++i) 
+			m_menu_items.get(i).draw(renderer);
 	}
 	
 	//these methods are called whenever an item is touched
