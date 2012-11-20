@@ -23,9 +23,11 @@ public class MainMenu extends GameMenuBase {
 		
 		
 		//add menu items
+		float button_width = size.x * 0.2f;
+		float button_height=0.394f*button_width;
 		m_menu_items.add(m_test_button = new MenuItemButton(
-				new Vector(pos.x+size.x / 2.f, pos.y),
-				new Vector(size.x / 2.f, size.y / 2.f), 
+				new Vector(pos.x+size.x / 2.f, pos.y+size.y / 2.f),
+				new Vector(button_width, button_height), 
 				m_item_font,
 				m_tex_manager));
 		
