@@ -28,32 +28,32 @@ public class MainMenu extends GameMenuBase {
 		
 		
 		//add menu items
-		float button_width = size.x * 0.3f;
-		float button_height=0.3f*button_width;
+		float button_width = size.x * 0.45f;
+		float button_height=0.2f*button_width;
 		float distanceButtons = screen_height/34.f;
 		
 		m_menu_items.add(m_host_button = new MenuItemButton(
-				new Vector(pos.x+size.x*2.f/ 3.f, pos.y+size.y*3.f/5.f),
+				new Vector(pos.x+size.x/2.f, pos.y+size.y*3.f/5.f),
 				new Vector(button_width, button_height), 
 				m_item_font,
 				m_tex_manager));
 		
 		m_menu_items.add(m_join_button = new MenuItemButton(
-				new Vector(pos.x+size.x*2.f/ 3.f,
+				new Vector(pos.x+size.x/2.f,
 						pos.y+size.y*3.f/5.f-(button_height+distanceButtons)),
 				new Vector(button_width, button_height), 
 				m_item_font,
 				m_tex_manager));
 		
 		m_menu_items.add(m_help_button = new MenuItemButton(
-				new Vector(pos.x+size.x*2.f/ 3.f, 
+				new Vector(pos.x+size.x/2.f, 
 						pos.y+size.y*3.f/5.f-2*(button_height+distanceButtons)),
 				new Vector(button_width, button_height), 
 				m_item_font,
 				m_tex_manager));
 		
 		m_menu_items.add(m_credits_button = new MenuItemButton(
-				new Vector(pos.x+size.x*2.f/ 3.f, 
+				new Vector(pos.x+size.x/2.f, 
 						pos.y+size.y*3.f/5.f-3*(button_height+distanceButtons)),
 				new Vector(button_width, button_height), 
 				m_item_font,
