@@ -1,6 +1,7 @@
 package com.android.game.clash_of_the_balls.menu;
 
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.game.GameObject;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
@@ -11,7 +12,9 @@ import com.android.game.clash_of_the_balls.game.Vector;
  *
  */
 public class MenuItem extends GameObject {
-	//font, string, texture (?) ...
+
+	protected VertexBufferFloat m_color_data;
+	protected VertexBufferFloat m_position_data;
 	
 	private Vector m_size = new Vector();
 	
