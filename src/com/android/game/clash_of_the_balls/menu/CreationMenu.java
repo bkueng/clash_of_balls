@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls.menu;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
@@ -10,6 +11,8 @@ import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 public class CreationMenu extends GameMenuBase {
 	
 	private String LOG_TAG="debug";
+	
+	private GameSettings m_settings;
 	
 	MenuItem m_create_button;
 	MenuItem m_cancel_button;
@@ -26,15 +29,17 @@ public class CreationMenu extends GameMenuBase {
 	MenuItemGreyButton m_10rounds_button;
 	
 	public CreationMenu(Font2D item_font, MenuBackground background
-			, float screen_width, float screen_height,TextureManager m_tex_manager) {
+			, float screen_width, float screen_height,TextureManager m_tex_manager,GameSettings settings) {
 		super(item_font, background);
 		
 		Vector pos=new Vector(0.f, 0.f);
 		Vector size=new Vector(screen_width, screen_height);
 		
+		m_settings=settings;
+		
+		
 		if(m_background != null)
 			m_background.getViewport(screen_width, screen_height, pos, size);
-		
 		
 		//add menu items
 		float button_width = size.x * 0.45f;
@@ -131,8 +136,10 @@ public class CreationMenu extends GameMenuBase {
 	@Override
 	protected void onTouchUp(MenuItem item) {
 		if(item == m_create_button) {
-			m_ui_change = UIChange.MAIN_MENU;
+			m_settings.is_host=true;
+			m_ui_change = UIChange.WAIT_MENU;
 		}else if(item == m_cancel_button){
+			m_settings.is_host=false;
 			m_ui_change = UIChange.MAIN_MENU;
 		}
 	}

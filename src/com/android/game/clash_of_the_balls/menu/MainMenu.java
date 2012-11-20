@@ -70,7 +70,7 @@ public class MainMenu extends GameMenuBase {
 		if(item == m_host_button) {
 			m_ui_change = UIChange.CREATION_MENU;
 		}else if(item == m_join_button){
-			
+			m_ui_change = UIChange.JOIN_MENU;
 		}else if(item == m_help_button){
 			
 		}else if(item == m_credits_button){

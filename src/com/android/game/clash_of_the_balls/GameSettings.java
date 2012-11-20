@@ -7,6 +7,8 @@ package com.android.game.clash_of_the_balls;
  */
 public class GameSettings {
 	public String user_name="";
+	
+	public boolean is_host=false;
 	//TODO: level, ...
 	
 	public int m_screen_width;
