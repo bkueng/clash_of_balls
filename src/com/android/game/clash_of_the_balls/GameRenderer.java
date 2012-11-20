@@ -41,8 +41,8 @@ public class GameRenderer implements GLSurfaceView.Renderer {
         
         //init GL
         
-        //GLES20.glEnable(GLES20.GL_BLEND);
-        //GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         
         // culling
         GLES20.glEnable(GLES20.GL_CULL_FACE);
