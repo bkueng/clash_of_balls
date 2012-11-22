@@ -71,7 +71,7 @@ public class Font2D implements IDrawable {
 	public Bitmap createFontBitmap() {
 		
 		// Create an empty, mutable bitmap
-		Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_4444);
+		Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
 		// get a canvas to paint over the bitmap
 		Canvas canvas = new Canvas(bitmap);
 		bitmap.eraseColor(0);
