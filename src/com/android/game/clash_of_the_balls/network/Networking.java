@@ -1092,8 +1092,7 @@ public class Networking {
         	return;
         }
         
-        //SignalEmitter emitter = new SignalEmitter(m_network_service, wellKnownNameToJoin, 
-        SignalEmitter emitter = new SignalEmitter(m_network_service,  
+        SignalEmitter emitter = new SignalEmitter(m_network_service, wellKnownNameToJoin, 
         		mUseSessionId, SignalEmitter.GlobalBroadcast.Off);
         mChatInterface = emitter.getInterface(AlljoynInterface.class);
         
