@@ -1,6 +1,7 @@
 package com.android.game.clash_of_the_balls;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.opengl.GLES20;
 
 import com.android.game.clash_of_the_balls.game.RenderHelper;
@@ -19,6 +20,10 @@ public class TextureBase {
 		m_activity_context = activity_context;
 		m_tex_handle = loadTexture(raw_res_id);
 		m_raw_res_id = raw_res_id;
+	}
+	
+	public TextureBase(Bitmap bitmap) {
+		m_tex_handle = TextureHelper.loadTextureFromBitmap(bitmap);
 	}
 	
 	public void reloadTexture() {

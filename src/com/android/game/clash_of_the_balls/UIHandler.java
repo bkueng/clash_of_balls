@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.game.IDrawable;
@@ -59,7 +60,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_fps_counter = new FPSCounter();
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
-		m_menu_item_font = new Font2D();
+		m_menu_item_font = new Font2D(m_tex_manager, Typeface.createFromAsset(m_activity_context.getAssets(), "arial.ttf"),
+				"Hello World!", 20, 255, 255, 255, 255);
 		
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
@@ -132,6 +134,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 
 	public void draw(RenderHelper renderer) {
 		if(m_active_ui != null) m_active_ui.draw(renderer);
+		m_menu_item_font.draw(renderer);
 	}
 
 	public void onTouchEvent(float x, float y, int event) {

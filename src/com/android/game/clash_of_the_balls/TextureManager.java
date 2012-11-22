@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 /**
@@ -44,6 +45,12 @@ public class TextureManager {
 			return ret;
 		}
 		return new Texture(texture, tex_coords);
+	}
+	
+	public Texture get(Bitmap bitmap, float[] tex_coords) {
+		TextureBase tex = new TextureBase(bitmap);
+		Texture ret = new Texture(tex, tex_coords);
+		return ret;
 	}
 	
 }
