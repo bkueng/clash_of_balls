@@ -8,8 +8,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 
 public class MainActivity extends Activity {
+	
+	private static final String LOG_TAG="MainActivity";
 
     private GLSurfaceView m_gl_view;
     
@@ -26,6 +29,11 @@ public class MainActivity extends Activity {
         // as the ContentView for this Activity
         m_gl_view = new MyGLSurfaceView(this);
         setContentView(m_gl_view);
+        
+        //start the network service
+        Intent intent = new Intent(this, NetworkService.class);
+        if(startService(intent)==null)
+        	Log.e(LOG_TAG, "Failed to start NetworkService");
     }
     
     @Override
@@ -45,6 +53,12 @@ public class MainActivity extends Activity {
         // If you de-allocated graphic objects for onPause()
         // this is a good place to re-allocate them.
         m_gl_view.onResume();
+    }
+    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    	stopService(new Intent(this, NetworkService.class));
     }
 
 }
