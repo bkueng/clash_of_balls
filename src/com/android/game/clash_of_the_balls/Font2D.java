@@ -24,14 +24,16 @@ public class Font2D implements IDrawable {
 	
 	private Texture m_texture;
 	private Typeface m_typeface;
+	private String m_string;
+	private int m_font_size;
 	private int m_alpha;
 	private int m_red;
 	private int m_green;
 	private int m_blue;
 
-	private String m_string;
-	private int m_font_size;
 	private TextureManager m_texture_manager;
+	private VertexBufferFloat m_position_data;
+	private VertexBufferFloat m_color_data;
 	
 	/**
 	 * Creates 2D font
@@ -44,6 +46,8 @@ public class Font2D implements IDrawable {
 	public Font2D(TextureManager texture_manager, Typeface typeface, String string, int font_size, int red, int green, int blue, int alpha) {
 		
 		m_texture_manager = texture_manager;
+		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
+		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
 		doInit(typeface, string, font_size, red, green, blue, alpha);
 
@@ -92,6 +96,21 @@ public class Font2D implements IDrawable {
 		
 		renderer.shaderManager().activateTexture(0);
 		m_texture.useTexture(renderer);
+		
+		// position
+		int position_handle = renderer.shaderManager().a_Position_handle;
+		if(position_handle != -1)
+			m_position_data.apply(position_handle);
+		
+		// color
+		int color_handle = renderer.shaderManager().a_Color_handle;
+		if(color_handle != -1)
+			m_color_data.apply(color_handle);
+		
+		renderer.apply();
+		
+        // Draw
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
 		Log.d(LOG_TAG, "draw font...");
 	}
