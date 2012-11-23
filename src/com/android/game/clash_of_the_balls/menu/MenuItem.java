@@ -53,13 +53,9 @@ public class MenuItem extends GameObject {
 	}
 	
 	public void select() {
-		//TODO
-		
 	}
 	
 	public void deselect() {
-		//TODO
-		
 	}
 
 }
