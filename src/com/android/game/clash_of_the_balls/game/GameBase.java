@@ -10,6 +10,8 @@ import com.android.game.clash_of_the_balls.TextureManager;
  * most of the game logic is implemented here
  */
 public class GameBase {
+	private static final String TAG = "GameBase";
+	
 	protected GameSettings m_settings;
 	
 	protected GameView m_game_view;
