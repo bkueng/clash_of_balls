@@ -36,7 +36,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private UIBase m_creation_menu_ui;
 	private UIBase m_wait_menu_ui;
 	private UIBase m_join_menu_ui;
-	private UIBase m_game_ui;
+	private Game m_game_ui;
 	
 	private Font2D m_menu_item_font;
 	private MenuBackground m_main_menu_background;
@@ -128,6 +128,11 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			new_ui.onActivate();
 			m_active_ui = new_ui;
 		}
+	}
+	
+	public void onDestroy() {
+		if(m_game_ui!=null) m_game_ui.onDestroy();
+		m_game_ui=null;
 	}
 
 	public void draw(RenderHelper renderer) {

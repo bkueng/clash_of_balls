@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
 	
 	private static final String LOG_TAG="MainActivity";
 
-    private GLSurfaceView m_gl_view;
+    private MyGLSurfaceView m_gl_view;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +59,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
     	super.onDestroy();
     	stopService(new Intent(this, NetworkService.class));
+    	m_gl_view.onDestroy();
     }
 
 }
@@ -82,6 +83,14 @@ class MyGLSurfaceView extends GLSurfaceView {
 
         
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+    }
+    
+    public void onDestroy() {
+    	queueEvent(new Runnable() {
+			public void run() {
+				m_renderer.onDestroy();
+			}
+    	});
     }
 
     @Override

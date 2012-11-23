@@ -33,6 +33,10 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     public GameRenderer(Context activity_context) {
     	m_activity_context = activity_context;
     }
+    
+    public void onDestroy() {
+    	m_ui_handler.onDestroy();
+    }
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 

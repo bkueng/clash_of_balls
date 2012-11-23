@@ -17,6 +17,9 @@ public class Game extends GameBase implements UIBase {
 		
 		//TODO: use gravity sensor
 	}
+	
+	public void onDestroy() {
+	}
 
 	public void onTouchEvent(float x, float y, int event) {
 		// that's not used in the game
