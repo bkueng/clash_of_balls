@@ -1141,16 +1141,13 @@ public class Networking {
          * method is only used as a signal emitter, it will never be called
          * directly.
 	     */
-		@Override
 		@BusSignal
 		public void sensorUpdate(int ack_seq_num, double pos_x, double pos_y)
 				throws BusException { }
 		
-		@Override
 		@BusSignal
 		public void ack(int ack_seq_num) throws BusException { }
 		
-		@Override
 		@BusSignal
 		public void gameCommand(byte[] data) throws BusException { }     
     }

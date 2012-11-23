@@ -1,5 +1,6 @@
 package com.android.game.clash_of_the_balls.menu;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
@@ -17,6 +18,8 @@ public class CreationMenu extends GameMenuBase {
 	MenuItem m_create_button;
 	MenuItem m_cancel_button;
 	
+	MenuItemKeyboard m_name_button;
+	
 	//Grp1 of Buttons: Levels
 	MenuItemGreyButton m_first_lvl_button;
 	MenuItemGreyButton m_second_lvl_button;
@@ -29,8 +32,9 @@ public class CreationMenu extends GameMenuBase {
 	MenuItemGreyButton m_10rounds_button;
 	
 	public CreationMenu(Font2D item_font, MenuBackground background
-			, float screen_width, float screen_height,TextureManager m_tex_manager,GameSettings settings) {
-		super(item_font, background);
+			, float screen_width, float screen_height,
+			TextureManager m_tex_manager,GameSettings settings,Context context) {
+		super(item_font, background,context);
 		
 		Vector pos=new Vector(0.f, 0.f);
 		Vector size=new Vector(screen_width, screen_height);
@@ -50,6 +54,17 @@ public class CreationMenu extends GameMenuBase {
 		float grey_button_height = grey_button_width;
 		
 		float offset_y = size.y*0.025f;
+		
+		//Name
+		m_menu_items.add(m_name_button = new MenuItemKeyboard(
+				new Vector(pos.x+size.x/3.f, pos.y+size.y*3.f/4.f+offset_y),
+				new Vector(5*grey_button_width, grey_button_height), 
+				m_item_font,
+				m_tex_manager,
+				m_activity_context,
+				"Please Enter your Nickname:"));
+		
+		
 		
 		//Group 1
 		m_menu_items.add(m_first_lvl_button = new MenuItemGreyButton(
