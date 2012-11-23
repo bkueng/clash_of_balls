@@ -26,11 +26,15 @@ import com.android.game.clash_of_the_balls.game.Vector;
  */
 public class MenuItemKeyboard extends MenuItem {
 
+	
+	private String LOG_TAG = "debug";
+	
 	private Context m_activity_context;
 	private Texture m_texture;
 	private TextureManager m_tex_manager;
 	private String m_dialog_text;
 	private String m_text_input;
+
 	
 	public MenuItemKeyboard(Vector position, Vector size, Font2D font, 
 			TextureManager tex_manager
@@ -45,6 +49,10 @@ public class MenuItemKeyboard extends MenuItem {
 				(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_color_data_white, 4);
+	}
+	
+	public String getString(){
+		return m_text_input;
 	}
 	
 	public void onTouchDown(float x, float y) {
@@ -69,6 +77,7 @@ public class MenuItemKeyboard extends MenuItem {
             	alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             	public void onClick(DialogInterface dialog, int whichButton) {
             	  m_text_input = input.getText().toString();
+            	  Log.d(LOG_TAG,"Text input: "+m_text_input);
             	  }
             	});
 

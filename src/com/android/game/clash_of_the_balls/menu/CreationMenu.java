@@ -64,8 +64,6 @@ public class CreationMenu extends GameMenuBase {
 				m_activity_context,
 				"Please Enter your Nickname:"));
 		
-		
-		
 		//Group 1
 		m_menu_items.add(m_first_lvl_button = new MenuItemGreyButton(
 				new Vector(pos.x+size.x/3.f, pos.y+size.y/2.f+offset_y),
@@ -152,6 +150,7 @@ public class CreationMenu extends GameMenuBase {
 	protected void onTouchUp(MenuItem item) {
 		if(item == m_create_button) {
 			m_settings.is_host=true;
+			m_settings.user_name=m_name_button.getString();
 			m_ui_change = UIChange.WAIT_MENU;
 		}else if(item == m_cancel_button){
 			m_settings.is_host=false;
