@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.android.game.clash_of_the_balls.game.Game;
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.IMoveable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
@@ -68,23 +69,23 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_main_menu_background = new MenuBackground(
 				m_tex_manager.get(R.raw.texture_main_menu_bg),1600.f/960.f);
 		m_main_menu = new MainMenu(m_menu_item_font, m_main_menu_background
-				, screen_width, screen_height,m_tex_manager);
+				, screen_width, screen_height,m_tex_manager,m_activity_context);
 		
 		//Creation Menu
 		m_normal_menu_background = new MenuBackground(
 				m_tex_manager.get(R.raw.texture_bg_normal),1600.f/960.f);
 		m_creation_menu_ui = new CreationMenu
 				(m_menu_item_font, m_normal_menu_background
-				, screen_width, screen_height,m_tex_manager,m_settings);
+				, screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
 		
 		//Wait Menu
 		m_wait_menu_ui = new WaitMenu(m_menu_item_font, m_normal_menu_background
-				, screen_width, screen_height,m_tex_manager,m_settings);
+				, screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
 
 		
 		//Join Menu
 		m_join_menu_ui = new JoinMenu(m_menu_item_font, m_normal_menu_background
-				, screen_width, screen_height,m_tex_manager);
+				, screen_width, screen_height,m_tex_manager,m_activity_context);
 		
 		
 		//TODO: init menu's , game

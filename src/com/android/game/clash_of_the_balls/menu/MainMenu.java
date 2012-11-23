@@ -1,5 +1,6 @@
 package com.android.game.clash_of_the_balls.menu;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
@@ -17,8 +18,9 @@ public class MainMenu extends GameMenuBase {
 	MenuItem m_credits_button;
 	
 	public MainMenu(Font2D item_font, MenuBackground background
-			, float screen_width, float screen_height,TextureManager m_tex_manager) {
-		super(item_font, background);
+			, float screen_width, float screen_height,
+			TextureManager m_tex_manager,Context context) {
+		super(item_font, background,context);
 		
 		Vector pos=new Vector(0.f, 0.f);
 		Vector size=new Vector(screen_width, screen_height);

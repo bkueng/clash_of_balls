@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls.menu;
 
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -24,13 +25,15 @@ public abstract class GameMenuBase implements UIBase {
 	protected ArrayList<MenuItem> m_menu_items = new ArrayList<MenuItem>();
 	protected MenuBackground m_background;
 	protected Font2D m_item_font;
+	protected Context m_activity_context;
 	
 	protected UIHandler.UIChange m_ui_change;
 	
-	public GameMenuBase(Font2D item_font, MenuBackground background) {
+	public GameMenuBase(Font2D item_font, MenuBackground background,Context context) {
 		m_item_font = item_font;
 		m_ui_change = UIChange.NO_CHANGE;
 		m_background = background;
+		m_activity_context=context;
 	}
 
 	public void onTouchEvent(float x, float y, int event) {
