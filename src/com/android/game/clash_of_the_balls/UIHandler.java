@@ -4,6 +4,7 @@ package com.android.game.clash_of_the_balls;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.game.IDrawable;
@@ -134,7 +135,14 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 
 	public void draw(RenderHelper renderer) {
 		if(m_active_ui != null) m_active_ui.draw(renderer);
+		
+		int model_mat_pos = renderer.pushModelMat();
+		float model_mat[] = renderer.modelMat();
+		Matrix.setIdentityM(model_mat, model_mat_pos);
+		Matrix.translateM(model_mat, model_mat_pos, 30.f, 30.f, 0.f);
+		Matrix.scaleM(model_mat, model_mat_pos, 300.f, 150.f, 0.f);
 		m_menu_item_font.draw(renderer);
+		renderer.popModelMat();
 	}
 
 	public void onTouchEvent(float x, float y, int event) {

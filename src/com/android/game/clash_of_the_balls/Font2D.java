@@ -84,7 +84,8 @@ public class Font2D implements IDrawable {
 		textPaint.setARGB(m_alpha, m_red, m_green, m_blue);
 		
 		// draw the text centered
-		canvas.drawText(m_string, 0, 0, textPaint);
+		canvas.drawText(m_string, 50, 50, textPaint);
+		
 		
 		Log.d(LOG_TAG, "fontBitmap created...");
 		
