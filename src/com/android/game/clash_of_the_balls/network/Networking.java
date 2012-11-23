@@ -560,6 +560,12 @@ public class Networking {
      */
     private void stopBusThread() {
         m_background_handler.exit();
+        //wait for the background thread to quit
+        try {
+			m_background_handler.getLooper().getThread().join(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
     }
     
     /**
@@ -567,7 +573,7 @@ public class Networking {
      * clients.  Pretty much all communiation with AllJoyn is going to go through
      * this obejct.
      */
-    private BusAttachment mBus;
+    private volatile BusAttachment mBus;
     
     /**
      * The well-known name prefix which all bus attachments hosting a channel
