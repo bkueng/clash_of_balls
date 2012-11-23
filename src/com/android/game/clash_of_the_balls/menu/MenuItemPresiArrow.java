@@ -13,29 +13,62 @@ import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
 
-public class MenuItemGreyButton extends MenuItem {
+public class MenuItemPresiArrow extends MenuItem{
 
 	private String LOG_TAG = "debug";
 	
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
 	private boolean m_pressed=false;
+	private PresiArrow m_type;
 
-
-	public MenuItemGreyButton(Vector position, Vector size,
-			Font2D font,TextureManager m_tex_manager) {
+	public enum PresiArrow{
+		RIGHT,
+		LEFT
+	}
+	
+	
+	
+	
+	public MenuItemPresiArrow(Vector position, Vector size,
+			Font2D font,TextureManager m_tex_manager,PresiArrow type) {
 		super(position, size, font);
-		m_texture_pressed=m_tex_manager
-				.get(R.raw.texture_grey_pressed_button);
-		m_texture_unpressed=m_tex_manager
-				.get(R.raw.texture_grey_unpressed_button);
+	
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_color_data_white, 4);
+		m_type=type;
+		
+		switch(type){
+		case RIGHT:
+			m_texture_pressed=m_tex_manager
+			.get(R.raw.texture_presiright_pressed_button);
+	m_texture_unpressed=m_tex_manager
+			.get(R.raw.texture_presiright_unpressed_button);
+		break;
+		case LEFT:
+			m_texture_pressed=m_tex_manager
+			.get(R.raw.texture_presileft_pressed_button);
+	m_texture_unpressed=m_tex_manager
+			.get(R.raw.texture_presileft_unpressed_button);
+		break;
+		}
+
 	}
 
-
+	public void move(float dsec) {
+		// nothing to do
+	}
+	public void select() {
+		m_pressed =true;
+	}
+	
+	public void deselect(){
+		m_pressed=false;
+	}
+	
+	
 	
 	public void draw(RenderHelper renderer) {		
 		Texture m_texture;
@@ -69,21 +102,4 @@ public class MenuItemGreyButton extends MenuItem {
         renderer.popModelMat();
 	}
 
-	public void move(float dsec) {
-		// nothing to do
-	}
-	public void select() {
-		m_pressed =true;
-	}
-	
-	public void deselect(){
-		
-	}
-
-	public boolean isPressed(){return m_pressed;}
-
-public void remain_unpressed(){
-	m_pressed=false;
-	}
-	
 }

@@ -15,7 +15,7 @@ import com.android.game.clash_of_the_balls.game.Vector;
 
 public class MenuItemButton extends MenuItem {
 
-	private String LOG_TAG = "MenuItemButton";
+	private String LOG_TAG = "debug";
 	
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;

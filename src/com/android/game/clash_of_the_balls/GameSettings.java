@@ -9,6 +9,8 @@ public class GameSettings {
 	public String user_name="";
 	
 	public boolean is_host=false;
+	
+	public int rounds_idx;
 	//TODO: level, ...
 	
 	public int m_screen_width;
