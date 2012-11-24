@@ -7,9 +7,12 @@ import android.content.DialogInterface;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.support.v4.content.Loader.ForceLoadContentObserver;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameSettings;
@@ -34,6 +37,9 @@ public class MenuItemKeyboard extends MenuItem {
 	private TextureManager m_tex_manager;
 	private String m_dialog_text;
 	private String m_text_input;
+	
+	private String m_regex = "^[a-zA-Z0-9]+$";
+	private String m_regex_msg = "Please enter only letters or numbers";
 
 	
 	public MenuItemKeyboard(Vector position, Vector size, Font2D font, 
@@ -72,6 +78,20 @@ public class MenuItemKeyboard extends MenuItem {
 
             	// Set an EditText view to get user input 
             	final EditText input = new EditText(m_activity_context);
+            	input.setSingleLine();
+            	input.addTextChangedListener(new TextValidator(input) {
+            	    @Override
+            	    public String validate(EditText textView, String text) {
+            	    	Log.d(LOG_TAG,"validate+ "+text);	    	
+            	    	if(text.length()>0){
+            	    	if(!text.matches(m_regex)){
+            	    		text=text.substring(0,text.length()-1);
+            	    		Toast.makeText(m_activity_context, m_regex_msg, Toast.LENGTH_SHORT).show();
+            	    	}}
+						return text;
+            	    }
+            	});
+            	
             	alert.setView(input);
 
             	alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -89,6 +109,29 @@ public class MenuItemKeyboard extends MenuItem {
 
             	alert.show();
             }
+            
+            abstract class TextValidator implements TextWatcher {
+                private EditText textView;
+
+                public TextValidator(EditText textView) {
+                    this.textView = textView;
+                }
+
+                public abstract String validate(EditText textView, String text);
+
+                final public void afterTextChanged(Editable s) {
+                    String text = textView.getText().toString();
+                    String newString = validate(textView, text);
+                    textView.setSelection(text.length());
+                    if(!newString.equals(text))textView.setText(newString);
+                   
+                }
+
+                final public void beforeTextChanged(CharSequence s, int start, int count, int after) { /* Don't care */ }
+
+                final public void onTextChanged(CharSequence s, int start, int before, int count) { /* Don't care */ }
+            }
+            
          }
   );
 
