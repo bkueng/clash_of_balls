@@ -1,5 +1,8 @@
 package com.android.game.clash_of_the_balls.game;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
@@ -14,11 +17,13 @@ public class GameBase {
 	
 	protected GameSettings m_settings;
 	
-	protected GameView m_game_view;
+	protected GameField m_game_field;
 	
 	public final boolean is_server;
 	
-	//map with dynamicGameObject (key is id)
+	//the moveable game objects: key is the object id
+	protected Map<Integer, DynamicGameObject> m_game_objects =
+			new TreeMap<Integer, DynamicGameObject>();
 	protected int m_next_object_id;
 	
 	
@@ -27,10 +32,11 @@ public class GameBase {
 		m_settings = s;
 	}
 	
-	protected void initGame(GameLevel level, TextureManager texture_manager) {
-		//TODO: level, ...
-		//players
-		//m_next_object_id
+	public void initGame(GameLevel level, TextureManager texture_manager) {
+		m_game_field = new GameField(texture_manager);
+		m_next_object_id = m_game_field.init(level, 1);
+		//TODO
+		//players & id
 	}
 	//TODO: game logic
 	
