@@ -1,5 +1,9 @@
 package com.android.game.clash_of_the_balls;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +18,7 @@ public class MainActivity extends Activity {
 	
 	private static final String LOG_TAG="MainActivity";
 
+	private ProgressDialog progressDialog;
     private MyGLSurfaceView m_gl_view;
     
     @Override
@@ -25,6 +30,8 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        
+        new LoadViewTask().execute();    
         // Create a GLSurfaceView instance and set it
         // as the ContentView for this Activity
         m_gl_view = new MyGLSurfaceView(this);
@@ -60,6 +67,90 @@ public class MainActivity extends Activity {
     	super.onDestroy();
     	stopService(new Intent(this, NetworkService.class));
     	m_gl_view.onDestroy();
+    }
+
+    
+    private class LoadViewTask extends AsyncTask<Void, Integer, Void>
+    {
+    	
+    	private int m_time = 2000;
+    	//Before running code in the separate thread
+		@Override
+		protected void onPreExecute() 
+		{
+			//Create a new progress dialog
+			progressDialog = new ProgressDialog(MainActivity.this);
+			//Set the progress dialog to display a horizontal progress bar 
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			//Set the dialog title to 'Loading...'
+			progressDialog.setTitle("Loading Game...");
+			//Set the dialog message to 'Loading application View, please wait...'
+			progressDialog.setMessage("Please wait...");
+			//This dialog can't be canceled by pressing the back key
+			progressDialog.setCancelable(false);
+			//This dialog isn't indeterminate
+			progressDialog.setIndeterminate(false);
+			//The maximum number of items is 100
+			progressDialog.setMax(100);
+			//Set the current progress to zero
+			progressDialog.setProgress(0);
+			//Display the progress dialog
+			progressDialog.show();
+		}
+		
+		//The code to be executed in a background thread.
+		@Override
+		protected Void doInBackground(Void... params) 
+		{
+			/* This is just a code that delays the thread execution 4 times, 
+			 * during 850 milliseconds and updates the current progress. This 
+			 * is where the code that is going to be executed on a background
+			 * thread must be placed. 
+			 */
+			try 
+			{
+				//Get the current thread's token
+				synchronized (this) 
+				{
+					//Initialize an integer (that will act as a counter) to zero
+					int counter = 0;
+					int step = 13;
+					//While the counter is smaller than four
+					while(counter <= m_time)
+					{
+						this.wait(step);
+						//Increment the counter 
+						counter+=step;
+						//Set the current progress. 
+						//This value is going to be passed to the onProgressUpdate() method.
+						publishProgress((int)((float)counter/(float)m_time*100));
+					}
+				}
+			} 
+			catch (InterruptedException e) 
+			{
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		//Update the progress
+		@Override
+		protected void onProgressUpdate(Integer... values) 
+		{
+			//set the current progress of the progress dialog
+			progressDialog.setProgress(values[0]);
+		}
+
+		//after executing the code in the thread
+		@Override
+		protected void onPostExecute(Void result) 
+		{
+			//close the progress dialog
+			progressDialog.dismiss();
+			//initialize the View
+			//setContentView(R.layout.main);
+		} 	
     }
 
 }
@@ -113,3 +204,5 @@ class MyGLSurfaceView extends GLSurfaceView {
         return true;
     }
 }
+
+
