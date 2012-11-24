@@ -60,6 +60,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_fps_counter = new FPSCounter();
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
+		onSurfaceChanged(screen_width, screen_height);
 		m_menu_item_font = new Font2D();
 		
 		m_level_manager = new LevelManager(m_activity_context);
@@ -90,8 +91,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		//TODO: init menu's , game
 		
-		
-		onSurfaceChanged(screen_width, screen_height);
 		m_active_ui = m_main_menu; //show main menu
 	}
 	
