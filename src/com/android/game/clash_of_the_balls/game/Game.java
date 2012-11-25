@@ -11,6 +11,7 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
+import com.android.game.clash_of_the_balls.network.NetworkClient;
 
 
 public class Game extends GameBase implements UIBase {
@@ -18,21 +19,25 @@ public class Game extends GameBase implements UIBase {
 	private SensorThread m_sensor_thread;
 	private GameView m_view;
 	
+	private NetworkClient m_network_client;
+	
 	/*
 	TODO 
 	own player -> if set: set m_view.setObjectToTrack
 	
 	*/
 	
-	public Game(Context c, GameSettings s, TextureManager texture_manager) {
-		super(false, s);
+	public Game(Context c, GameSettings s, TextureManager texture_manager, 
+			NetworkClient network_client) {
+		super(false, s, texture_manager);
 		
 		m_sensor_thread=new SensorThread(c);
 		m_sensor_thread.startThread();
+		m_network_client = network_client;
 	}
 	
-	public void initGame(GameLevel level, TextureManager texture_manager) {
-		super.initGame(level, texture_manager);
+	public void initGame(GameLevel level) {
+		super.initGame(level);
 		
 		//view: save & restore scaling if it exists
 		float scaling = -1.f;
@@ -80,6 +85,17 @@ public class Game extends GameBase implements UIBase {
 		
 		m_view.resetView(renderer);
 	}
+	
+	public void gameStartNow() {
+		//TODO
+	}
+	public void gameEnd() {
+		//TODO
+	}
+	
+	public int getNextSequenceNum() {
+		return -1; //only the server generates sequence numbers
+	}
 
 	public UIHandler.UIChange UIChange() {
 		// TODO Auto-generated method stub
@@ -94,5 +110,8 @@ public class Game extends GameBase implements UIBase {
 	public void onDeactivate() {
 		// ignore
 	}
-
+	
+	public String getUniqueNameFromPlayerId(short player_id) {
+		throw new RuntimeException("getUniqueNameFromPlayerId should not be called inside Game object");
+	}
 }
