@@ -1,6 +1,8 @@
 package com.android.game.clash_of_the_balls;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,7 +48,7 @@ public class GameLevel {
 	public int foreground(int x, int y) { return m_foreground[y*width+x]; }
 	
 	
-	//field specification:
+	//field specification: all must be <128 !
 	//fg
 	//when objects are added change GameField to load correct object
 	public static final int TYPE_EMPTY = 0;
@@ -88,6 +90,28 @@ public class GameLevel {
 		loadLevelImpl(fileReader);
 	}
 	
+	//load from network buffer
+	public void loadLevel(DataInputStream s) throws IOException {
+		width = s.readInt();
+		height = s.readInt();
+		player_count = (int)s.readShort();
+		m_background = new int[width*height];
+		m_foreground = new int[width*height];
+		for(int i=0; i<width*height; ++i) {
+			m_background[i] = (int)s.readByte();
+			m_foreground[i] = (int)s.readByte();
+		}
+	}
+	//write to network buffer
+	public void write(DataOutputStream s) throws IOException {
+		s.writeInt(width);
+		s.writeInt(height);
+		s.writeShort((short)player_count);
+		for(int i=0; i<width*height; ++i) {
+			s.writeByte(m_background[i]);
+			s.writeByte(m_foreground[i]);
+		}
+	}
 	
 	private void loadLevelImpl(Reader stream) throws Exception {
 		player_count = 0;
