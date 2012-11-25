@@ -24,7 +24,7 @@ public class StaticGameObject extends GameObject {
 	
 	public final Type m_type;
 	
-	public final int m_id; //object id: this is unique across a game
+	public final short m_id; //object id: this is unique across a game
 						   //used by the network to identify a dynamic game object
 						   //(it is not used for background objects)
 						   //the lowest id is 1
@@ -33,7 +33,8 @@ public class StaticGameObject extends GameObject {
 	protected VertexBufferFloat m_color_data;
 	protected VertexBufferFloat m_position_data;
 	
-	StaticGameObject(final int id, Vector position, Type type, Texture texture) {
+	StaticGameObject(final short id, Vector position, Type type
+			, Texture texture) {
 		super(position);
 		m_type = type;
 		m_id = id;

@@ -22,9 +22,8 @@ public class GameBase {
 	public final boolean is_server;
 	
 	//the moveable game objects: key is the object id
-	protected Map<Integer, DynamicGameObject> m_game_objects =
-			new TreeMap<Integer, DynamicGameObject>();
-	protected int m_next_object_id;
+	public Map<Short, DynamicGameObject> m_game_objects;
+	protected short m_next_object_id;
 	
 	
 	public GameBase(boolean is_server, GameSettings s) {

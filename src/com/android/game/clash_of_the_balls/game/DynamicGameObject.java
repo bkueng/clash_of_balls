@@ -17,8 +17,12 @@ public class DynamicGameObject extends StaticGameObject {
 	public Vector m_new_pos=new Vector();
 	public boolean m_has_moved = false;
 	
-	DynamicGameObject(final int id, Vector position, Type type, Texture texture) {
+	protected GameBase m_owner;
+	
+	DynamicGameObject(GameBase owner, final short id, Vector position, Type type
+			, Texture texture) {
 		super(id, position, type, texture);
+		m_owner = owner;
 	}
 
 	@Override

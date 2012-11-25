@@ -35,7 +35,7 @@ public class GameField extends GameObject {
 	
 	//returns the next object id to be used
 	//for the first game call set next_object_id to 1
-	public int init(GameLevel level, int next_object_id) {
+	public short init(GameLevel level, short next_object_id) {
 		m_width = level.width;
 		m_height = level.height;
 		
@@ -47,7 +47,7 @@ public class GameField extends GameObject {
 					int type = level.background(x, y);
 					int raw_res_id = GameLevel.rawResTexIdFromBackground(type);
 					if(raw_res_id != -1) {
-						m_bg_objects[y*m_width+x] = new StaticGameObject(-1,
+						m_bg_objects[y*m_width+x] = new StaticGameObject((short)-1,
 								new Vector((float)x+0.5f, (float)y+0.5f),
 								Type.Background,
 								m_texture_manager.get(raw_res_id));
@@ -57,7 +57,7 @@ public class GameField extends GameObject {
 		}
 		
 		//foreground
-		int object_id=next_object_id;
+		short object_id=next_object_id;
 		m_fg_objects = new StaticGameObject[m_width*m_height];
 		for(int y=0; y<m_height; ++y) {
 			for(int x=0; x<m_width; ++x) {
