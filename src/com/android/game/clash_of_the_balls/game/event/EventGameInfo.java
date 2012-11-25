@@ -8,6 +8,7 @@ import java.util.Map;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.game.DynamicGameObject;
 import com.android.game.clash_of_the_balls.game.GameBase;
+import com.android.game.clash_of_the_balls.game.GamePlayer;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 
 public class EventGameInfo extends Event {
@@ -53,6 +54,13 @@ public class EventGameInfo extends Event {
 		for (Map.Entry<Short, DynamicGameObject> entry : game.m_game_objects.entrySet()) {
 			DynamicGameObject obj = entry.getValue();
 			if(obj.m_type == Type.Player) {
+				GamePlayer player = (GamePlayer) obj;
+				m_players[i]=new PlayerInfo();
+				m_players[i].pos_x = player.pos().x;
+				m_players[i].pos_y = player.pos().y;
+				m_players[i].color = player.color();
+				m_players[i].id = player.m_id;
+				m_players[i].unique_name = game.getUniqueNameFromPlayerId(player.m_id);
 				
 				++i;
 			}
