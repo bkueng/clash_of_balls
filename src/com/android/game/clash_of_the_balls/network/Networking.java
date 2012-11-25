@@ -158,6 +158,10 @@ public class Networking {
     public String receiveServerLost() {
     	return m_server_lost.poll();
     }
+    //this is the own unique name
+    public String getUniqueName() {
+    	return mBus.getUniqueName();
+    }
     
 	public synchronized void registerEventListener(Handler h) {
 		m_event_listeners.add(h);
@@ -178,7 +182,7 @@ public class Networking {
     public static final int HANDLE_SERVER_LOST = 4;
     public static final int HANDLE_ERROR = 5;
     
-    private volatile AllJoynErrorData m_error;
+    private volatile AllJoynErrorData m_error = null;
     
     public AllJoynErrorData getError() {
     	return m_error;

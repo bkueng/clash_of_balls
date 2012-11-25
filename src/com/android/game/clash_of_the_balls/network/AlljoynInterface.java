@@ -53,6 +53,4 @@ public interface AlljoynInterface {
     @BusSignal
     public void gameCommand(byte[] data) throws BusException;
     
-    //TODO: add userJoined ???
-    
 }
