@@ -17,6 +17,9 @@ public class DynamicGameObject extends StaticGameObject {
 	public Vector m_new_pos=new Vector();
 	public boolean m_has_moved = false;
 	
+	private Vector m_speed = new Vector();
+	public Vector speed() { return m_speed; }
+	
 	protected GameBase m_owner;
 	
 	DynamicGameObject(GameBase owner, final short id, Vector position, Type type

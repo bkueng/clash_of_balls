@@ -13,7 +13,6 @@ public class GamePlayer extends DynamicGameObject {
 	
 	public int color() { return m_color; }
 	
-	private Vector m_speed = new Vector();
 	private Vector m_acceleration = new Vector();
 	
 	//TODO: add overlay texture
