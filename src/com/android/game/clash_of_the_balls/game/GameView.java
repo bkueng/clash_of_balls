@@ -44,6 +44,8 @@ public class GameView extends GameObject {
 	//       >1 = zoom in
 	//       <1 = zoom out
 	public void zoom(float amount) {
+		if(amount <= 0.f) return;
+		
 		float new_scaling = m_scaling / amount;
 		if(new_scaling > 2.f * m_output_size.x) { //restrict max zoom level 
 			new_scaling = 2.f * m_output_size.x;
