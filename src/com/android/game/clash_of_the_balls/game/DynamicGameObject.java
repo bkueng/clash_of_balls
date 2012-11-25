@@ -20,6 +20,8 @@ public class DynamicGameObject extends StaticGameObject {
 	private Vector m_speed = new Vector();
 	public Vector speed() { return m_speed; }
 	
+	private int m_impact_count = 0;
+	
 	protected GameBase m_owner;
 	
 	DynamicGameObject(GameBase owner, final short id, Vector position, Type type
@@ -38,6 +40,20 @@ public class DynamicGameObject extends StaticGameObject {
 	public void move(float dsec) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void handleImpact(DynamicGameObject other) {
+		++m_impact_count;
+	}
+	public int impactCount() { return m_impact_count; }
+	
+	
+	public void die() {
+		//TODO: dying effect ?
+		
+		m_bIs_dead = true;
+		
+		//generate event ?
 	}
 	
 	

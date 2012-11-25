@@ -34,6 +34,9 @@ public abstract class GameBase {
 	public Map<Short, DynamicGameObject> m_game_objects;
 	protected short m_next_object_id;
 	
+	public DynamicGameObject getGameObject(short id) {
+		return m_game_objects.get(id); //can return null!
+	}
 	
 	public GameBase(boolean is_server, GameSettings s, TextureManager texture_manager) {
 		this.is_server = is_server;
