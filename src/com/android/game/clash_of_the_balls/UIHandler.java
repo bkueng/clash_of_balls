@@ -62,7 +62,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
 		m_menu_item_font = new Font2D(m_tex_manager, Typeface.createFromAsset(m_activity_context.getAssets(), "arial.ttf"),
-				"Hello World!g", 50, 0, 255, 255, 255, 255);
+				"Hello World!g", 50, 255, 255, 255, 255);
 		
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();

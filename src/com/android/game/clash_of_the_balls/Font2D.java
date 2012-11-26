@@ -49,20 +49,20 @@ public class Font2D implements IDrawable {
 	 */
 	
 	public Font2D(TextureManager texture_manager, Typeface typeface, String string,
-			int font_size, int height, int red, int green, int blue, int alpha) {
+			int font_size, int red, int green, int blue, int alpha) {
 		
 		m_texture_manager = texture_manager;
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
-		doInit(typeface, string, font_size, height, red, green, blue, alpha);
+		doInit(typeface, string, font_size, red, green, blue, alpha);
 
 		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
 		
 		Log.d(LOG_TAG, "Font succesfully created");
 	}
 
-	private void doInit(Typeface typeface, String string, int font_size, int height, int red, int green, int blue, int alpha) {
+	private void doInit(Typeface typeface, String string, int font_size, int red, int green, int blue, int alpha) {
 		
 		// Set members
 		m_typeface = typeface;
@@ -79,6 +79,16 @@ public class Font2D implements IDrawable {
 		m_texture = null;
 	}
 
+	public void setString(String string) {
+		doInit(m_typeface, string, m_font_size, m_red, m_green, m_blue, m_alpha);
+		
+		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
+	}
+	
+	public void reloadTexture() {
+		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
+	}
+	
 	private Bitmap createFontBitmap() {
 
 		// Create text paint to customize font
@@ -138,7 +148,5 @@ public class Font2D implements IDrawable {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
 		renderer.popModelMat();
-        
-		//Log.d(LOG_TAG, "draw font...");
 	}
 }
