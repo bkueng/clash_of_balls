@@ -58,7 +58,7 @@ public class Networking {
 		return m_instance;
 	}
 	
-	public void init(Context context) {
+	public synchronized void init(Context context) {
 		if(m_bInit) return;
 		Log.d(TAG, "init Network Object");
 		m_context = context;
@@ -68,7 +68,7 @@ public class Networking {
 		m_background_handler.connect();
 		m_bInit=true;
 	}
-	public void deinit() {
+	public synchronized void deinit() {
 		if(!m_bInit) return;
 		Log.d(TAG, "deinit Network Object");
 		if(isBusConnected()) {
