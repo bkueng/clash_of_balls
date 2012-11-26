@@ -52,11 +52,12 @@ public class MenuItemButton extends MenuItem {
 		Matrix.setIdentityM(model_mat, model_mat_pos);
 		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
 		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
+		
+		// position
 		int position_handle = renderer.shaderManager().a_Position_handle;
 		if(position_handle != -1)
 			m_position_data.apply(position_handle);
 		
-        
         // color
 		int color_handle = renderer.shaderManager().a_Color_handle;
 		if(color_handle != -1)
