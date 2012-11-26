@@ -11,21 +11,20 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
+import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
 
 
 public class Game extends GameBase implements UIBase {
+	private static final String TAG_GAME = "Game";
 	
 	private SensorThread m_sensor_thread;
 	private GameView m_view;
 	
 	private NetworkClient m_network_client;
 	
-	/*
-	TODO 
-	own player -> if set: set m_view.setObjectToTrack
+	private GamePlayer m_own_player;
 	
-	*/
 	
 	public Game(Context c, GameSettings s, TextureManager texture_manager, 
 			NetworkClient network_client) {
@@ -46,6 +45,25 @@ public class Game extends GameBase implements UIBase {
 				null, (float)level.width, (float)level.height);
 		if(scaling > 0.f) m_view.setZoomToTileSize(scaling);
 		
+	}
+	
+	public void initPlayers(PlayerInfo[] players) {
+		super.initPlayers(players);
+		
+		String own_unique_name = m_network_client.getOwnUniqueName();
+		if(own_unique_name != null) {
+			for(int i=0; i<players.length; ++i) {
+				if(own_unique_name.equals(players[i].unique_name)) {
+					m_own_player = (GamePlayer)m_game_objects.get(players[i].id);
+				}
+			}
+		}
+		
+		if(m_own_player == null) {
+			Log.e(TAG_GAME, "could not find own player in players list! This is very bad!");
+		}
+		
+		m_view.setObjectToTrack(m_own_player);
 	}
 	
 	public void onDestroy() {

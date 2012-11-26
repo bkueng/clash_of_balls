@@ -43,6 +43,10 @@ public class NetworkClient {
 		m_networking = networking;
 	}
 	
+	public String getOwnUniqueName() {
+		return m_networking.getUniqueName();
+	}
+	
 	//this will return the server_id
 	//to get the (displayable) name, call: Networking.getNameFromServerId()
 	public String serverId(int idx) {
