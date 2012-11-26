@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.alljoyn.bus.BusAttachment;
 import org.alljoyn.bus.BusException;
@@ -163,6 +164,14 @@ public class Networking {
     	return mBus.getUniqueName();
     }
     
+    //set this before start advertising
+    //use -1 for unlimited
+    public void setMaxClientCount(int max_count) {
+    	m_max_client_count = max_count;
+    }
+    
+    private volatile int m_max_client_count = -1;
+    
 	public synchronized void registerEventListener(Handler h) {
 		m_event_listeners.add(h);
 	}
@@ -251,6 +260,7 @@ public class Networking {
 	private Queue<NetworkData> m_game_commands = new ConcurrentLinkedQueue<NetworkData>();
 	
 	private Queue<String> m_clients_joined = new ConcurrentLinkedQueue<String>();
+	private AtomicInteger m_clients_joined_count = new AtomicInteger(0);
 	private Queue<String> m_clients_left = new ConcurrentLinkedQueue<String>();
 	
 	private Queue<String> m_server_found = new ConcurrentLinkedQueue<String>();
@@ -852,7 +862,17 @@ public class Networking {
         		if (sessionPort == CONTACT_PORT) {
         			//TODO: whom do we accept??
         			
-        			return true;
+        			
+        			//use max_clients value -> use max value from game level
+        			int connected_clients = m_clients_joined_count.get();
+        			if(mJoinedToSelf) ++connected_clients;
+        			
+        			if(m_max_client_count==-1 || connected_clients < m_max_client_count) {
+        				Log.e("", "CLIENT JOINED REQUEST");
+
+        				return true;
+        				
+        			}
         		}
         		return false;
             }
@@ -878,6 +898,7 @@ public class Networking {
                 		, SignalEmitter.GlobalBroadcast.Off);
                 mHostChatInterface = emitter.getInterface(AlljoynInterface.class);
                 m_clients_joined.add(joiner);
+                m_clients_joined_count.incrementAndGet();
                 sendEventToListeners(HANDLE_CLIENT_JOINED);
             }             
         });
