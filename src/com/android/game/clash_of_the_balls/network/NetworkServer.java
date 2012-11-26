@@ -67,7 +67,7 @@ public class NetworkServer {
 	}
 	
 	//send events to clients
-	void addOutgoingEvent(Event e) {
+	public void addOutgoingEvent(Event e) {
 		//TODO: add important events to queue to be acked
 		
 		try {
@@ -77,7 +77,7 @@ public class NetworkServer {
 		}
 	}
 	
-	void sendEvents() throws BusException {
+	public void sendEvents() throws BusException {
 		try {
 			m_outgoing_stream.flush();
 			if(m_outgoing_byte_stream.size() > 0) {
@@ -92,7 +92,7 @@ public class NetworkServer {
 	
 	
 	//call this regularly to handle incoming network data
-	void handleReceive() {
+	public void handleReceive() {
 		//connected clients
 		String client_unique_id;
 		while((client_unique_id=m_networking.receiveClientJoined()) != null) {
@@ -130,7 +130,7 @@ public class NetworkServer {
 	
 	//receive sensor updates
 	//will return player id or -1 if no update
-	public int getSensorUpdate(Vector pos_out) {
+	public short getSensorUpdate(Vector pos_out) {
 		NetworkData d=m_networking.receiveSensorUpdate();
 		if(d!=null) {
 			pos_out.set((Vector)d.arg1);
@@ -138,10 +138,10 @@ public class NetworkServer {
 			if(player_id!=-1) handleAckReceived(d.ack_num, player_id);
 			return player_id;
 		}
-		return -1;
+		return (short)-1;
 	}
 	
-	private short getClientId(String unique_id) {
+	public short getClientId(String unique_id) {
 		short ret=-1;
 		if(unique_id != null) {
 			for(ConnectedClient client : m_connected_clients) {
@@ -153,6 +153,14 @@ public class NetworkServer {
 			Log.w(TAG, "Received data: sender String is NULL!");
 		}
 		return ret;
+	}
+	
+	public String getClientUniqueName(short client_id) {
+		for(ConnectedClient client : m_connected_clients) {
+			if(client.id == client_id)
+				return client.unique_id;
+		}
+		return "";
 	}
 	
 	private void handleAckReceived(int ack_seq_num, int player_id) {
