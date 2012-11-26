@@ -11,7 +11,10 @@ public class LevelManager {
 	
 	private Context m_context;
 	
-	public ArrayList<GameLevel> m_levels;
+	private ArrayList<GameLevel> m_levels;
+	
+	public GameLevel level(int idx) { return m_levels.get(idx); }
+	public int levelCount() { return m_levels.size(); }
 
 	public LevelManager(Context context) {
 		m_context = context;
