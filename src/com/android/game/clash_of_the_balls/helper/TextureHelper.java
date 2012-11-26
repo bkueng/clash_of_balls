@@ -61,6 +61,13 @@ public class TextureHelper
 		
 		if (textureHandle[0] != 0)
 		{
+			
+			// Flip bitmap upside down
+			Matrix flip = new Matrix();
+			flip.postScale(1f, -1f);
+			final Bitmap bitmap_final = Bitmap.createBitmap(bitmap, 0, 0
+					, bitmap.getWidth(), bitmap.getHeight(), flip, true);
+			
 			// Bind to the texture in OpenGL
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
 			
@@ -69,10 +76,10 @@ public class TextureHelper
 			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
 			
 			// Load the bitmap into the bound texture.
-			GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-			
+			GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap_final, 0);
+						
 			// Recycle the bitmap, since its data has been loaded into OpenGL.
-			bitmap.recycle();
+			bitmap_final.recycle();
 		}
 
 		if (textureHandle[0] == 0)

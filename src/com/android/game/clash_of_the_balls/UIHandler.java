@@ -62,7 +62,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
 		m_menu_item_font = new Font2D(m_tex_manager, Typeface.createFromAsset(m_activity_context.getAssets(), "arial.ttf"),
-				"Hello World!", 20, 255, 255, 255, 255);
+				"Hello World!g", 50, 0, 255, 255, 255, 255);
 		
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
@@ -112,9 +112,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			break;
 			case CREATION_MENU: uiChange(m_active_ui,m_creation_menu_ui);
 			break;
-			case WAIT_MENU:uiChange(m_active_ui,m_wait_menu_ui);
+			case WAIT_MENU: uiChange(m_active_ui,m_wait_menu_ui);
 			break;
-			case JOIN_MENU:uiChange(m_active_ui,m_join_menu_ui);
+			case JOIN_MENU: uiChange(m_active_ui,m_join_menu_ui);
 			break;
 			case MAIN_MENU: uiChange(m_active_ui, m_main_menu);
 			break;
@@ -135,14 +135,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 
 	public void draw(RenderHelper renderer) {
 		if(m_active_ui != null) m_active_ui.draw(renderer);
-		
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.setIdentityM(model_mat, model_mat_pos);
-		Matrix.translateM(model_mat, model_mat_pos, 30.f, 30.f, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, 300.f, 150.f, 0.f);
+
 		m_menu_item_font.draw(renderer);
-		renderer.popModelMat();
 	}
 
 	public void onTouchEvent(float x, float y, int event) {

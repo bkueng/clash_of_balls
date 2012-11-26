@@ -12,6 +12,7 @@ import android.graphics.Bitmap.Config;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.view.animation.BounceInterpolator;
 
 /**
  * Font2D
@@ -26,6 +27,10 @@ public class Font2D implements IDrawable {
 	private Typeface m_typeface;
 	private String m_string;
 	private int m_font_size;
+	private float m_font_width;
+	private float m_font_height;
+	private float m_x_offset;
+	private float m_y_offset;
 	private int m_alpha;
 	private int m_red;
 	private int m_green;
@@ -43,23 +48,29 @@ public class Font2D implements IDrawable {
 	 * 
 	 */
 	
-	public Font2D(TextureManager texture_manager, Typeface typeface, String string, int font_size, int red, int green, int blue, int alpha) {
+	public Font2D(TextureManager texture_manager, Typeface typeface, String string,
+			int font_size, int height, int red, int green, int blue, int alpha) {
 		
 		m_texture_manager = texture_manager;
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
-		doInit(typeface, string, font_size, red, green, blue, alpha);
+		doInit(typeface, string, font_size, height, red, green, blue, alpha);
 
 		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
 		
 		Log.d(LOG_TAG, "Font succesfully created");
 	}
 
-	private void doInit(Typeface typeface, String string, int font_size, int red, int green, int blue, int alpha) {
+	private void doInit(Typeface typeface, String string, int font_size, int height, int red, int green, int blue, int alpha) {
 		
+		// Set members
 		m_typeface = typeface;
 		m_string = string;
+		m_font_width = 0;
+		m_font_height = 0;
+		m_x_offset = 0;
+		m_y_offset = 0;
 		m_font_size = font_size;
 		m_alpha = alpha;
 		m_red = red;
@@ -68,27 +79,34 @@ public class Font2D implements IDrawable {
 		m_texture = null;
 	}
 
-	public Bitmap createFontBitmap() {
-		
-		// Create an empty, mutable bitmap
-		Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-		// get a canvas to paint over the bitmap
-		Canvas canvas = new Canvas(bitmap);
-		bitmap.eraseColor(0);
-		
-		// Draw the text
+	private Bitmap createFontBitmap() {
+
+		// Create text paint to customize font
 		Paint textPaint = new Paint();
+
 		textPaint.setTypeface(m_typeface);
 		textPaint.setTextSize(m_font_size);
 		textPaint.setAntiAlias(true);
 		textPaint.setARGB(m_alpha, m_red, m_green, m_blue);
+	    
+	    // Get font width
+	    m_font_width = textPaint.measureText(m_string);
+	    
+		// Get font metrics
+	    Paint.FontMetrics fm = textPaint.getFontMetrics();
+		m_y_offset = Math.abs(fm.top);
+	    m_font_height = Math.round( Math.abs(fm.bottom) + m_y_offset);
+
 		
-		// draw the text centered
-		canvas.drawText(m_string, 50, 50, textPaint);
+		// Create an empty, mutable bitmap
+		Bitmap bitmap = Bitmap.createBitmap((int)Math.round(m_font_width), (int)Math.round(m_font_height), Bitmap.Config.ARGB_8888);
+		// Get a canvas to paint over the bitmap
+		Canvas canvas = new Canvas(bitmap);
+		bitmap.eraseColor(0);
 		
-		
-		Log.d(LOG_TAG, "fontBitmap created...");
-		
+		// Draw the text centered
+		canvas.drawText(m_string, m_x_offset, m_y_offset, textPaint);
+				
 		return bitmap;
 	}
 
@@ -97,6 +115,12 @@ public class Font2D implements IDrawable {
 		
 		renderer.shaderManager().activateTexture(0);
 		m_texture.useTexture(renderer);
+		
+		int model_mat_pos = renderer.pushModelMat();
+		float model_mat[] = renderer.modelMat();
+		Matrix.setIdentityM(model_mat, model_mat_pos);
+		Matrix.translateM(model_mat, model_mat_pos, 30.f, 30.f, 0.f);
+		Matrix.scaleM(model_mat, model_mat_pos, m_font_width, m_font_height, 0.f);
 		
 		// position
 		int position_handle = renderer.shaderManager().a_Position_handle;
@@ -113,6 +137,8 @@ public class Font2D implements IDrawable {
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
-		Log.d(LOG_TAG, "draw font...");
+		renderer.popModelMat();
+        
+		//Log.d(LOG_TAG, "draw font...");
 	}
 }
