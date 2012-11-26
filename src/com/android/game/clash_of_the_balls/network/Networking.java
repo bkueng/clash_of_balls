@@ -1304,7 +1304,8 @@ public class Networking {
 		ADVERTISE_ERROR,
 		ADVERTISE_CANCEL_ERROR,
 		JOIN_SESSION_ERROR,
-		SEND_ERROR
+		SEND_ERROR,
+		BUS_EXCEPTION
 	}
 	public static class AllJoynErrorData {
 		public Module module;

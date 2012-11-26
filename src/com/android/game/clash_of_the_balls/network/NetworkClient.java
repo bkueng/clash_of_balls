@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.Vector;
+import com.android.game.clash_of_the_balls.network.Networking.AllJoynError;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
 import com.android.game.clash_of_the_balls.network.Networking.NetworkData;
 
@@ -73,54 +74,69 @@ public class NetworkClient {
 	
 	
 	//call this every frame, or in a regular time period
-	public void handleReceive() throws BusException {
-		//available servers
-		String server_id;
-		//joined servers
-		while((server_id=m_networking.receiveServerFound()) != null) {
-			//check if already added
-			boolean exists=false;
-			for(String server : m_available_servers) {
-				if(server.equals(server_id)) exists=true;
-			}
-			if(!exists) {
-				m_available_servers.add(server_id);
-				Log.i(TAG, "New Server found: "+server_id);
-			}
-		}
-		//lost servers
-		while((server_id=m_networking.receiveServerLost()) != null) {
-			//find where
-			for(int i=0; i<m_available_servers.size(); ++i) {
-				if(m_available_servers.get(i).equals(server_id)) {
-					m_available_servers.remove(i);
-					Log.i(TAG, "Server lost: "+server_id);
+	public void handleReceive() {
+		try {
+			//available servers
+			String server_id;
+			//joined servers
+			while((server_id=m_networking.receiveServerFound()) != null) {
+				//check if already added
+				boolean exists=false;
+				for(String server : m_available_servers) {
+					if(server.equals(server_id)) exists=true;
+				}
+				if(!exists) {
+					m_available_servers.add(server_id);
+					Log.i(TAG, "New Server found: "+server_id);
 				}
 			}
-		}
-		
-		//server updates
-		NetworkData d;
-		while((d=m_networking.receiveGameCommand()) != null) {
-			ByteArrayInputStream bais = new ByteArrayInputStream(d.data);
-			DataInputStream di = new DataInputStream(bais);
-			Event e;
-			while((e=Event.read(di)) != null) {
-				m_available_events.add(e);
-				
-				//TODO: timestamp handling
-				
+			//lost servers
+			while((server_id=m_networking.receiveServerLost()) != null) {
+				//find where
+				for(int i=0; i<m_available_servers.size(); ++i) {
+					if(m_available_servers.get(i).equals(server_id)) {
+						m_available_servers.remove(i);
+						Log.i(TAG, "Server lost: "+server_id);
+					}
+				}
 			}
-		}
-		
-		if(m_bHas_sensor_update) {
-			m_bHas_sensor_update=false;
-			m_networking.sendSensorUpdate(-1, m_sensor_update);
+			
+			//server updates
+			NetworkData d;
+			while((d=m_networking.receiveGameCommand()) != null) {
+				ByteArrayInputStream bais = new ByteArrayInputStream(d.data);
+				DataInputStream di = new DataInputStream(bais);
+				Event e;
+				while((e=Event.read(di)) != null) {
+					m_available_events.add(e);
+					
+					//TODO: timestamp handling
+					
+				}
+			}
+			
+			if(m_bHas_sensor_update) {
+				m_bHas_sensor_update=false;
+				m_networking.sendSensorUpdate(-1, m_sensor_update);
+			}
+		} catch(BusException e) {
+			Log.e(TAG, "BusException");
+			e.printStackTrace();
+			m_network_error = new AllJoynErrorData();
+			m_network_error.error_string = "";
+			m_network_error.error = AllJoynError.BUS_EXCEPTION;
 		}
 	}
 	
+	private AllJoynErrorData m_network_error=null;
+	
 	//will return null if no error
 	public AllJoynErrorData getNetworkError() {
+		if(m_network_error != null) {
+			AllJoynErrorData d = m_network_error;
+			m_network_error = null;
+			return d;
+		}
 		return m_networking.getError();
 	}
 	
