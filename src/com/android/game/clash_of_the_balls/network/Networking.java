@@ -123,7 +123,7 @@ public class Networking {
 				//this signal is: server --> clients. so send to all clients
 				if (mHostChatInterface != null)
 					mHostChatInterface.gameCommand(data);
-				//receivedGameCommand(mBus.getUniqueName(), data); //send to ourself
+				receivedGameCommand(mBus.getUniqueName(), data); //send to ourself
 			} else {
 				mChatInterface.gameCommand(data);
 			}
@@ -230,6 +230,8 @@ public class Networking {
 	public void joinSessionToSelf() {
 		//join to ourself
 		joinSession(getWellKnownName());
+		m_clients_joined.add(getUniqueName()); ///////////////////////////////////////////
+			//this should not be necesary with the next version!
 	}
 	public void leaveSession() {
 		m_background_handler.leaveSession();
