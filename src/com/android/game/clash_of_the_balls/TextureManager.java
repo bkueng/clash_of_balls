@@ -21,7 +21,6 @@ public class TextureManager {
 	public TextureManager(Context activity_context) {
 		m_activity_context = activity_context;
 		m_textures = new TreeMap<Integer, TextureBase>();		
-		Font2D.m_weakFont2D = new ArrayList<WeakReference<Font2D>>();
 	}
 	
 	//reload all textures into memory: do this when context is lost

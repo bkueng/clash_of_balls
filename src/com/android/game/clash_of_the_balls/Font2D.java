@@ -43,7 +43,9 @@ public class Font2D implements IDrawable {
 	private VertexBufferFloat m_position_data;
 	private VertexBufferFloat m_color_data;
 	
-	public static ArrayList<WeakReference<Font2D>> m_weakFont2D;
+	private static ArrayList<WeakReference<Font2D>> m_weakFont2D
+		= new ArrayList<WeakReference<Font2D>>();
+	private WeakReference<Font2D> m_reference;
 	
 	/**
 	 * Creates 2D font
@@ -65,9 +67,8 @@ public class Font2D implements IDrawable {
 		
 		doInit(typeface, string, font_size, align, position, text_field_size, color);
 
-		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
-		
-		m_weakFont2D.add(new WeakReference<Font2D>(this));
+		m_reference = new WeakReference<Font2D>(this);
+		m_weakFont2D.add(m_reference);
 		
 		Log.d(LOG_TAG, "Font succesfully created");
 	}
@@ -85,12 +86,23 @@ public class Font2D implements IDrawable {
 		m_x_offset = 0;
 		m_y_offset = 0;
 		m_color = color;
-		m_texture = null;
+		
+		if(m_texture != null) {
+			int[] textureHandle = new int[1];
+			textureHandle[0] = m_texture.textureHandle();
+
+			GLES20.glDeleteTextures(1, textureHandle, 0);
+		}
 		
 		/*
 		 * LEFT, CENTER, RIGHT
 		 */
 		m_align = align;
+		
+		Bitmap bitmap = createFontBitmap();
+		m_texture = m_texture_manager.get(bitmap, VertexBufferFloat.sprite_tex_coords);
+		bitmap.recycle();
+		
 	}
 	
 	private Paint.Align getAlignment(TextAlign align) {
@@ -146,16 +158,19 @@ public class Font2D implements IDrawable {
 	}
 	
 	public void setString(String string) {
-		doInit(m_typeface, string, m_font_size, TextAlign.LEFT, m_position, m_text_field_size, m_color);
-		
-		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
+		doInit(m_typeface, string, m_font_size, m_align, m_position, m_text_field_size, m_color);
 	}
 	
 	public static void reloadFonts() {
 		Font2D tmpFont2D;
 		for (WeakReference<Font2D> wr : m_weakFont2D) {
 			tmpFont2D = wr.get();
-			tmpFont2D.m_texture = tmpFont2D.m_texture_manager.get(tmpFont2D.createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
+			if(tmpFont2D != null) {
+				Bitmap b = tmpFont2D.createFontBitmap();
+				tmpFont2D.m_texture = tmpFont2D.m_texture_manager.get(b
+						, VertexBufferFloat.sprite_tex_coords);
+				b.recycle();
+			}
 		}
 	}
 
@@ -190,7 +205,12 @@ public class Font2D implements IDrawable {
 	}
 	
 	protected void finalize() {
-		// TODO:
-		m_weakFont2D.remove(new WeakReference<Font2D>(this));
+		//remove this object from the object list
+		for(int i=0; i<m_weakFont2D.size(); ++i) {
+			if(m_weakFont2D.get(i) == m_reference) {
+				m_weakFont2D.remove(i);
+				return;
+			}
+		}
 	}
 }

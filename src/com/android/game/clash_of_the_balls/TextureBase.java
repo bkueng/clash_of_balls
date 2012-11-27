@@ -16,6 +16,8 @@ public class TextureBase {
 	private Context m_activity_context;
 	private int m_raw_res_id;
 	
+	public int textureHandle() { return m_tex_handle; }
+	
 	public TextureBase(Context activity_context, int raw_res_id) {
 		m_activity_context = activity_context;
 		m_tex_handle = loadTexture(raw_res_id);
