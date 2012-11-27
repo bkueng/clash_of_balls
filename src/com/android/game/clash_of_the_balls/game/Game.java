@@ -11,8 +11,10 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
+import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
+import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
 
 
 public class Game extends GameBase implements UIBase {
@@ -45,6 +47,8 @@ public class Game extends GameBase implements UIBase {
 				null, (float)level.width, (float)level.height);
 		if(scaling > 0.f) m_view.setZoomToTileSize(scaling);
 		
+		//TODO: start calibration
+		
 	}
 	
 	public void initPlayers(PlayerInfo[] players) {
@@ -55,6 +59,9 @@ public class Game extends GameBase implements UIBase {
 			for(int i=0; i<players.length; ++i) {
 				if(own_unique_name.equals(players[i].unique_name)) {
 					m_own_player = (GamePlayer)m_game_objects.get(players[i].id);
+					
+					Log.d(TAG_GAME, "we got our player at x="+m_own_player.pos().x
+							+", y="+m_own_player.pos().y);
 				}
 			}
 		}
@@ -74,41 +81,82 @@ public class Game extends GameBase implements UIBase {
 	public void onTouchEvent(float x, float y, int event) {
 		// that's not used in the game
 	}
+	
+	private boolean m_bReceived_events = false; //send new sensor data if true
 
 	public void move(float dsec) {
-		
-		//get sensor values & send to server
-		
-		//receive server updates
-		Vector sensor_vec = m_sensor_thread.getCurrentVector();
-		
-		//receive network errors
-		
-		//has updates? -> apply them
-		//else: move normally
-		m_game_field.move(dsec);
-		
-		
-		m_view.move(dsec);
+		if(m_bIs_game_running) {
+
+			//get sensor values & send to server
+			Vector sensor_vec = m_sensor_thread.getCurrentVector();
+			if(m_bReceived_events) 
+				m_network_client.sensorUpdate(sensor_vec);
+			//TODO: apply sensor values to own player
+
+			handleNetworkError(m_network_client.getNetworkError());
+
+			m_network_client.handleReceive();
+			if(m_network_client.hasEvents()) {
+				//TODO: undo prediction...
+				
+				//apply the updates from the server
+				applyIncomingEvents();
+				
+				m_bReceived_events = true;
+			} else {
+				//TODO: do predicted move
+				
+				m_bReceived_events = false;
+			}
+			m_game_field.move(dsec);
+
+
+			m_view.move(dsec);
+			m_game_field.move(dsec);
+			
+		} else {
+			m_network_client.handleReceive();
+			applyIncomingEvents();
+		}
+	}
+	
+	private void applyIncomingEvents() {
+		Event e;
+		while((e=m_network_client.getNextEvent()) != null) {
+			e.apply(this);
+		}
+	}
+	
+	private void handleNetworkError(AllJoynErrorData data) {
+		if(data != null) {
+			//TODO
+
+		}
 	}
 
 	public void draw(RenderHelper renderer) {
 		
-		m_view.applyView(renderer);
-		
-		m_game_field.draw(renderer);
-		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
-			entry.getValue().draw(renderer);
+		if(m_view != null && m_game_field != null) {
+			m_view.applyView(renderer);
+
+			m_game_field.draw(renderer);
+			for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
+				entry.getValue().draw(renderer);
+			}
+
+			m_view.resetView(renderer);
 		}
-		
-		m_view.resetView(renderer);
 	}
 	
 	public void gameStartNow() {
+		super.gameStartNow();
+		m_bReceived_events = true;
 		//TODO
 	}
 	public void gameEnd() {
+		super.gameEnd();
 		//TODO
+		
 	}
 	
 	public int getNextSequenceNum() {

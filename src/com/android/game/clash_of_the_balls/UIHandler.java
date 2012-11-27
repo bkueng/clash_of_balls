@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.android.game.clash_of_the_balls.MainActivity.LoadViewTask;
 import com.android.game.clash_of_the_balls.game.Game;
+import com.android.game.clash_of_the_balls.game.GameServer;
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.IMoveable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
@@ -15,6 +16,9 @@ import com.android.game.clash_of_the_balls.menu.JoinMenu;
 import com.android.game.clash_of_the_balls.menu.MainMenu;
 import com.android.game.clash_of_the_balls.menu.MenuBackground;
 import com.android.game.clash_of_the_balls.menu.WaitMenu;
+import com.android.game.clash_of_the_balls.network.NetworkClient;
+import com.android.game.clash_of_the_balls.network.NetworkServer;
+import com.android.game.clash_of_the_balls.network.Networking;
 
 /**
  * UIHandler
@@ -146,6 +150,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	public void onDestroy() {
 		if(m_game_ui!=null) m_game_ui.onDestroy();
 		m_game_ui=null;
+		//TODO: stop the server if running
+		
 	}
 
 	public void draw(RenderHelper renderer) {

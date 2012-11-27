@@ -1,6 +1,8 @@
 package com.android.game.clash_of_the_balls.game;
 
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
 import com.android.game.clash_of_the_balls.GameLevel;
@@ -19,12 +21,18 @@ import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 public abstract class GameBase {
 	private static final String TAG = "GameBase";
 	
+	protected final static int wait_to_start_game = 3; //[sec]
+					//time between press of play and actual game start
+	
 	protected GameSettings m_settings;
 	protected final TextureManager m_texture_manager;
 	
 	protected GameField m_game_field;
 	protected int m_player_count;
 	protected GameLevel m_level;
+	
+	protected boolean m_bIs_game_running = false;
+	public boolean isRunning() { return m_bIs_game_running; }
 	
 	public final boolean is_server;
 	
@@ -33,6 +41,8 @@ public abstract class GameBase {
 	//the moveable game objects: key is the object id
 	public Map<Short, DynamicGameObject> m_game_objects;
 	protected short m_next_object_id;
+	
+	protected Queue<Event> m_events = new LinkedList<Event>();
 	
 	public DynamicGameObject getGameObject(short id) {
 		return m_game_objects.get(id); //can return null!
@@ -49,6 +59,7 @@ public abstract class GameBase {
 		m_game_field = new GameField(m_texture_manager);
 		m_next_object_id = m_game_field.init(level, (short) 1);
 		m_level = level;
+		m_bIs_game_running = false;
 	}
 	
 	public GameLevel level() { return m_level; }
@@ -56,8 +67,9 @@ public abstract class GameBase {
 	
 	public void addEvent(Event e) {
 		assert(generate_events); //don't add events if generate_events==false!
-		//TODO: a queue, timestamp ?
+		//TODO timestamp ?
 		
+		m_events.add(e);
 	}
 	
 	//initGame must be called before this!
@@ -78,20 +90,18 @@ public abstract class GameBase {
 		return m_player_count;
 	}
 	
-	protected int getNextItemId() {
+	protected short getNextItemId() {
 		return m_next_object_id++;
 	}
 	
 	public abstract int getNextSequenceNum();
 
 	public void gameEnd() {
-		// TODO Auto-generated method stub
-		
+		m_bIs_game_running = false;
 	}
 
 	public void gameStartNow() {
-		// TODO Auto-generated method stub
-		
+		m_bIs_game_running = true;
 	}
 	
 	public abstract String getUniqueNameFromPlayerId(short player_id);

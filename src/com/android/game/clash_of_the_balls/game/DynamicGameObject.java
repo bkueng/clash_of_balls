@@ -1,6 +1,7 @@
 package com.android.game.clash_of_the_balls.game;
 
 import com.android.game.clash_of_the_balls.Texture;
+import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 
 /**
  * all game objects that can be dynamically added or removed must inherit from
@@ -17,7 +18,7 @@ public class DynamicGameObject extends StaticGameObject {
 	public Vector m_new_pos=new Vector();
 	public boolean m_has_moved = false;
 	
-	private Vector m_speed = new Vector();
+	protected Vector m_speed = new Vector();
 	public Vector speed() { return m_speed; }
 	
 	private int m_impact_count = 0;
@@ -32,14 +33,15 @@ public class DynamicGameObject extends StaticGameObject {
 
 	@Override
 	public void draw(RenderHelper renderer) {
-		// TODO Auto-generated method stub
-		//only if not dead... -> call super.draw()
+		if(!m_bIs_dead) {
+			super.draw(renderer);
+		}
 	}
 
 	@Override
 	public void move(float dsec) {
 		// TODO Auto-generated method stub
-		
+			//-> set m_has_moved & m_new_pos
 	}
 	
 	public void handleImpact(DynamicGameObject other) {
@@ -61,6 +63,9 @@ public class DynamicGameObject extends StaticGameObject {
 		if(m_has_moved) {
 			m_position.set(m_new_pos);
 			m_has_moved = false;
+			if(m_owner.generate_events) {
+				m_owner.addEvent(new EventItemUpdate(this));
+			}
 		}
 	}
 	
