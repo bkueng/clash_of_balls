@@ -113,6 +113,7 @@ public class GameServer extends GameBase implements Runnable {
 		//TODO: player colors
 		
 		
+		
 		for(int i=0; i< m_player_count; ++i) {
 			short id = getNextItemId();
 			m_network_server.getConnectedClient(i).id = id;
@@ -143,7 +144,7 @@ public class GameServer extends GameBase implements Runnable {
 		short id;
 		while((id=m_network_server.getSensorUpdate(m_sensor_vector)) != -1) {
 			DynamicGameObject obj = getGameObject(id);
-			if(obj != null && obj.m_type == Type.Player) {
+			if(obj != null && obj.type == Type.Player) {
 				GamePlayer p = (GamePlayer)obj;
 				p.acceleration().set(m_sensor_vector);
 				++m_sensor_update_count;
@@ -170,8 +171,7 @@ public class GameServer extends GameBase implements Runnable {
 		
 		generate_events = true;
 		move(elapsed_time);
-		//TODO: object collision detection
-		
+		doCollisionHandling();
 		applyMove();
 		//TODO: check for game end
 		

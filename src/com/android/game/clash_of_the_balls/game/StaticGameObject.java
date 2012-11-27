@@ -23,7 +23,7 @@ public class StaticGameObject extends GameObject {
 		Item
 	}
 	
-	public final Type m_type;
+	public final Type type;
 	
 	public final short m_id; //object id: this is unique across a game
 						   //used by the network to identify a dynamic game object
@@ -37,7 +37,7 @@ public class StaticGameObject extends GameObject {
 	StaticGameObject(final short id, Vector position, Type type
 			, Texture texture) {
 		super(position);
-		m_type = type;
+		this.type = type;
 		m_id = id;
 		m_texture = texture;
 		

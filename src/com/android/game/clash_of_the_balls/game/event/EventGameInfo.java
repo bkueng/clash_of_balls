@@ -53,7 +53,7 @@ public class EventGameInfo extends Event {
 		int i=0;
 		for (Map.Entry<Short, DynamicGameObject> entry : game.m_game_objects.entrySet()) {
 			DynamicGameObject obj = entry.getValue();
-			if(obj.m_type == Type.Player) {
+			if(obj.type == Type.Player) {
 				GamePlayer player = (GamePlayer) obj;
 				m_players[i]=new PlayerInfo();
 				m_players[i].pos_x = player.pos().x;

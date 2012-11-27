@@ -27,7 +27,7 @@ public class EventItemAdded extends Event {
 	
 	public EventItemAdded(GameBase game, int seq_num, StaticGameObject obj) {
 		super(type_item_added, seq_num);
-		m_object_type = obj.m_type;
+		m_object_type = obj.type;
 		m_id = obj.m_id;
 		m_pos_x = obj.pos().x;
 		m_pos_y = obj.pos().y;

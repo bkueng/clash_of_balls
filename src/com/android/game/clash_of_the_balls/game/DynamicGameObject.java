@@ -14,9 +14,13 @@ import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 public class DynamicGameObject extends StaticGameObject {
 	
 	protected boolean m_bIs_dead = false;
+	public boolean isDead() { return m_bIs_dead; }
 	
-	public Vector m_new_pos=new Vector();
-	public boolean m_has_moved = false;
+	protected Vector m_new_pos=new Vector();
+	protected boolean m_has_moved = false;
+	
+	public Vector newPosition() { return m_new_pos; }
+	public boolean hasMoved() { return m_has_moved; }
 	
 	protected Vector m_speed = new Vector();
 	public Vector speed() { return m_speed; }

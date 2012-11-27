@@ -1,5 +1,6 @@
 package com.android.game.clash_of_the_balls.game;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -106,4 +107,117 @@ public abstract class GameBase {
 	}
 	
 	public abstract String getUniqueNameFromPlayerId(short player_id);
+	
+	
+	protected void doCollisionHandling() {
+		
+		//dynamic objects <--> static game objects
+		for(DynamicGameObject obj : m_game_objects.values()) {
+			
+			//assume that the game objects are not larger than 1.0 (one sprite)
+			
+			if(obj.hasMoved()) {
+				int x_start = (int)(obj.pos().x) - 1;
+				if(x_start < 0) x_start = 0;
+				int x_end = x_start + 2;
+				if(x_end >= m_game_field.width()) x_end = m_game_field.width()-1;
+				
+				int y_start = (int)(obj.pos().y) - 1;
+				if(y_start < 0) y_start = 0;
+				int y_end = y_start + 2;
+				if(y_end >= m_game_field.height()) y_end = m_game_field.height()-1;
+				
+				for(int x=x_start; x<=x_end; ++x) {
+					for(int y=y_start; y<=y_end; ++y) {
+						StaticGameObject field_obj = m_game_field.foreground(x, y);
+						if(field_obj != null) {
+							//check intersection between field_obj & obj
+							switch(obj.type) {
+							case Player:
+								
+								switch(field_obj.type) {
+								case Hole:
+									//TODO
+									
+									break;
+								case Obstacle:
+									//TODO
+									
+									break;
+								default: throw new RuntimeException("collision detection for type "+
+										field_obj.type+" not implemented!");
+								}
+								
+								break;
+							case Item:
+								
+								//an item does not move (or does it??)
+								
+								break;
+								default: throw new RuntimeException("collision detection for type "+
+										obj.type+" not implemented!");
+							}
+						}
+					}
+				}
+			}
+			
+		}
+		
+		//dynamic objects <--> dynamic objects
+		for(DynamicGameObject obja : m_game_objects.values()) {
+			if(!obja.isDead()) {
+				Iterator<DynamicGameObject> iter = m_game_objects.values().iterator();
+				//stupid java forces us to do stupid things...
+				while(iter.hasNext() && iter.next() != obja) { }
+				
+				while(iter.hasNext()) {
+					DynamicGameObject objb = iter.next();
+					if(!objb.isDead() && (obja.hasMoved() || objb.hasMoved())) {
+						//check intersection between obja & objb
+						if(objb.type.ordinal() < objb.type.ordinal()) {
+							DynamicGameObject tmp = obja;
+							obja = objb;
+							objb = tmp;
+						}
+						//now: obja.type <= objb.type
+						
+						switch(obja.type) {
+						case Player:
+							
+							switch(objb.type) {
+							case Player:
+								//TODO
+								
+								break;
+							case Item:
+								//TODO: take the item
+								
+								break;
+							default: throw new RuntimeException("collision detection for type "+
+									objb.type+" not implemented!");
+							}
+							
+							break;
+						case Item:
+							
+							//an item does not move (or does it??)
+							switch(objb.type) {
+							case Item:
+								//nothing to do if items cannot move
+								break;
+							}
+							
+							
+							break;
+							default: throw new RuntimeException("collision detection for type "+
+									obja.type+" not implemented!");
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
 }
