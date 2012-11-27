@@ -137,15 +137,19 @@ public class GameView extends GameObject {
 	}
 	
 	private void checkLevelWithinOutputView() {
-		if(m_scaling*m_level_width > m_output_size.x) {
+		if(m_scaling*m_level_width > m_output_size.x) { //does not fit into screen
 			if(m_position.x > 0.f) m_position.x=0.f;
 			else if(m_position.x + m_scaling*m_level_width < m_output_size.x) 
 				m_position.x = m_output_size.x - m_scaling*m_level_width;
+		} else {
+			m_position.x = (m_output_size.x-m_level_width*m_scaling) / 2.f;
 		}
 		if(m_scaling*m_level_height > m_output_size.y) {
 			if(m_position.y > 0.f) m_position.y=0.f;
 			else if(m_position.y + m_scaling*m_level_height < m_output_size.y) 
 				m_position.y = m_output_size.y - m_scaling*m_level_height;
+		} else {
+			m_position.y = (m_output_size.y-m_level_height*m_scaling) / 2.f;
 		}
 	}
 	
