@@ -148,7 +148,8 @@ public class NetworkServer {
 				if(client.unique_id.equals(unique_id))
 					return client.id;
 			}
-			Log.w(TAG, "Received data but cannot find associated client id!");
+			Log.w(TAG, "Received data but cannot find associated client id (unique_id = "
+					+unique_id+", client_count="+m_connected_clients.size()+")!");
 		} else {
 			Log.w(TAG, "Received data: sender String is NULL!");
 		}
