@@ -3,14 +3,20 @@ package com.android.game.clash_of_the_balls;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint.Align;
+import android.graphics.Typeface;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.MainActivity.LoadViewTask;
 import com.android.game.clash_of_the_balls.game.Game;
 import com.android.game.clash_of_the_balls.game.GameServer;
+import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.IMoveable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
+import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.menu.CreationMenu;
 import com.android.game.clash_of_the_balls.menu.JoinMenu;
 import com.android.game.clash_of_the_balls.menu.MainMenu;
@@ -28,7 +34,6 @@ import com.android.game.clash_of_the_balls.network.Networking;
 public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	
 	private static final String LOG_TAG = "UIHandler";
-	
 	
 	private GameSettings m_settings;
 	private Context m_activity_context;
@@ -70,7 +75,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
 		onSurfaceChanged(screen_width, screen_height);
-		m_menu_item_font = new Font2D();
+		m_menu_item_font = new Font2D(m_tex_manager, Typeface.createFromAsset(m_activity_context.getAssets(), "arial.ttf"),
+				"*_'?\nHello World!g", 30, TextAlign.CENTER, new Vector(30, 30), new Vector(400, 60), Color.argb(255, 255, 255, 255));
 		
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
@@ -128,9 +134,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			break;
 			case CREATION_MENU: uiChange(m_active_ui,m_creation_menu_ui);
 			break;
-			case WAIT_MENU:uiChange(m_active_ui,m_wait_menu_ui);
+			case WAIT_MENU: uiChange(m_active_ui,m_wait_menu_ui);
 			break;
-			case JOIN_MENU:uiChange(m_active_ui,m_join_menu_ui);
+			case JOIN_MENU: uiChange(m_active_ui,m_join_menu_ui);
 			break;
 			case MAIN_MENU: uiChange(m_active_ui, m_main_menu);
 			break;
@@ -159,6 +165,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 
 	public void draw(RenderHelper renderer) {
 		if(m_active_ui != null) m_active_ui.draw(renderer);
+
+		m_menu_item_font.draw(renderer);
 	}
 
 	public void onTouchEvent(float x, float y, int event) {

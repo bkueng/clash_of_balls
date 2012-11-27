@@ -12,6 +12,8 @@ public class Texture {
 	private TextureBase m_texture;
 	private VertexBufferFloat m_tex_buffer;
 	
+	public int textureHandle() { return m_texture.textureHandle(); }
+	
 	//tex_coords can be null to use default tex coords
 	public Texture(TextureBase t, float[] tex_coords) {
 		m_texture = t;

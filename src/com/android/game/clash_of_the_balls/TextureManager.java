@@ -1,11 +1,12 @@
 package com.android.game.clash_of_the_balls;
 
-import java.util.Iterator;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
 import android.content.Context;
-import android.util.Log;
+import android.graphics.Bitmap;
 
 /**
  * manages all textures: new textures are all generated here
@@ -19,15 +20,16 @@ public class TextureManager {
 	
 	public TextureManager(Context activity_context) {
 		m_activity_context = activity_context;
-		m_textures = new TreeMap<Integer, TextureBase>();
+		m_textures = new TreeMap<Integer, TextureBase>();		
 	}
-	
 	
 	//reload all textures into memory: do this when context is lost
 	public void reloadAllTextures() {
 		for (Map.Entry<Integer, TextureBase> entry : m_textures.entrySet()) {
 			entry.getValue().reloadTexture();
 		}
+		// reload all fonts as well
+		Font2D.reloadFonts();
 	}
 	
 	// this will return a texture with default tex coords (for a sprite)
@@ -44,6 +46,12 @@ public class TextureManager {
 			return ret;
 		}
 		return new Texture(texture, tex_coords);
+	}
+	
+	public Texture get(Bitmap bitmap, float[] tex_coords) {
+		TextureBase tex = new TextureBase(bitmap);
+		Texture ret = new Texture(tex, tex_coords);
+		return ret;
 	}
 	
 }
