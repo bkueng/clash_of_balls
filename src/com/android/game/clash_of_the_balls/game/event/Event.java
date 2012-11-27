@@ -38,6 +38,8 @@ public abstract class Event {
 	//returns new Event or null if end of stream
 	public static Event read(DataInputStream s) {
 		try {
+			if(s.available() <= 0) return null;
+			
 			byte b=s.readByte();
 			int seq_num = -1;
 			if(b == type_seq_num) {
@@ -52,7 +54,7 @@ public abstract class Event {
 			case type_item_added: return new EventItemAdded(s, seq_num);
 			case type_item_update: return new EventItemUpdate(s);
 			case type_impact: return new EventImpact(s, seq_num);
-			default: throw new IOException();
+			default: throw new IOException("unknown Event type");
 			}
 			
 		} catch (IOException e) {
