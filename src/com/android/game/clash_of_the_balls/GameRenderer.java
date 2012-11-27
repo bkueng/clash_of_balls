@@ -4,6 +4,7 @@ package com.android.game.clash_of_the_balls;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.android.game.clash_of_the_balls.MainActivity.LoadViewTask;
 import com.android.game.clash_of_the_balls.ShaderManager.ShaderType;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 
@@ -30,8 +31,11 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     
     private long m_last_time=0;
     
-    public GameRenderer(Context activity_context) {
+    private LoadViewTask m_progress_view;
+    
+    public GameRenderer(Context activity_context, LoadViewTask progress_view) {
     	m_activity_context = activity_context;
+    	m_progress_view = progress_view;
     }
     
     public void onDestroy() {
@@ -66,7 +70,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     	m_last_time = SystemClock.elapsedRealtime(); //or: nanoTime()
     	
     	m_ui_handler = new UIHandler(m_width, m_height
-    			, m_activity_context);
+    			, m_activity_context, m_progress_view);
     	m_shader_manager = new ShaderManager(m_activity_context);
     	m_renderer = new RenderHelper(m_shader_manager, (float)m_width
     			, (float)m_height);

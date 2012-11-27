@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.android.game.clash_of_the_balls.MainActivity.LoadViewTask;
 import com.android.game.clash_of_the_balls.game.Game;
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.IMoveable;
@@ -54,7 +55,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	}
 	
 	public UIHandler(int screen_width, int screen_height
-			, Context activity_context) {
+			, Context activity_context, LoadViewTask progress_view) {
+		
+		progress_view.setProgress(5);
 		
 		m_settings = new GameSettings();
 		m_fps_counter = new FPSCounter();
@@ -66,11 +69,15 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
 		
+		progress_view.setProgress(20);
+		
 		//Main Menu
 		m_main_menu_background = new MenuBackground(
 				m_tex_manager.get(R.raw.texture_main_menu_bg),1600.f/960.f);
 		m_main_menu = new MainMenu(m_menu_item_font, m_main_menu_background
 				, screen_width, screen_height,m_tex_manager,m_activity_context);
+		
+		progress_view.setProgress(30);
 		
 		//Creation Menu
 		m_normal_menu_background = new MenuBackground(
@@ -79,19 +86,25 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 				(m_menu_item_font, m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
 		
+		progress_view.setProgress(40);
+		
 		//Wait Menu
 		m_wait_menu_ui = new WaitMenu(m_menu_item_font, m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
 
 		
+		progress_view.setProgress(50);
+		
 		//Join Menu
 		m_join_menu_ui = new JoinMenu(m_menu_item_font, m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager,m_activity_context);
 		
-		
-		//TODO: init menu's , game
+		progress_view.setProgress(60);
 		
 		m_active_ui = m_main_menu; //show main menu
+		
+		
+		progress_view.setProgress(100); //finish progress bar
 	}
 	
 	public void onSurfaceChanged(int width, int height) {

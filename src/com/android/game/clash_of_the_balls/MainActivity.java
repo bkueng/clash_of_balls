@@ -1,5 +1,7 @@
 package com.android.game.clash_of_the_balls;
 
+import com.android.game.clash_of_the_balls.MainActivity.LoadViewTask;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -31,10 +33,11 @@ public class MainActivity extends Activity {
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         
-        new LoadViewTask().execute();    
+        LoadViewTask progress_view = new LoadViewTask();
+        progress_view.execute();
         // Create a GLSurfaceView instance and set it
         // as the ContentView for this Activity
-        m_gl_view = new MyGLSurfaceView(this);
+        m_gl_view = new MyGLSurfaceView(this, progress_view);
         setContentView(m_gl_view);
         
         //start the network service
@@ -70,10 +73,11 @@ public class MainActivity extends Activity {
     }
 
     
-    private class LoadViewTask extends AsyncTask<Void, Integer, Void>
+    public class LoadViewTask extends AsyncTask<Void, Integer, Void>
     {
     	
-    	private int m_time = 2000;
+    	private volatile int m_progress = 0; //progress: [0,100]
+    	
     	//Before running code in the separate thread
 		@Override
 		protected void onPreExecute() 
@@ -98,32 +102,28 @@ public class MainActivity extends Activity {
 			progressDialog.show();
 		}
 		
+		//if progress is 100, progress bar will be hidden
+		public void setProgress(int progress) {
+			synchronized (this) {
+				m_progress = progress;
+				this.notify();
+			}
+		}
+		
 		//The code to be executed in a background thread.
 		@Override
 		protected Void doInBackground(Void... params) 
 		{
-			/* This is just a code that delays the thread execution 4 times, 
-			 * during 850 milliseconds and updates the current progress. This 
-			 * is where the code that is going to be executed on a background
-			 * thread must be placed. 
-			 */
 			try 
 			{
-				//Get the current thread's token
-				synchronized (this) 
-				{
-					//Initialize an integer (that will act as a counter) to zero
-					int counter = 0;
-					int step = 13;
-					//While the counter is smaller than four
-					while(counter <= m_time)
+				while(m_progress < 100) {
+					//Get the current thread's token
+					synchronized (this) 
 					{
-						this.wait(step);
-						//Increment the counter 
-						counter+=step;
+						this.wait();
 						//Set the current progress. 
 						//This value is going to be passed to the onProgressUpdate() method.
-						publishProgress((int)((float)counter/(float)m_time*100));
+						publishProgress(m_progress);
 					}
 				}
 			} 
@@ -162,14 +162,14 @@ class MyGLSurfaceView extends GLSurfaceView {
 
     private final GameRenderer m_renderer;
 
-    public MyGLSurfaceView(Context context) {
+    public MyGLSurfaceView(Context context, LoadViewTask progress_view) {
         super(context);
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
 
         // Set the Renderer for drawing on the GLSurfaceView
-        m_renderer = new GameRenderer(this.getContext());
+        m_renderer = new GameRenderer(this.getContext(), progress_view);
         setRenderer(m_renderer);
 
         
