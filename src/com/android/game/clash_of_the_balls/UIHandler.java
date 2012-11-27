@@ -48,6 +48,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private MenuBackground m_main_menu_background;
 	private MenuBackground m_normal_menu_background;
 	
+	GameServer m_game_server;
+	
 	public enum UIChange {
 		NO_CHANGE,
 		MAIN_MENU,
@@ -152,6 +154,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_game_ui=null;
 		//TODO: stop the server if running
 		
+		if(m_game_server != null) m_game_server.stopThread();
 	}
 
 	public void draw(RenderHelper renderer) {
