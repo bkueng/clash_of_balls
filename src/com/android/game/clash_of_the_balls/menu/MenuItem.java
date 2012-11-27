@@ -37,7 +37,6 @@ public class MenuItem extends GameObject {
 	
 	public void draw(RenderHelper renderer) {
 		// TODO Auto-generated method stub
-		//m_menu_item_font.draw(renderer);
 	}
 
 	public void move(float dsec) {

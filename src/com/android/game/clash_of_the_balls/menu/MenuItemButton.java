@@ -2,8 +2,6 @@ package com.android.game.clash_of_the_balls.menu;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Font2D;
@@ -71,7 +69,9 @@ public class MenuItemButton extends MenuItem {
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);                               
         
+        // Render font
         m_item_font.draw(renderer);
+        
         renderer.popModelMat();
 	}
 

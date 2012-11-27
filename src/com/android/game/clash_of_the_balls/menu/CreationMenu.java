@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls.menu;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
 
@@ -71,37 +72,41 @@ public class CreationMenu extends GameMenuBase {
 		
 		// Prepare fonts
 		// color constants
-		int font_color = 0x00000000;
+		int font_color = Color.WHITE;
 		int font_size = (int)Math.round(0.5 * button_height);
-		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "arial.ttf");
+		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "alphafridgemagnets.ttf");
 		
-		Font2D host_font = new Font2D(m_tex_manager, font_typeface, "Host", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
-		m_font = host_font;
+		Font2D name_font = new Font2D(m_tex_manager, font_typeface, "Name", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		Font2D first_font = new Font2D(m_tex_manager, font_typeface, "1", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		Font2D second_font = new Font2D(m_tex_manager, font_typeface, "2", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		Font2D left_arrow_font = new Font2D(m_tex_manager, font_typeface, "Left", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+
+		m_font = name_font;
 		
 		// Name
 		m_menu_items.add(m_name_button = new MenuItemKeyboard(new Vector(pos.x
 				+ size.x / 3.f, pos.y + size.y * 3.f / 4.f + offset_y),
 				new Vector(5 * grey_button_width, grey_button_height),
-				host_font, m_tex_manager, m_activity_context,
+				name_font, m_tex_manager, m_activity_context,
 				"Please Enter your Nickname:"));
 
 		// Group 1
 		m_menu_items.add(m_first_lvl_button = new MenuItemGreyButton(
 				new Vector(pos.x + size.x / 3.f, pos.y + size.y / 2.f
 						+ offset_y), new Vector(grey_button_width,
-						grey_button_height), host_font, m_tex_manager));
+						grey_button_height), first_font, m_tex_manager));
 
 		m_menu_items.add(m_second_lvl_button = new MenuItemGreyButton(
 				new Vector(pos.x + size.x / 3.f + grey_button_width
 						+ distanceButtons, pos.y + size.y / 2.f + offset_y),
-				new Vector(grey_button_width, grey_button_height), host_font,
+				new Vector(grey_button_width, grey_button_height), second_font,
 				m_tex_manager));
 
 		// Group 2
 		m_menu_items.add(m_presiLeft_button = new MenuItemPresiArrow(
 				new Vector(pos.x + size.x / 3.f, pos.y + size.y / 4.f
 						+ offset_y), new Vector(grey_button_width,
-						grey_button_height), host_font, m_tex_manager,
+						grey_button_height), left_arrow_font, m_tex_manager,
 				PresiArrow.LEFT));
 
 		// Create List for PresiView---
@@ -114,23 +119,28 @@ public class CreationMenu extends GameMenuBase {
 				list_size);
 		//--------------------------------
 		m_menu_items.add(m_presi_rounds = new MenuItemPresi(list_pos,
-				list_size, host_font, presi_round_list));
+				list_size, name_font, presi_round_list));
 
 		m_menu_items.add(m_presiRight_button = new MenuItemPresiArrow(
 				new Vector(pos.x + size.x / 3.f + 2
 						* (grey_button_width + distanceButtons), pos.y + size.y
 						/ 4.f + offset_y), new Vector(grey_button_width,
-						grey_button_height), host_font, m_tex_manager,
+						grey_button_height), name_font, m_tex_manager,
 				PresiArrow.RIGHT));
 
 		// Last Line
+		// Fonts
+		Font2D cancel_font = new Font2D(m_tex_manager, font_typeface, "Cancel", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		Font2D create_font = new Font2D(m_tex_manager, font_typeface, "Create", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+
+		// Buttons
 		m_menu_items.add(m_cancel_button = new MenuItemButton(new Vector(pos.x
 				+ size.x * (1 / 2.f + 0.025f), pos.y + offset_y), new Vector(
-				button_width, button_height), host_font, m_tex_manager));
+				button_width, button_height), cancel_font, m_tex_manager));
 
 		m_menu_items.add(m_create_button = new MenuItemButton(new Vector(pos.x
 				+ size.x * 0.025f, pos.y + offset_y), new Vector(button_width,
-				button_height), host_font, m_tex_manager));
+				button_height), create_font, m_tex_manager));
 	}
 
 	@Override

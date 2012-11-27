@@ -7,7 +7,6 @@ import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;

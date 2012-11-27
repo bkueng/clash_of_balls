@@ -40,10 +40,13 @@ public class MainMenu extends GameMenuBase {
 		// prepare fonts
 		// font constants
 		int font_color = Color.WHITE;
-		int font_size = (int)Math.round(0.5 * button_height);
-		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "arial.ttf");
+		int font_size = (int)Math.round(0.6 * button_height);
+		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "alphafridgemagnets.ttf");
 		
 		Font2D host_font = new Font2D(m_tex_manager, font_typeface, "Host", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		Font2D join_font = new Font2D(m_tex_manager, font_typeface, "Join", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		Font2D help_font = new Font2D(m_tex_manager, font_typeface, "Help", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		Font2D credits_font = new Font2D(m_tex_manager, font_typeface, "Credits", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
 		
 		m_menu_items.add(m_host_button = new MenuItemButton(
 				new Vector(pos.x+size.x/2.f, pos.y+size.y*3.f/5.f),
@@ -55,21 +58,21 @@ public class MainMenu extends GameMenuBase {
 				new Vector(pos.x+size.x/2.f,
 						pos.y+size.y*3.f/5.f-(button_height+distanceButtons)),
 				new Vector(button_width, button_height), 
-				host_font,
+				join_font,
 				m_tex_manager));
 		
 		m_menu_items.add(m_help_button = new MenuItemButton(
 				new Vector(pos.x+size.x/2.f, 
 						pos.y+size.y*3.f/5.f-2*(button_height+distanceButtons)),
 				new Vector(button_width, button_height), 
-				host_font,
+				help_font,
 				m_tex_manager));
 		
 		m_menu_items.add(m_credits_button = new MenuItemButton(
 				new Vector(pos.x+size.x/2.f, 
 						pos.y+size.y*3.f/5.f-3*(button_height+distanceButtons)),
 				new Vector(button_width, button_height), 
-				host_font,
+				credits_font,
 				m_tex_manager));
 	}
 

@@ -1,6 +1,7 @@
 package com.android.game.clash_of_the_balls.menu;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
 
@@ -52,24 +53,24 @@ public class JoinMenu extends GameMenuBase {
 		
 		// Prepare fonts
 		// color constants
-		int font_color = 0x00000000;
+		int font_color = Color.WHITE;
 		int font_size = (int)Math.round(0.5 * button_height);
-		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "arial.ttf");
+		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "alphafridgemagnets.ttf");
 		
-		Font2D host_font = new Font2D(m_tex_manager, font_typeface, "Host", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
-		
+		Font2D join_font = new Font2D(m_tex_manager, font_typeface, "Join", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		Font2D cancel_font = new Font2D(m_tex_manager, font_typeface, "Cancel", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
 		
 		//right Column
 
 		m_menu_items.add(m_join_button = new MenuItemButton(
 				new Vector(pos.x+size.x * (0.025f+2.f/3.f), pos.y+size.y*1.f/4.f+offset_y),
 				new Vector(button_width, button_height), 
-				host_font,
+				join_font,
 				m_tex_manager));
 		m_menu_items.add(m_cancel_button = new MenuItemButton(
 				new Vector(pos.x+size.x* (0.025f+2.f/3.f), pos.y+offset_y),
 				new Vector(button_width, button_height), 
-				host_font ,
+				cancel_font ,
 				m_tex_manager));
 
 	}

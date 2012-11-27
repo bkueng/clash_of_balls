@@ -128,8 +128,6 @@ public class Font2D implements IDrawable {
 		textPaint.setAntiAlias(true);
 		textPaint.setColor(m_color);
 		
-	    // Get font width
-	    //m_font_width = textPaint.measureText(m_string);
 		// Alignment
 		textPaint.setTextAlign(getAlignment(m_align));
 	    
