@@ -1,6 +1,7 @@
 package com.android.game.clash_of_the_balls.menu;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
 
@@ -38,7 +39,7 @@ public class MainMenu extends GameMenuBase {
 		
 		// prepare fonts
 		// font constants
-		int font_color = 0x00000000;
+		int font_color = Color.WHITE;
 		int font_size = (int)Math.round(0.5 * button_height);
 		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "arial.ttf");
 		

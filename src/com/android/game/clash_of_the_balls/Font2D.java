@@ -12,7 +12,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.util.Log;
 
 /**
@@ -147,7 +146,7 @@ public class Font2D implements IDrawable {
 		bitmap.eraseColor(0);
 		
 		// Draw the text centered
-		canvas.drawRGB(255, 0, 127); // TODO: Delete when finished
+		//canvas.drawRGB(255, 0, 127); // TODO: Delete when finished
 		canvas.drawText(m_string, m_x_offset, m_y_offset, textPaint);
 				
 		return bitmap;
@@ -175,13 +174,6 @@ public class Font2D implements IDrawable {
 		
 		renderer.shaderManager().activateTexture(0);
 		m_texture.useTexture(renderer);
-		/*
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.setIdentityM(model_mat, model_mat_pos);
-		Matrix.translateM(model_mat, model_mat_pos, 30.f, 30.f, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_text_field_size.x, m_text_field_size.y, 0.f);
-		*/
 		
 		// position
 		int position_handle = renderer.shaderManager().a_Position_handle;
@@ -197,8 +189,6 @@ public class Font2D implements IDrawable {
 		
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-
-		//renderer.popModelMat();
 	}
 	
 	protected void finalize() {
