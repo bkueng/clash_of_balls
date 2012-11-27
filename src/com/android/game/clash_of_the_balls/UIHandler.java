@@ -49,7 +49,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private UIBase m_join_menu_ui;
 	private Game m_game_ui;
 	
-	private Font2D m_menu_item_font;
 	private MenuBackground m_main_menu_background;
 	private MenuBackground m_normal_menu_background;
 	
@@ -75,8 +74,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
 		onSurfaceChanged(screen_width, screen_height);
-		m_menu_item_font = new Font2D(m_tex_manager, Typeface.createFromAsset(m_activity_context.getAssets(), "arial.ttf"),
-				"*_'?\nHello World!g", 30, TextAlign.CENTER, new Vector(30, 30), new Vector(400, 60), Color.argb(255, 255, 255, 255));
 		
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
@@ -86,7 +83,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		//Main Menu
 		m_main_menu_background = new MenuBackground(
 				m_tex_manager.get(R.raw.texture_main_menu_bg),1600.f/960.f);
-		m_main_menu = new MainMenu(m_menu_item_font, m_main_menu_background
+		m_main_menu = new MainMenu(m_main_menu_background
 				, screen_width, screen_height,m_tex_manager,m_activity_context);
 		
 		progress_view.setProgress(30);
@@ -94,21 +91,20 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		//Creation Menu
 		m_normal_menu_background = new MenuBackground(
 				m_tex_manager.get(R.raw.texture_bg_normal),1600.f/960.f);
-		m_creation_menu_ui = new CreationMenu
-				(m_menu_item_font, m_normal_menu_background
-				, screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
+		m_creation_menu_ui = new CreationMenu(m_normal_menu_background,
+				screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
 		
 		progress_view.setProgress(40);
 		
 		//Wait Menu
-		m_wait_menu_ui = new WaitMenu(m_menu_item_font, m_normal_menu_background
+		m_wait_menu_ui = new WaitMenu(m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
 
 		
 		progress_view.setProgress(50);
 		
 		//Join Menu
-		m_join_menu_ui = new JoinMenu(m_menu_item_font, m_normal_menu_background
+		m_join_menu_ui = new JoinMenu(m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager,m_activity_context);
 		
 		progress_view.setProgress(60);
@@ -165,8 +161,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 
 	public void draw(RenderHelper renderer) {
 		if(m_active_ui != null) m_active_ui.draw(renderer);
-
-		m_menu_item_font.draw(renderer);
 	}
 
 	public void onTouchEvent(float x, float y, int event) {

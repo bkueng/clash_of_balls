@@ -3,8 +3,6 @@ package com.android.game.clash_of_the_balls;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import javax.xml.transform.Templates;
-
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
@@ -27,7 +25,6 @@ public class Font2D implements IDrawable {
 	private static final String LOG_TAG = "Font2D";
 	
 	private Texture m_texture;
-	private Vector m_position;
 	private Vector m_text_field_size;
 	
 	private Typeface m_typeface;
@@ -59,13 +56,13 @@ public class Font2D implements IDrawable {
 	}
 	
 	public Font2D(TextureManager texture_manager, Typeface typeface, String string,
-			int font_size, TextAlign align, Vector position, Vector text_field_size, int color) {
+			int font_size, TextAlign align, Vector text_field_size, int color) {
 		
 		m_texture_manager = texture_manager;
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
-		doInit(typeface, string, font_size, align, position, text_field_size, color);
+		doInit(typeface, string, font_size, align, text_field_size, color);
 
 		m_reference = new WeakReference<Font2D>(this);
 		m_weakFont2D.add(m_reference);
@@ -74,13 +71,12 @@ public class Font2D implements IDrawable {
 	}
 
 	private void doInit(Typeface typeface, String string, int font_size,
-			TextAlign align, Vector position, Vector text_field_size, int color) {
+			TextAlign align, Vector text_field_size, int color) {
 		
 		// Set members
 		m_typeface = typeface;
 		m_string = string;
 		m_font_size = font_size;
-		m_position = position;
 		m_text_field_size = text_field_size;
 		m_font_height = 0;
 		m_x_offset = 0;
@@ -158,7 +154,7 @@ public class Font2D implements IDrawable {
 	}
 	
 	public void setString(String string) {
-		doInit(m_typeface, string, m_font_size, m_align, m_position, m_text_field_size, m_color);
+		doInit(m_typeface, string, m_font_size, m_align, m_text_field_size, m_color);
 	}
 	
 	public static void reloadFonts() {
@@ -179,12 +175,13 @@ public class Font2D implements IDrawable {
 		
 		renderer.shaderManager().activateTexture(0);
 		m_texture.useTexture(renderer);
-		
+		/*
 		int model_mat_pos = renderer.pushModelMat();
 		float model_mat[] = renderer.modelMat();
 		Matrix.setIdentityM(model_mat, model_mat_pos);
-		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
+		Matrix.translateM(model_mat, model_mat_pos, 30.f, 30.f, 0.f);
 		Matrix.scaleM(model_mat, model_mat_pos, m_text_field_size.x, m_text_field_size.y, 0.f);
+		*/
 		
 		// position
 		int position_handle = renderer.shaderManager().a_Position_handle;
@@ -201,7 +198,7 @@ public class Font2D implements IDrawable {
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
-		renderer.popModelMat();
+		//renderer.popModelMat();
 	}
 	
 	protected void finalize() {

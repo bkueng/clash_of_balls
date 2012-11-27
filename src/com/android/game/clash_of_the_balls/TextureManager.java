@@ -15,7 +15,8 @@ import android.graphics.Bitmap;
  */
 public class TextureManager {
 	
-	private Context m_activity_context;
+	public Context m_activity_context;
+	
 	private Map<Integer, TextureBase> m_textures; //key is raw_res_id
 	
 	public TextureManager(Context activity_context) {

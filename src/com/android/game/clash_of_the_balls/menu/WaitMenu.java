@@ -1,12 +1,14 @@
 package com.android.game.clash_of_the_balls.menu;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.Vector;
+import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 
 public class WaitMenu extends GameMenuBase {
@@ -29,10 +31,10 @@ public class WaitMenu extends GameMenuBase {
 	MenuItemGreyButton m_4rounds_button;
 	MenuItemGreyButton m_10rounds_button;
 
-	public WaitMenu(Font2D item_font, MenuBackground background,
+	public WaitMenu(MenuBackground background,
 			float screen_width, float screen_height,
 			TextureManager m_tex_manager, GameSettings settings,Context context) {
-		super(item_font, background,context);
+		super(background, context);
 
 		Vector pos = new Vector(0.f, 0.f);
 		Vector size = new Vector(screen_width, screen_height);
@@ -52,16 +54,25 @@ public class WaitMenu extends GameMenuBase {
 
 		float offset_y = size.y * 0.025f;
 
+		// Prepare fonts
+		// color constants
+		int font_color = 0x00000000;
+		int font_size = (int)Math.round(0.5 * button_height);
+		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "arial.ttf");
+		
+		Font2D host_font = new Font2D(m_tex_manager, font_typeface, "Host", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
+		
+		
 		// right Column
 		m_menu_items.add(m_start_button = new MenuItemButton(new Vector(pos.x
 				+ size.x * (0.025f + 2.f / 3.f), pos.y + size.y * 2.f / 4.f
 				+ offset_y), new Vector(button_width, button_height),
-				m_item_font, m_tex_manager));
+				host_font, m_tex_manager));
 
 		m_menu_items.add(m_cancel_button = new MenuItemButton(new Vector(pos.x
 				+ size.x * (0.025f + 2.f / 3.f), pos.y + offset_y + size.y
 				* 1.f / 4.f), new Vector(button_width, button_height),
-				m_item_font, m_tex_manager));
+				host_font, m_tex_manager));
 
 	}
 

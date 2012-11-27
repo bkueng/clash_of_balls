@@ -16,6 +16,8 @@ import com.android.game.clash_of_the_balls.game.Vector;
 public class MenuItemButton extends MenuItem {
 
 	private String LOG_TAG = "debug";
+
+	private Font2D m_item_font;
 	
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
@@ -25,6 +27,7 @@ public class MenuItemButton extends MenuItem {
 	public MenuItemButton(Vector position, Vector size,
 			Font2D font,TextureManager m_tex_manager) {
 		super(position, size, font);
+		m_item_font = font;
 		m_texture_pressed=m_tex_manager
 				.get(R.raw.texture_main_menu_pressed_button);
 		m_texture_unpressed=m_tex_manager
@@ -68,6 +71,7 @@ public class MenuItemButton extends MenuItem {
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);                               
         
+        m_item_font.draw(renderer);
         renderer.popModelMat();
 	}
 

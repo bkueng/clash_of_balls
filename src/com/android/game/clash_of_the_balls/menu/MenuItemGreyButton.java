@@ -17,10 +17,11 @@ public class MenuItemGreyButton extends MenuItem {
 
 	private String LOG_TAG = "debug";
 	
+	private Font2D m_font;
+	
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
 	private boolean m_pressed=false;
-
 
 	public MenuItemGreyButton(Vector position, Vector size,
 			Font2D font,TextureManager m_tex_manager) {
@@ -35,8 +36,6 @@ public class MenuItemGreyButton extends MenuItem {
 				(VertexBufferFloat.sprite_color_data_white, 4);
 	}
 
-
-	
 	public void draw(RenderHelper renderer) {		
 		Texture m_texture;
 		if(m_pressed){
@@ -52,6 +51,8 @@ public class MenuItemGreyButton extends MenuItem {
 		Matrix.setIdentityM(model_mat, model_mat_pos);
 		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
 		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
+		
+		// position
 		int position_handle = renderer.shaderManager().a_Position_handle;
 		if(position_handle != -1)
 			m_position_data.apply(position_handle);
