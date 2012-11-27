@@ -1,5 +1,10 @@
 package com.android.game.clash_of_the_balls;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+
+import javax.xml.transform.Templates;
+
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
@@ -29,18 +34,16 @@ public class Font2D implements IDrawable {
 	private String m_string;
 	private int m_font_size;
 	private TextAlign m_align;
-	private float m_font_width;
 	private float m_font_height;
 	private float m_x_offset;
 	private float m_y_offset;
-	private int m_alpha;
-	private int m_red;
-	private int m_green;
-	private int m_blue;
+	private int m_color;
 
 	private TextureManager m_texture_manager;
 	private VertexBufferFloat m_position_data;
 	private VertexBufferFloat m_color_data;
+	
+	public static ArrayList<WeakReference<Font2D>> m_weakFont2D;
 	
 	/**
 	 * Creates 2D font
@@ -54,21 +57,23 @@ public class Font2D implements IDrawable {
 	}
 	
 	public Font2D(TextureManager texture_manager, Typeface typeface, String string,
-			int font_size, TextAlign align, Vector position, Vector text_field_size, int red, int green, int blue, int alpha) {
+			int font_size, TextAlign align, Vector position, Vector text_field_size, int color) {
 		
 		m_texture_manager = texture_manager;
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
-		doInit(typeface, string, font_size, align, position, text_field_size, red, green, blue, alpha);
+		doInit(typeface, string, font_size, align, position, text_field_size, color);
 
 		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
+		
+		m_weakFont2D.add(new WeakReference<Font2D>(this));
 		
 		Log.d(LOG_TAG, "Font succesfully created");
 	}
 
 	private void doInit(Typeface typeface, String string, int font_size,
-			TextAlign align, Vector position, Vector text_field_size, int red, int green, int blue, int alpha) {
+			TextAlign align, Vector position, Vector text_field_size, int color) {
 		
 		// Set members
 		m_typeface = typeface;
@@ -76,14 +81,10 @@ public class Font2D implements IDrawable {
 		m_font_size = font_size;
 		m_position = position;
 		m_text_field_size = text_field_size;
-		m_font_width = 0;
 		m_font_height = 0;
 		m_x_offset = 0;
 		m_y_offset = 0;
-		m_alpha = alpha;
-		m_red = red;
-		m_green = green;
-		m_blue = blue;
+		m_color = color;
 		m_texture = null;
 		
 		/*
@@ -109,16 +110,6 @@ public class Font2D implements IDrawable {
 				return Paint.Align.LEFT;
 		}
 	}
-
-	public void setString(String string) {
-		doInit(m_typeface, string, m_font_size, TextAlign.LEFT, m_position, m_text_field_size, m_red, m_green, m_blue, m_alpha);
-		
-		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
-	}
-	
-	public void reloadTexture() {
-		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
-	}
 	
 	private Bitmap createFontBitmap() {
 
@@ -128,10 +119,10 @@ public class Font2D implements IDrawable {
 		textPaint.setTypeface(m_typeface);
 		textPaint.setTextSize(m_font_size);
 		textPaint.setAntiAlias(true);
-		textPaint.setARGB(m_alpha, m_red, m_green, m_blue);
+		textPaint.setColor(m_color);
 		
 	    // Get font width
-	    m_font_width = textPaint.measureText(m_string);
+	    //m_font_width = textPaint.measureText(m_string);
 		// Alignment
 		textPaint.setTextAlign(getAlignment(m_align));
 	    
@@ -152,6 +143,20 @@ public class Font2D implements IDrawable {
 		canvas.drawText(m_string, m_x_offset, m_y_offset, textPaint);
 				
 		return bitmap;
+	}
+	
+	public void setString(String string) {
+		doInit(m_typeface, string, m_font_size, TextAlign.LEFT, m_position, m_text_field_size, m_color);
+		
+		m_texture = m_texture_manager.get(createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
+	}
+	
+	public static void reloadFonts() {
+		Font2D tmpFont2D;
+		for (WeakReference<Font2D> wr : m_weakFont2D) {
+			tmpFont2D = wr.get();
+			tmpFont2D.m_texture = tmpFont2D.m_texture_manager.get(tmpFont2D.createFontBitmap(), VertexBufferFloat.sprite_tex_coords);
+		}
 	}
 
 	@Override
@@ -182,5 +187,10 @@ public class Font2D implements IDrawable {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
 		renderer.popModelMat();
+	}
+	
+	protected void finalize() {
+		// TODO:
+		m_weakFont2D.remove(new WeakReference<Font2D>(this));
 	}
 }

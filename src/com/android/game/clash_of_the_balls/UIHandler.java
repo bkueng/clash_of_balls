@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Paint.Align;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
@@ -27,7 +28,6 @@ import com.android.game.clash_of_the_balls.menu.WaitMenu;
 public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	
 	private static final String LOG_TAG = "UIHandler";
-	
 	
 	private GameSettings m_settings;
 	private Context m_activity_context;
@@ -65,7 +65,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_activity_context = activity_context;
 		m_tex_manager = new TextureManager(m_activity_context);
 		m_menu_item_font = new Font2D(m_tex_manager, Typeface.createFromAsset(m_activity_context.getAssets(), "arial.ttf"),
-				"*_'?\nHello World!g", 30, TextAlign.CENTER, new Vector(30, 30), new Vector(400, 60),255, 255, 255, 255);
+				"*_'?\nHello World!g", 30, TextAlign.CENTER, new Vector(30, 30), new Vector(400, 60), Color.argb(255, 255, 255, 255));
 		
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
