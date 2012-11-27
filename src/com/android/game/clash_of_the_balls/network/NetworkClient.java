@@ -104,6 +104,8 @@ public class NetworkClient {
 			//server updates
 			NetworkData d;
 			while((d=m_networking.receiveGameCommand()) != null) {
+				Log.v(TAG, "Client: Received game command");
+				
 				ByteArrayInputStream bais = new ByteArrayInputStream(d.data);
 				DataInputStream di = new DataInputStream(bais);
 				Event e;
