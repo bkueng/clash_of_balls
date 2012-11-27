@@ -52,6 +52,7 @@ public abstract class GameBase {
 		this.is_server = is_server;
 		m_settings = s;
 		m_texture_manager = texture_manager;
+		m_game_objects = new TreeMap<Short, DynamicGameObject>();
 	}
 	
 	public void initGame(GameLevel level) {
