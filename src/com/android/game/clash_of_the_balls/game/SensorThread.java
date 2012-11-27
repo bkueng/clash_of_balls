@@ -17,6 +17,8 @@ import android.os.HandlerThread;
 public class SensorThread implements SensorEventListener {
 	HandlerThread m_handler_thread;
 	
+	private static final float output_scaling = 0.1f;
+	
     private Vector3D m_calib_vec; //calibration vector
     private volatile Vector3D m_cur_vec; //is accessed from different threads!
     private Vector3D m_cur_vec_tmp;
@@ -89,7 +91,7 @@ public class SensorThread implements SensorEventListener {
     	v.rotate(v_n, angle);
     	
     	//rotate because we use portrait format, and another coord system
-    	return new Vector(-v.y, v.x);
+    	return new Vector(-v.y * output_scaling, v.x * output_scaling);
     }
     
     
