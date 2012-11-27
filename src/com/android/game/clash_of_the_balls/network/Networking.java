@@ -144,14 +144,6 @@ public class Networking {
     public NetworkData receiveGameCommand() {
     	return m_game_commands.poll();
     }
-    //client has connected: returns unique id of client 
-    //(same as packet sender in receive* methods)
-    public String receiveClientJoined() {
-    	return m_clients_joined.poll();
-    }
-    public String receiveClientLeft() {
-    	return m_clients_left.poll();
-    }
     //this will return a server_id
     public String receiveServerFound() {
     	return m_server_found.poll();
@@ -164,11 +156,31 @@ public class Networking {
     	return mBus.getUniqueName();
     }
     
+    /* joined clients */
+    
+	public static class ConnectedClient {
+		public String unique_id; //same as packet sender
+		public String well_known_name; //TODO
+		public short id = -1; //game id: server decides which client gets which id
+	}
+	private List<ConnectedClient> m_connected_clients = new ArrayList<ConnectedClient>();
+	
+	public synchronized ConnectedClient connectedClient(int idx) {
+		if(idx < m_connected_clients.size())
+			return m_connected_clients.get(idx);
+		return null;
+	}
+	public synchronized int connectedClientCount() {
+		return m_connected_clients.size();
+	}
+	
+    
     //set this before start advertising
     //use -1 for unlimited
     public void setMaxClientCount(int max_count) {
     	m_max_client_count = max_count;
     }
+    
     
     private volatile int m_max_client_count = -1;
     
@@ -230,8 +242,6 @@ public class Networking {
 	public void joinSessionToSelf() {
 		//join to ourself
 		joinSession(getWellKnownName());
-		m_clients_joined.add(getUniqueName()); ///////////////////////////////////////////
-			//this should not be necesary with the next version!
 	}
 	public void leaveSession() {
 		m_background_handler.leaveSession();
@@ -260,10 +270,6 @@ public class Networking {
 	private Queue<NetworkData> m_sensor_updates = new ConcurrentLinkedQueue<NetworkData>();
 	private Queue<NetworkData> m_acks = new ConcurrentLinkedQueue<NetworkData>();
 	private Queue<NetworkData> m_game_commands = new ConcurrentLinkedQueue<NetworkData>();
-	
-	private Queue<String> m_clients_joined = new ConcurrentLinkedQueue<String>();
-	private AtomicInteger m_clients_joined_count = new AtomicInteger(0);
-	private Queue<String> m_clients_left = new ConcurrentLinkedQueue<String>();
 	
 	private Queue<String> m_server_found = new ConcurrentLinkedQueue<String>();
 	private Queue<String> m_server_lost = new ConcurrentLinkedQueue<String>();
@@ -862,16 +868,12 @@ public class Networking {
         		 * Accept anyone who can get our contact port correct.
         		 */
         		if (sessionPort == CONTACT_PORT) {
-        			//TODO: whom do we accept??
         			
         			
-        			//use max_clients value -> use max value from game level
-        			int connected_clients = m_clients_joined_count.get();
-        			if(mJoinedToSelf) ++connected_clients;
+        			int connected_clients = connectedClientCount();
         			
         			if(m_max_client_count==-1 || connected_clients < m_max_client_count) {
-        				Log.e("", "CLIENT JOINED REQUEST");
-
+        				
         				return true;
         				
         			}
@@ -899,9 +901,6 @@ public class Networking {
                 SignalEmitter emitter = new SignalEmitter(m_network_service, id
                 		, SignalEmitter.GlobalBroadcast.Off);
                 mHostChatInterface = emitter.getInterface(AlljoynInterface.class);
-                m_clients_joined.add(joiner);
-                m_clients_joined_count.incrementAndGet();
-                sendEventToListeners(HANDLE_CLIENT_JOINED);
             }             
         });
         
@@ -1081,6 +1080,7 @@ public class Networking {
         	if (wellKnownNameToJoin.equals(getWellKnownName())) {              
              	mUseChannelState = UseChannelState.JOINED;
         		mJoinedToSelf = true;
+        		handleClientJoined(getUniqueName());
         		Log.d(TAG, "JoinSession: we are joined to ourself");
                 return;
         	}
@@ -1114,6 +1114,14 @@ public class Networking {
         				"The session has been lost");
              	mUseChannelState = UseChannelState.IDLE;
             }
+            
+            public void sessionMemberAdded(int sessionId, String uniqueName) {
+            	handleClientJoined(uniqueName);
+            }
+            
+            public void sessionMemberRemoved(int sessionId, String uniqueName) {
+            	handleClientLeft(uniqueName);
+            }
         });
         
         if (status == Status.OK) {
@@ -1145,6 +1153,8 @@ public class Networking {
         Log.i(TAG, "doLeaveSession()");
         if (mJoinedToSelf == false) {
         	mBus.leaveSession(mUseSessionId);
+        } else {
+        	handleClientLeft(getUniqueName());
         }
         mUseSessionId = -1;
         mJoinedToSelf = false;
@@ -1154,6 +1164,42 @@ public class Networking {
     private void doExit() {
     	mBus.unregisterBusObject((BusObject)m_network_service);
     	mBus=null;
+    }
+    
+    private synchronized void handleClientJoined(String unique_name) {
+    	if(unique_name != null) {
+    		Log.i(TAG, "Client joined: "+unique_name);
+
+    		//check if already added
+    		boolean exists=false;
+    		for(ConnectedClient client : m_connected_clients) {
+    			if(client.unique_id.equals(unique_name)) exists=true;
+    		}
+    		if(!exists) {
+    			ConnectedClient c=new ConnectedClient();
+    			c.unique_id = unique_name;
+    			m_connected_clients.add(c);
+    		}
+
+    		sendEventToListeners(HANDLE_CLIENT_JOINED);
+    	} else {
+    		Log.e(TAG, "handleClientJoined: unique_name is NULL!");
+    	}
+    }
+    private synchronized void handleClientLeft(String unique_name) {
+    	if(unique_name != null) {
+    		Log.i(TAG, "Client left: "+unique_name);
+
+			for(int i=0; i<m_connected_clients.size(); ++i) {
+				if(m_connected_clients.get(i).unique_id.equals(unique_name)) {
+					m_connected_clients.remove(i);
+				}
+			}
+
+    		sendEventToListeners(HANDLE_CLIENT_LEFT);
+    	} else {
+    		Log.e(TAG, "handleClientLeft: unique_name is NULL!");
+    	}
     }
     
     /**

@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.Vector;
+import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
 import com.android.game.clash_of_the_balls.network.Networking.NetworkData;
 
 /**
@@ -27,13 +28,6 @@ public class NetworkServer {
 	
 	private int m_next_sequence_num;
 	
-	public static class ConnectedClient {
-		public String unique_id; //network id
-		public short id = -1; //game id: server decides which client gets which id
-	}
-	
-	private List<ConnectedClient> m_connected_clients=new ArrayList<ConnectedClient>();
-	
 	private final ByteArrayOutputStream m_outgoing_byte_stream
 			= new ByteArrayOutputStream();
 	private final DataOutputStream m_outgoing_stream
@@ -47,8 +41,8 @@ public class NetworkServer {
 	}
 	
 	public ConnectedClient getConnectedClient(int idx) 
-		{ return m_connected_clients.get(idx); }
-	public int getConnectedClientCount() { return m_connected_clients.size(); }
+		{ return m_networking.connectedClient(idx); }
+	public int getConnectedClientCount() { return m_networking.connectedClientCount(); }
 	
 	
 	public int getSequenceNum() {
@@ -93,31 +87,6 @@ public class NetworkServer {
 	
 	//call this regularly to handle incoming network data
 	public void handleReceive() {
-		//connected clients
-		String client_unique_id;
-		while((client_unique_id=m_networking.receiveClientJoined()) != null) {
-			//check if already added
-			boolean exists=false;
-			for(ConnectedClient client : m_connected_clients) {
-				if(client.unique_id.equals(client_unique_id)) exists=true;
-			}
-			if(!exists) {
-				ConnectedClient c=new ConnectedClient();
-				c.unique_id = client_unique_id;
-				m_connected_clients.add(c);
-				Log.i(TAG, "New Client connected: "+client_unique_id);
-			}
-		}
-		//lost clients
-		while((client_unique_id=m_networking.receiveClientLeft()) != null) {
-			//find where
-			for(int i=0; i<m_connected_clients.size(); ++i) {
-				if(m_connected_clients.get(i).unique_id.equals(client_unique_id)) {
-					m_connected_clients.remove(i);
-					Log.i(TAG, "Client left: "+client_unique_id);
-				}
-			}
-		}
 		
 		//acks 
 		NetworkData d;
@@ -144,12 +113,13 @@ public class NetworkServer {
 	public short getClientId(String unique_id) {
 		short ret=-1;
 		if(unique_id != null) {
-			for(ConnectedClient client : m_connected_clients) {
-				if(client.unique_id.equals(unique_id))
+			for(int i=0; i<m_networking.connectedClientCount(); ++i) {
+				ConnectedClient client = m_networking.connectedClient(i);
+				if(client!=null && client.unique_id.equals(unique_id))
 					return client.id;
 			}
 			Log.w(TAG, "Received data but cannot find associated client id (unique_id = "
-					+unique_id+", client_count="+m_connected_clients.size()+")!");
+					+unique_id+", client_count="+m_networking.connectedClientCount()+")!");
 		} else {
 			Log.w(TAG, "Received data: sender String is NULL!");
 		}
@@ -157,8 +127,9 @@ public class NetworkServer {
 	}
 	
 	public String getClientUniqueName(short client_id) {
-		for(ConnectedClient client : m_connected_clients) {
-			if(client.id == client_id)
+		for(int i=0; i<m_networking.connectedClientCount(); ++i) {
+			ConnectedClient client = m_networking.connectedClient(i);
+			if(client!=null && client.id == client_id)
 				return client.unique_id;
 		}
 		return "";

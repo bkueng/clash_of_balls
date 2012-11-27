@@ -28,7 +28,7 @@ import com.android.game.clash_of_the_balls.network.Networking;
  * start this thread when all clients have joined and the start button is pressed
  * network advertisement & listening should be disabled at this point
  * 
- * call initGame before starting the game thread!
+ * call initGame before starting the game thread (when all clients are connected)!
  * -> stop the thread between every game & reinit
  *
  */
