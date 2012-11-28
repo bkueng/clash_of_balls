@@ -41,11 +41,15 @@ public class MenuItemKeyboard extends MenuItem {
 	private String m_regex = "^[a-zA-Z0-9]+$";
 	private String m_regex_msg = "Please enter only letters or numbers";
 
+	private Font2D m_item_font;
 	
-	public MenuItemKeyboard(Vector position, Vector size, Font2D font, 
-			TextureManager tex_manager
-			, Context activity_context,String text) {
-		super(position, size, font);
+	public MenuItemKeyboard(Vector position, Vector size
+			, Font2D.Font2DSettings font_settings, TextureManager tex_manager
+			, Context activity_context, String text) {
+		
+		super(position, size);
+		
+		m_item_font = new Font2D(m_tex_manager, size, font_settings, (int)Math.round(size.y * 0.7));
 		m_dialog_text = text;
 		m_tex_manager=tex_manager;
 		m_activity_context = activity_context;
@@ -145,6 +149,8 @@ public class MenuItemKeyboard extends MenuItem {
 		Matrix.setIdentityM(model_mat, model_mat_pos);
 		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
 		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
+		
+		// position
 		int position_handle = renderer.shaderManager().a_Position_handle;
 		if(position_handle != -1)
 			m_position_data.apply(position_handle);

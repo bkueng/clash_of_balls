@@ -16,9 +16,7 @@ import com.android.game.clash_of_the_balls.game.Vector;
 public class MenuItemPresiArrow extends MenuItem{
 
 	private String LOG_TAG = "debug";
-	
-	private Font2D m_item_font;
-	
+		
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
 	private boolean m_pressed=false;
@@ -32,10 +30,10 @@ public class MenuItemPresiArrow extends MenuItem{
 	
 	
 	
-	public MenuItemPresiArrow(Vector position, Vector size,
-			Font2D font,TextureManager m_tex_manager,PresiArrow type) {
-		super(position, size, font);
-		m_item_font = font;
+	public MenuItemPresiArrow(Vector position, Vector size
+			,TextureManager m_tex_manager,PresiArrow type) {
+		super(position, size);
+
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat
@@ -87,6 +85,8 @@ public class MenuItemPresiArrow extends MenuItem{
 		Matrix.setIdentityM(model_mat, model_mat_pos);
 		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
 		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
+		
+		// position
 		int position_handle = renderer.shaderManager().a_Position_handle;
 		if(position_handle != -1)
 			m_position_data.apply(position_handle);
@@ -100,9 +100,6 @@ public class MenuItemPresiArrow extends MenuItem{
 		
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);                               
-        
-        // Render font
-        m_item_font.draw(renderer);
         
         renderer.popModelMat();
 	}

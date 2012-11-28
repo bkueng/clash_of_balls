@@ -2,9 +2,12 @@ package com.android.game.clash_of_the_balls;
 
 
 import android.content.Context;
+import android.graphics.Typeface;
 
 import android.util.Log;
 
+import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
+import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.MainActivity.LoadViewTask;
 import com.android.game.clash_of_the_balls.game.Game;
 import com.android.game.clash_of_the_balls.game.GameServer;
@@ -34,6 +37,11 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private IMoveable m_fps_counter;
 	private TextureManager m_tex_manager;
 	private LevelManager m_level_manager;
+	
+	private Font2DSettings m_font_settings;
+	private Typeface m_font_typeface;
+	private TextAlign m_font_align;
+	private int m_font_color;
 	
 	private UIBase m_active_ui;
 	
@@ -72,34 +80,44 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
 		
+		// Initialize Font2D.Font2DSetting for all menus
+		m_font_typeface = Typeface.createFromAsset(m_activity_context.getAssets(),  "alphafridgemagnets.ttf");
+		m_font_color = 0xddffffff;
+		m_font_align = Font2D.TextAlign.CENTER;
+		m_font_settings = new Font2D.Font2DSettings(m_font_typeface, m_font_align, m_font_color);
+		
 		progress_view.setProgress(20);
 		
 		//Main Menu
 		m_main_menu_background = new MenuBackground(
 				m_tex_manager.get(R.raw.texture_main_menu_bg),1600.f/960.f);
 		m_main_menu = new MainMenu(m_main_menu_background
-				, screen_width, screen_height,m_tex_manager,m_activity_context);
+				, screen_width, screen_height,m_tex_manager,m_activity_context
+				, m_font_settings);
 		
 		progress_view.setProgress(30);
 		
 		//Creation Menu
 		m_normal_menu_background = new MenuBackground(
 				m_tex_manager.get(R.raw.texture_bg_normal),1600.f/960.f);
-		m_creation_menu_ui = new CreationMenu(m_normal_menu_background,
-				screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
+		m_creation_menu_ui = new CreationMenu(m_normal_menu_background
+				, screen_width, screen_height, m_tex_manager, m_settings
+				, m_activity_context, m_font_settings);
 		
 		progress_view.setProgress(40);
 		
 		//Wait Menu
 		m_wait_menu_ui = new WaitMenu(m_normal_menu_background
-				, screen_width, screen_height,m_tex_manager,m_settings,m_activity_context);
+				, screen_width, screen_height,m_tex_manager
+				, m_settings,m_activity_context, m_font_settings);
 
 		
 		progress_view.setProgress(50);
 		
 		//Join Menu
 		m_join_menu_ui = new JoinMenu(m_normal_menu_background
-				, screen_width, screen_height,m_tex_manager,m_activity_context);
+				, screen_width, screen_height,m_tex_manager
+				, m_activity_context, m_font_settings);
 		
 		progress_view.setProgress(60);
 		

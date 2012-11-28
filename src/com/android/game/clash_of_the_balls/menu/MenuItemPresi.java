@@ -23,9 +23,10 @@ public class MenuItemPresi extends MenuItem {
 	private int curr_pos;
 	private int m_size;
 	
-	public MenuItemPresi(Vector position, Vector size,
-			Font2D font,ArrayList<MenuItemGreyButton> list) {
-		super(position, size, font);
+	public MenuItemPresi(Vector position, Vector size
+			, ArrayList<MenuItemGreyButton> list) {
+		super(position, size);
+		
 		m_list=list;
 		if(m_list!=null && m_list.size()>0){
 			curr_pos=0;

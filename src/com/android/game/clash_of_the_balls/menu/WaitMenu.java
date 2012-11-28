@@ -33,8 +33,9 @@ public class WaitMenu extends GameMenuBase {
 	MenuItemGreyButton m_10rounds_button;
 
 	public WaitMenu(MenuBackground background,
-			float screen_width, float screen_height,
-			TextureManager m_tex_manager, GameSettings settings,Context context) {
+			float screen_width, float screen_height
+			, TextureManager m_tex_manager, GameSettings settings
+			, Context context, Font2D.Font2DSettings font_settings) {
 		super(background, context);
 
 		Vector pos = new Vector(0.f, 0.f);
@@ -54,26 +55,17 @@ public class WaitMenu extends GameMenuBase {
 		float grey_button_height = grey_button_width;
 
 		float offset_y = size.y * 0.025f;
-
-		// Prepare fonts
-		// color constants
-		int font_color = Color.WHITE;
-		int font_size = (int)Math.round(0.5 * button_height);
-		Typeface font_typeface = Typeface.createFromAsset(m_tex_manager.m_activity_context.getAssets(), "alphafridgemagnets.ttf");
-		
-		Font2D start_font = new Font2D(m_tex_manager, font_typeface, "Start", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);
-		Font2D cancel_font = new Font2D(m_tex_manager, font_typeface, "Cancel", font_size, TextAlign.CENTER, new Vector(button_width, button_height), font_color);		
 		
 		// right Column
 		m_menu_items.add(m_start_button = new MenuItemButton(new Vector(pos.x
 				+ size.x * (0.025f + 2.f / 3.f), pos.y + size.y * 2.f / 4.f
 				+ offset_y), new Vector(button_width, button_height),
-				start_font, m_tex_manager));
+				font_settings, "Start", m_tex_manager));
 
 		m_menu_items.add(m_cancel_button = new MenuItemButton(new Vector(pos.x
 				+ size.x * (0.025f + 2.f / 3.f), pos.y + offset_y + size.y
 				* 1.f / 4.f), new Vector(button_width, button_height),
-				cancel_font, m_tex_manager));
+				font_settings, "Cancel", m_tex_manager));
 
 	}
 

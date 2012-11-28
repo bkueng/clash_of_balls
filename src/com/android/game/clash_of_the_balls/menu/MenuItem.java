@@ -21,7 +21,7 @@ public class MenuItem extends GameObject {
 	public Vector size() { return m_size; }
 	
 	
-	public MenuItem(Vector position, Vector size, Font2D font) {
+	public MenuItem(Vector position, Vector size) {
 		m_position.set(position);
 		m_size.set(size);
 		//TODO

@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls.menu;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
+import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.Texture;
@@ -15,17 +16,20 @@ public class MenuItemButton extends MenuItem {
 
 	private String LOG_TAG = "debug";
 
-	private Font2D m_item_font;
+	public Font2D m_item_font;
 	
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
 	private boolean m_pressed=false;
 
-
-	public MenuItemButton(Vector position, Vector size,
-			Font2D font,TextureManager m_tex_manager) {
-		super(position, size, font);
-		m_item_font = font;
+	public MenuItemButton(Vector position, Vector size
+			, Font2DSettings font_settings, String font_string
+			, TextureManager m_tex_manager) {
+		super(position, size);
+		
+		m_item_font = new Font2D(m_tex_manager, size, font_settings, (int)Math.round(size.y * 0.7));
+		m_item_font.setString(font_string);
+		
 		m_texture_pressed=m_tex_manager
 				.get(R.raw.texture_main_menu_pressed_button);
 		m_texture_unpressed=m_tex_manager

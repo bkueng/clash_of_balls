@@ -16,17 +16,16 @@ import com.android.game.clash_of_the_balls.game.Vector;
 public class MenuItemGreyButton extends MenuItem {
 
 	private String LOG_TAG = "debug";
-	
-	private Font2D m_item_font;
-	
+		
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
 	private boolean m_pressed=false;
 
-	public MenuItemGreyButton(Vector position, Vector size,
-			Font2D font,TextureManager m_tex_manager) {
-		super(position, size, font);
-		m_item_font = font;
+	public MenuItemGreyButton(Vector position, Vector size
+			, TextureManager m_tex_manager) {
+		
+		super(position, size);
+		
 		m_texture_pressed=m_tex_manager
 				.get(R.raw.texture_grey_pressed_button);
 		m_texture_unpressed=m_tex_manager
@@ -67,9 +66,6 @@ public class MenuItemGreyButton extends MenuItem {
 		
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);                               
-        
-        // Render font
-        m_item_font.draw(renderer);
         
         renderer.popModelMat();
 	}

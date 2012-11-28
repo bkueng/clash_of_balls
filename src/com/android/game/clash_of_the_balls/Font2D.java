@@ -30,10 +30,11 @@ public class Font2D implements IDrawable {
 	private String m_string;
 	private int m_font_size;
 	private TextAlign m_align;
+	private int m_color;
+	
 	private float m_font_height;
 	private float m_x_offset;
 	private float m_y_offset;
-	private int m_color;
 
 	private TextureManager m_texture_manager;
 	private VertexBufferFloat m_position_data;
@@ -54,14 +55,18 @@ public class Font2D implements IDrawable {
 		LEFT, RIGHT, CENTER
 	}
 	
-	public Font2D(TextureManager texture_manager, Typeface typeface, String string,
-			int font_size, TextAlign align, Vector text_field_size, int color) {
+	public Font2D(TextureManager texture_manager, Vector text_field_size, 
+			Font2DSettings font_settings, int font_size) {
 		
 		m_texture_manager = texture_manager;
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
-		doInit(typeface, string, font_size, align, text_field_size, color);
+		m_text_field_size = text_field_size;
+		m_font_size = font_size;
+		m_typeface = font_settings.m_typeface;
+		m_align = font_settings.m_align;
+		m_color = font_settings.m_color;
 
 		m_reference = new WeakReference<Font2D>(this);
 		m_weakFont2D.add(m_reference);
@@ -69,18 +74,12 @@ public class Font2D implements IDrawable {
 		Log.d(LOG_TAG, "Font succesfully created");
 	}
 
-	private void doInit(Typeface typeface, String string, int font_size,
-			TextAlign align, Vector text_field_size, int color) {
+	private void doInit(String string) {
 		
-		// Set members
-		m_typeface = typeface;
 		m_string = string;
-		m_font_size = font_size;
-		m_text_field_size = text_field_size;
 		m_font_height = 0;
 		m_x_offset = 0;
 		m_y_offset = 0;
-		m_color = color;
 		
 		if(m_texture != null) {
 			int[] textureHandle = new int[1];
@@ -88,11 +87,6 @@ public class Font2D implements IDrawable {
 
 			GLES20.glDeleteTextures(1, textureHandle, 0);
 		}
-		
-		/*
-		 * LEFT, CENTER, RIGHT
-		 */
-		m_align = align;
 		
 		Bitmap bitmap = createFontBitmap();
 		m_texture = m_texture_manager.get(bitmap, VertexBufferFloat.sprite_tex_coords);
@@ -151,7 +145,7 @@ public class Font2D implements IDrawable {
 	}
 	
 	public void setString(String string) {
-		doInit(m_typeface, string, m_font_size, m_align, m_text_field_size, m_color);
+		doInit(string);
 	}
 	
 	public static void reloadFonts() {
@@ -196,6 +190,27 @@ public class Font2D implements IDrawable {
 				m_weakFont2D.remove(i);
 				return;
 			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Font2DSetting
+	 * Settings for Font2D
+	 *
+	 */
+	public static class Font2DSettings {
+		
+		public Typeface m_typeface;
+		public int m_color;
+		public TextAlign m_align;
+		
+		public Font2DSettings(Typeface typeface, TextAlign align, int color) {
+			
+			m_typeface = typeface;
+			m_align = align;
+			m_color = color;
 		}
 	}
 }
