@@ -172,6 +172,8 @@ public class Font2D implements IDrawable {
 	@Override
 	public void draw(RenderHelper renderer) {
 		
+		if(m_texture == null) return; //this happens if string is not set
+		
 		renderer.shaderManager().activateTexture(0);
 		m_texture.useTexture(renderer);
 		
