@@ -23,6 +23,10 @@ public class LevelManager {
 	
 	public void loadLevels() {
 		loadLevel(R.raw.level_test);
+		loadLevel(R.raw.level_test2);
+		loadLevel(R.raw.level_test3);
+		loadLevel(R.raw.level_test4);
+		loadLevel(R.raw.level_test5);
 		//TODO: other levels, also from file system?
 		
 	}
