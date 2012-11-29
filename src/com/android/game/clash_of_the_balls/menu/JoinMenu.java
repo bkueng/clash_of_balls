@@ -83,6 +83,8 @@ public class JoinMenu extends GameMenuBase {
 	}
 	
 	public void move(float dsec) {
+		super.move(dsec);
+		
 		//update available games
 		m_network_client.handleReceive();
 		//remove old ones

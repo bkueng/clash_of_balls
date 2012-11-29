@@ -30,13 +30,15 @@ import com.android.game.clash_of_the_balls.game.Vector;
 public class MenuItemKeyboard extends MenuItem {
 
 	
-	private String LOG_TAG = "debug";
+	private static final String LOG_TAG = "MenuItemKeyboard";
 	
 	private Context m_activity_context;
 	private Texture m_texture;
 	private TextureManager m_tex_manager;
 	private String m_dialog_text;
-	private String m_text_input;
+	private String m_text_input="";
+	
+	private String m_new_str;
 	
 	private String m_regex = "^[a-zA-Z0-9]+$";
 	private String m_regex_msg = "Please enter only letters or numbers";
@@ -53,8 +55,7 @@ public class MenuItemKeyboard extends MenuItem {
 		m_dialog_text = text;
 		m_tex_manager=tex_manager;
 		m_activity_context = activity_context;
-		m_texture=m_tex_manager
-				.get(R.raw.texture_grey_unpressed_button);
+		m_texture=m_tex_manager.get(R.raw.texture_grey_unpressed_button);
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat
@@ -63,6 +64,17 @@ public class MenuItemKeyboard extends MenuItem {
 	
 	public String getString(){
 		return m_text_input;
+	}
+	
+	public void setString(String new_str) {
+		m_text_input = new_str;
+		m_item_font.setString(new_str);
+	}
+	
+	private void setStringFromOutside(String new_str) {
+		synchronized(this) {
+			m_new_str = new String(new_str);
+		}
 	}
 	
 	public void onTouchDown(float x, float y) {
@@ -86,7 +98,7 @@ public class MenuItemKeyboard extends MenuItem {
             	input.addTextChangedListener(new TextValidator(input) {
             	    @Override
             	    public String validate(EditText textView, String text) {
-            	    	Log.d(LOG_TAG,"validate+ "+text);	    	
+            	    	Log.d(LOG_TAG,"validate: "+text);	    	
             	    	if(text.length()>0){
             	    	if(!text.matches(m_regex)){
             	    		text=text.substring(0,text.length()-1);
@@ -100,8 +112,9 @@ public class MenuItemKeyboard extends MenuItem {
 
             	alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             	public void onClick(DialogInterface dialog, int whichButton) {
-            	  m_text_input = input.getText().toString();
-            	  Log.d(LOG_TAG,"Text input: "+m_text_input);
+            		String str = input.getText().toString();
+            		setStringFromOutside(str);
+            		Log.d(LOG_TAG,"Text input: "+str);
             	  }
             	});
 
@@ -140,30 +153,26 @@ public class MenuItemKeyboard extends MenuItem {
   );
 
 	}
+	
+	public void move(float dsec) {
+		synchronized (this) {
+			if(m_new_str != null) {
+				setString(m_new_str);
+				m_new_str = null;
+			}
+		}
+	}
 
 	public void draw(RenderHelper renderer) {			
-		renderer.shaderManager().activateTexture(0);
-		m_texture.useTexture(renderer);
+		
 		int model_mat_pos = renderer.pushModelMat();
 		float model_mat[] = renderer.modelMat();
-		Matrix.setIdentityM(model_mat, model_mat_pos);
 		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
 		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
 		
-		// position
-		int position_handle = renderer.shaderManager().a_Position_handle;
-		if(position_handle != -1)
-			m_position_data.apply(position_handle);
+		drawTexture(renderer, m_texture);
 		
-        // color
-		int color_handle = renderer.shaderManager().a_Color_handle;
-		if(color_handle != -1)
-			m_color_data.apply(color_handle);      
-
-		renderer.apply();
-		
-        // Draw
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);                               
+		m_item_font.draw(renderer);
         
         renderer.popModelMat();
 	}
