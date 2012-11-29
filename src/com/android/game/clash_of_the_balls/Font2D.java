@@ -142,8 +142,8 @@ public class Font2D implements IDrawable {
 		bitmap.eraseColor(0);
 		
 		// Draw the text centered
-		//canvas.drawRGB(255, 0, 127); // TODO: Delete when finished
-		canvas.drawText(m_string, m_x_offset, m_y_offset, textPaint);
+		if(m_string!=null)
+			canvas.drawText(m_string, m_x_offset, m_y_offset, textPaint);
 				
 		return bitmap;
 	}

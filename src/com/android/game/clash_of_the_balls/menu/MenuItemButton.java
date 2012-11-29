@@ -24,15 +24,15 @@ public class MenuItemButton extends MenuItem {
 
 	public MenuItemButton(Vector position, Vector size
 			, Font2DSettings font_settings, String font_string
-			, TextureManager m_tex_manager) {
+			, TextureManager tex_manager) {
 		super(position, size);
 		
-		m_item_font = new Font2D(m_tex_manager, size, font_settings, (int)Math.round(size.y * 0.7));
+		m_item_font = new Font2D(tex_manager, size, font_settings, (int)Math.round(size.y * 0.7));
 		m_item_font.setString(font_string);
 		
-		m_texture_pressed=m_tex_manager
+		m_texture_pressed=tex_manager
 				.get(R.raw.texture_main_menu_pressed_button);
-		m_texture_unpressed=m_tex_manager
+		m_texture_unpressed=tex_manager
 				.get(R.raw.texture_main_menu_unpressed_button);
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
