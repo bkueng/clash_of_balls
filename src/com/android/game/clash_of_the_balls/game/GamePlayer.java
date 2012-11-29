@@ -47,10 +47,10 @@ public class GamePlayer extends DynamicGameObject {
 	private void initColorData(int color) {
 		float color_data[] = new float[4*4];
 		for(int i=0; i<4; ++i) {
-			color_data[i*4 + 0] = (float)Color.alpha(color) / 255.f;
-			color_data[i*4 + 1] = (float)Color.red(color) / 255.f;
-			color_data[i*4 + 2] = (float)Color.green(color) / 255.f;
-			color_data[i*4 + 3] = (float)Color.blue(color) / 255.f;
+			color_data[i*4 + 0] = (float)Color.red(color) / 255.f;
+			color_data[i*4 + 1] = (float)Color.green(color) / 255.f;
+			color_data[i*4 + 2] = (float)Color.blue(color) / 255.f;
+			color_data[i*4 + 3] = (float)Color.alpha(color) / 255.f;
 		}
 		m_color_data_colored = new VertexBufferFloat(color_data, 4);
 	}
