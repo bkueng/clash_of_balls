@@ -6,10 +6,13 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameSettings;
+import com.android.game.clash_of_the_balls.LevelManager;
 import com.android.game.clash_of_the_balls.TextureManager;
+import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.menu.MenuItemArrow.ArrowType;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
@@ -28,26 +31,15 @@ public class CreationMenu extends GameMenuBase {
 	MenuItem m_cancel_button;
 
 	MenuItemKeyboard m_name_button;
-
-	// Grp1 of Buttons: Levels
-	MenuItemGreyButton m_first_lvl_button;
-	MenuItemGreyButton m_second_lvl_button;
-	// MenuItemGreyButton m_thrid_lvl_button;
-
-	// Grp2 of Buttons: Rounds
-	MenuItem m_presiLeft_button;
-	MenuItem m_presiRight_button;
-	MenuItemPresi m_presi_rounds;
-
-	MenuItemGreyButton m_1round_button;
-	MenuItemGreyButton m_2rounds_button;
-	MenuItemGreyButton m_4rounds_button;
-	MenuItemGreyButton m_10rounds_button;
+	
+	MenuItemGreyButton m_round_buttons[];
+	
+	private MenuItemList m_level_list;
 
 	public CreationMenu(MenuBackground background,
 			float screen_width, float screen_height
 			, TextureManager tex_manager, GameSettings settings, Context context
-			, Font2D.Font2DSettings font_settings) {
+			, Font2D.Font2DSettings font_settings, LevelManager level_manager) {
 		super(background, context);
 
 		Vector pos = new Vector(0.f, 0.f);
@@ -72,49 +64,45 @@ public class CreationMenu extends GameMenuBase {
 
 		float offset_y = size.y * 0.025f;
 		
+		
+		//levels
+		float level_item_width = button_width;
+		m_menu_items.add(m_level_list = new MenuItemList(
+				new Vector(pos.x+size.x * 0.025f, pos.y+size.y/5.f),
+				new Vector(level_item_width, 
+					size.y * 3.f/4.f + offset_y + grey_button_height - size.y/5.f),
+				new Vector(1.5f*button_height*0.6f, button_height*0.6f)
+				, m_tex_manager));
+		
+		for(int i=0; i<level_manager.levelCount(); ++i) {
+			m_level_list.addItem(new MenuItemLevel(new Vector()
+				, new Vector(level_item_width, size.y/2.f/3.f)
+				, level_manager.level(i), tex_manager));
+		}
+		m_level_list.selectItem(0);
+		
+		
 		// Name
-		m_menu_items.add(m_name_button = new MenuItemKeyboard(new Vector(pos.x
-				+ size.x / 3.f, pos.y + size.y * 3.f / 4.f + offset_y),
-				new Vector(5 * grey_button_width, grey_button_height),
+		m_menu_items.add(m_name_button = new MenuItemKeyboard(
+				new Vector(pos.x + size.x / 2.f
+						, pos.y + size.y * 3.f / 4.f + offset_y),
+				new Vector(4 * grey_button_width, grey_button_height),
 				m_font_settings, m_tex_manager, m_activity_context,
 				"Please Enter your Nickname:"));
 
-		// Group 1
-		m_menu_items.add(m_first_lvl_button = new MenuItemGreyButton(
-				new Vector(pos.x + size.x / 3.f, pos.y + size.y / 2.f
-						+ offset_y), new Vector(grey_button_width,
-						grey_button_height), m_tex_manager));
+		
+		// rounds
+		m_round_buttons = new MenuItemGreyButton[3];
+		for(int i=0; i<m_round_buttons.length; ++i) {
+			m_round_buttons[i] = new MenuItemGreyButton(
+					new Vector(pos.x + size.x / 2.f 
+							+ (grey_button_width + distanceButtons) * i
+							, pos.y + size.y / 2.f + offset_y), 
+					new Vector(grey_button_width, grey_button_height)
+					, m_tex_manager);
+		}
+		m_round_buttons[0].select();
 
-		m_menu_items.add(m_second_lvl_button = new MenuItemGreyButton(
-				new Vector(pos.x + size.x / 3.f + grey_button_width
-						+ distanceButtons, pos.y + size.y / 2.f + offset_y),
-				new Vector(grey_button_width, grey_button_height), m_tex_manager));
-
-		// Group 2
-		m_menu_items.add(m_presiLeft_button = new MenuItemArrow(
-				new Vector(pos.x + size.x / 3.f, pos.y + size.y / 4.f
-						+ offset_y), new Vector(grey_button_width,
-						grey_button_height), m_tex_manager,
-				ArrowType.LEFT));
-
-		// Create List for PresiView---
-
-		Vector list_pos = new Vector(pos.x + size.x / 3.f + grey_button_width
-				+ distanceButtons, pos.y + size.y / 4.f + offset_y);
-		Vector list_size = new Vector(grey_button_width, grey_button_height);
-
-		ArrayList<MenuItemGreyButton> presi_round_list = createRoundList(list_pos,
-				list_size);
-		//--------------------------------
-		m_menu_items.add(m_presi_rounds = new MenuItemPresi(list_pos,
-				list_size, presi_round_list));
-
-		m_menu_items.add(m_presiRight_button = new MenuItemArrow(
-				new Vector(pos.x + size.x / 3.f + 2
-						* (grey_button_width + distanceButtons), pos.y + size.y
-						/ 4.f + offset_y), new Vector(grey_button_width,
-						grey_button_height), m_tex_manager,
-				ArrowType.RIGHT));
 
 		// Last Line
 		// Buttons
@@ -130,19 +118,43 @@ public class CreationMenu extends GameMenuBase {
 
 	@Override
 	protected void onTouchDown(MenuItem item) {
-		if (item == m_first_lvl_button) {
-			m_second_lvl_button.remain_unpressed();
-		} else if (item == m_second_lvl_button) {
-			m_first_lvl_button.remain_unpressed();
-		} else if (item == m_presiRight_button) {
-			m_presi_rounds.next();
-		} else if (item == m_presiLeft_button) {
-			m_presi_rounds.previous();
-		} else if (item==m_presi_rounds){
-			Log.d(LOG_TAG,"PresiRoungs pressed");
-			
+		boolean is_round_button=false;
+		for(int i=0; i<m_round_buttons.length; ++i) {
+			if(item == m_round_buttons[i]) is_round_button = true;
 		}
-
+		if(is_round_button) {
+			for(int i=0; i<m_round_buttons.length; ++i) {
+				if(item != m_round_buttons[i])
+					m_round_buttons[i].remain_unpressed();
+				else m_round_buttons[i].select();
+			}
+		}
+	}
+	
+	public void onTouchEvent(float x, float y, int event) {
+		super.onTouchEvent(x, y, event);
+		
+		if(event == MotionEvent.ACTION_DOWN) {
+			int round_button=-1;
+			for(int i=0; i<m_round_buttons.length; ++i) {
+				if(m_round_buttons[i].isInside(x, y)) round_button = i;
+			}
+			if(round_button != -1) {
+				for(int i=0; i<m_round_buttons.length; ++i) {
+					if(i != round_button)
+						m_round_buttons[i].remain_unpressed();
+					else m_round_buttons[i].select();
+				}
+			}
+		}
+	}
+	
+	
+	
+	public void draw(RenderHelper renderer) {
+		super.draw(renderer);
+		for(int i=0; i<m_round_buttons.length; ++i) 
+			m_round_buttons[i].draw(renderer);
 	}
 
 	@Override
@@ -150,7 +162,14 @@ public class CreationMenu extends GameMenuBase {
 		if (item == m_create_button) {
 			m_settings.is_host = true;
 			//1->1 Round, 2->2 Round, 3-> 4 Rounds, 4-> 10 Rounds?? TODO
-			m_settings.rounds_idx=m_presi_rounds.getPos();
+			int idx= 0;
+			for(int i=0; i<m_round_buttons.length; ++i)
+				if(m_round_buttons[i].isPressed()) idx = i;
+			Log.d(LOG_TAG, "Game Creation: selected rounds: "+idx);
+			m_settings.game_rounds=idx;
+			
+			MenuItemLevel item_level = (MenuItemLevel)m_level_list.getSelectedItem();
+			m_settings.selected_level = item_level.level();
 			
 			m_settings.user_name = m_name_button.getString();
 			m_ui_change = UIChange.WAIT_MENU;
@@ -158,25 +177,6 @@ public class CreationMenu extends GameMenuBase {
 			m_settings.is_host = false;
 			m_ui_change = UIChange.MAIN_MENU;
 		}
-	}
-
-	private ArrayList<MenuItemGreyButton> createRoundList(Vector pos, Vector size) {
-
-		// Initialize list
-		ArrayList<MenuItemGreyButton> presi_round_list = new ArrayList<MenuItemGreyButton>();
-		presi_round_list.add(m_1round_button = new MenuItemGreyButton(pos,
-				size, m_tex_manager));
-
-		presi_round_list.add(m_2rounds_button = new MenuItemGreyButton(pos,
-				size, m_tex_manager));
-
-		presi_round_list.add(m_4rounds_button = new MenuItemGreyButton(pos,
-				size, m_tex_manager));
-
-		presi_round_list.add(m_10rounds_button = new MenuItemGreyButton(pos,
-				size, m_tex_manager));
-		return presi_round_list;
-
 	}
 
 }

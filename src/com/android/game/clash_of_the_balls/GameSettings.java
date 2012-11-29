@@ -10,8 +10,8 @@ public class GameSettings {
 	
 	public boolean is_host=false;
 	
-	public int rounds_idx;
-	//TODO: level, ...
+	public int game_rounds;
+	public GameLevel selected_level=null;
 	
 	public int m_screen_width;
 	public int m_screen_height;

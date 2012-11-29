@@ -42,25 +42,25 @@ public class MenuItemList extends MenuItem {
 	
 	private Texture m_background_texture;
 	
-	public MenuItemList(Vector position, Vector size, float arrow_button_height
+	public MenuItemList(Vector position, Vector size, Vector arrow_button_size
 			, TextureManager tex_manager) {
 		super(position, size);
 		
 		m_item_spacing = size.y / 40.f;
 		
-		float button_y_offset = arrow_button_height/4.f;
-		float button_x_offset = arrow_button_height/3.f;
-		m_view_height = size.y - arrow_button_height 
+		float button_y_offset = arrow_button_size.y/4.f;
+		float button_x_offset = arrow_button_size.x/3.f;
+		m_view_height = size.y - arrow_button_size.y 
 					- m_item_spacing - button_y_offset;
 		
 		m_left_arrow = new MenuItemArrow(
 				new Vector(position.x+button_x_offset, position.y+button_y_offset)
-				, new Vector(arrow_button_height, arrow_button_height)
+				, arrow_button_size
 				, tex_manager, ArrowType.LEFT);
 		m_right_arrow = new MenuItemArrow(
-				new Vector(position.x + size.x-arrow_button_height-button_x_offset
+				new Vector(position.x + size.x-arrow_button_size.x-button_x_offset
 						, position.y+button_y_offset)
-				, new Vector(arrow_button_height, arrow_button_height)
+				, arrow_button_size
 				, tex_manager, ArrowType.RIGHT);
 		
 		
