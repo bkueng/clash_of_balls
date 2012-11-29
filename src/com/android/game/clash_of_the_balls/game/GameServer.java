@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.alljoyn.bus.BusException;
 
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -110,18 +111,38 @@ public class GameServer extends GameBase implements Runnable {
 			indexes[k2] = tmp;
 		}
 		
-		//TODO: player colors
-		
-		
+		int colors[] = getDiffColors(m_player_count);
 		
 		for(int i=0; i< m_player_count; ++i) {
 			short id = getNextItemId();
 			m_network_server.getConnectedClient(i).id = id;
 			//create the player (without textures)
-			int color = 0xffffffff;
-			GamePlayer p = new GamePlayer(this, id, player_pos[indexes[i]], color, null);
+			GamePlayer p = new GamePlayer(this, id, player_pos[indexes[i]]
+					, colors[i], null, null);
 			m_game_objects.put(id, p);
 		}
+	}
+	
+	//get n distinct colors in ARGB format (A=0xff)
+	static int[] getDiffColors(int n) {
+		int ret[]=new int[n];
+		float hsv[] = new float[3];
+		for(int k=0; k<n; ++k) {
+			int i = (360/n) * k;
+		    float h = (float)i;
+		    float s = (float) (0.9f + Math.random() * 0.1f);
+		    float l = (float) (0.5f + Math.random() * 0.1f);
+		    
+		    //convert to hsv
+		    hsv[0] = h;
+		    l *= 2;
+		    s *= (l <= 1.f) ? l : 2.f - l;
+		    hsv[2] = (l + s) / 2.f;
+		    hsv[1] = (2.f * s) / (l + s);
+		    
+		    ret[k] = Color.HSVToColor(hsv);
+		}
+		return ret;
 	}
 	
 	
