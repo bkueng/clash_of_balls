@@ -79,9 +79,12 @@ public abstract class GameBase {
 		m_player_count = players.length;
 		for(int i=0; i<players.length; ++i) {
 			Texture texture=null;
-			if(m_texture_manager != null) 
-				texture = m_texture_manager.get(R.raw.texture_grey_pressed_button);
-			GamePlayer p = new GamePlayer(players[i], this, texture);
+			Texture texture_overlay=null;
+			if(m_texture_manager != null) {
+				texture = m_texture_manager.get(R.raw.texture_grey_unpressed_button);
+				texture_overlay = m_texture_manager.get(R.raw.texture_grey_pressed_button);
+			}
+			GamePlayer p = new GamePlayer(players[i], this, texture, texture_overlay);
 			m_game_objects.put(players[i].id, p);
 			if(players[i].id >= m_next_object_id)
 				m_next_object_id = (short) (players[i].id + 1);

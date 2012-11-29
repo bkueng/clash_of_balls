@@ -1,8 +1,13 @@
 package com.android.game.clash_of_the_balls.game;
 
+import java.nio.FloatBuffer;
+
+import android.graphics.Color;
+import android.opengl.GLES20;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Texture;
+import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 
 /**
@@ -12,24 +17,42 @@ import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 public class GamePlayer extends DynamicGameObject {
 	
 	private int m_color; //ARGB
+	private VertexBufferFloat m_color_data_colored;
 	
 	public int color() { return m_color; }
 	
 	private Vector m_acceleration = new Vector();
 	public Vector acceleration() { return m_acceleration; }
 	
-	//TODO: add overlay texture
 	
+	protected Texture m_overlay_texture;
 
 	public GamePlayer(GameBase owner, short id, Vector position
-			, int color, Texture texture) {
+			, int color, Texture texture, Texture texture_overlay) {
 		super(owner, id, position, Type.Player, texture);
+		m_overlay_texture = texture_overlay;
 		m_color = color;
+		initColorData(m_color);
 	}
 	
-	public GamePlayer(PlayerInfo info, GameBase owner, Texture texture) {
-		super(owner, info.id, new Vector(info.pos_x, info.pos_y), Type.Player, texture);
+	public GamePlayer(PlayerInfo info, GameBase owner, Texture texture_base
+			, Texture texture_overlay) {
+		super(owner, info.id, new Vector(info.pos_x, info.pos_y), Type.Player
+				, texture_base);
+		m_overlay_texture = texture_overlay;
 		m_color = info.color;
+		initColorData(m_color);
+	}
+	
+	private void initColorData(int color) {
+		float color_data[] = new float[4*4];
+		for(int i=0; i<4; ++i) {
+			color_data[i*4 + 0] = (float)Color.alpha(color) / 255.f;
+			color_data[i*4 + 1] = (float)Color.red(color) / 255.f;
+			color_data[i*4 + 2] = (float)Color.green(color) / 255.f;
+			color_data[i*4 + 3] = (float)Color.blue(color) / 255.f;
+		}
+		m_color_data_colored = new VertexBufferFloat(color_data, 4);
 	}
 	
 	
@@ -48,7 +71,56 @@ public class GamePlayer extends DynamicGameObject {
 	public void draw(RenderHelper renderer) {
 		if(!m_bIs_dead) {
 			super.draw(renderer);
-			//TODO
+			
+			doModelTransformation(renderer);
+			
+			//colored texture: m_texture
+			
+			if(m_texture != null) {
+				renderer.shaderManager().activateTexture(0);
+				m_texture.useTexture(renderer);
+				
+				//position data
+				int position_handle = renderer.shaderManager().a_Position_handle;
+				if(position_handle != -1)
+					m_position_data.apply(position_handle);
+				
+		        // color
+				int color_handle = renderer.shaderManager().a_Color_handle;
+				if(color_handle != -1)
+					m_color_data_colored.apply(color_handle);
+				
+				renderer.apply();
+				
+		        // Draw
+		        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);     
+		        
+			}
+			
+	        
+			//overlay texture
+			
+			if(m_overlay_texture != null) {
+				renderer.shaderManager().activateTexture(0);
+				m_overlay_texture.useTexture(renderer);
+				
+				//position data
+				int position_handle = renderer.shaderManager().a_Position_handle;
+				if(position_handle != -1)
+					m_position_data.apply(position_handle);
+				
+		        // color
+				int color_handle = renderer.shaderManager().a_Color_handle;
+				if(color_handle != -1)
+					m_color_data.apply(color_handle);
+				
+				renderer.apply();
+				
+		        // Draw
+		        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+			}
+	        
+	        undoModelTransformation(renderer);
 			
 		}
 	}
