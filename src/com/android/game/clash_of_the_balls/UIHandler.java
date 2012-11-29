@@ -87,7 +87,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		// Initialize Font2D.Font2DSetting for all menus
 		m_font_typeface = Typeface.createFromAsset(m_activity_context.getAssets(),  "alphafridgemagnets.ttf");
-		m_font_color = 0xddffffff;
+		m_font_color = 0xddeeeeff;
 		m_font_align = Font2D.TextAlign.CENTER;
 		m_font_settings = new Font2D.Font2DSettings(m_font_typeface, m_font_align, m_font_color);
 		
