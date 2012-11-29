@@ -44,6 +44,10 @@ public class Font2D implements IDrawable {
 		= new ArrayList<WeakReference<Font2D>>();
 	private WeakReference<Font2D> m_reference;
 	
+	public static void resetFonts() {
+		m_weakFont2D = new ArrayList<WeakReference<Font2D>>();
+	}
+	
 	/**
 	 * Creates 2D font
 	 * 

@@ -27,6 +27,8 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        Font2D.resetFonts();
+        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         // making it full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -148,8 +150,7 @@ public class MainActivity extends Activity {
 		{
 			//close the progress dialog
 			progressDialog.dismiss();
-			//initialize the View
-			//setContentView(R.layout.main);
+			progressDialog = null;
 		} 	
     }
 
