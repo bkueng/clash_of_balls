@@ -165,7 +165,6 @@ public class Font2D implements IDrawable {
 		}
 	}
 
-	@Override
 	public void draw(RenderHelper renderer) {
 		
 		renderer.shaderManager().activateTexture(0);
