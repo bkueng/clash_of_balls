@@ -1292,22 +1292,12 @@ public class Networking {
      	 */
     	String uniqueName = mBus.getUniqueName();
     	MessageContext ctx = mBus.getMessageContext();
-    	
         
          // Always drop our own signals which may be echoed back from the system.
         if (ctx.sender.equals(uniqueName)) {
             Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
     		return;
     	}
-
-         // Drop signals on the hosted session unless we are joined-to-self.
-        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
-            Log.i(TAG, "Chat(): dropped signal received on hosted session " 
-            		+ ctx.sessionId + " when not joined-to-self");
-    		return;
-    	}
-        
-        //TODO: what to filter exactly?
         
         receivedSensorUpdate(ctx.sender, ack_seq_num, pos_x, pos_y);
     }
@@ -1336,14 +1326,6 @@ public class Networking {
             Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
     		return;
     	}
-
-         // Drop signals on the hosted session unless we are joined-to-self.
-        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
-            Log.i(TAG, "Chat(): dropped signal received on hosted session " + ctx.sessionId + " when not joined-to-self");
-    		return;
-    	}
-        
-        //TODO: what to filter exactly?
         
         receivedAck(ctx.sender, ack_seq_num);
     }
@@ -1378,8 +1360,6 @@ public class Networking {
     		return;
     	}
         
-        //TODO: what to filter exactly?
-        
         receivedGameCommand(ctx.sender, data);
     }
     private void receivedGameCommand(String sender, byte[] game_data) {
@@ -1399,11 +1379,6 @@ public class Networking {
          // Always drop our own signals which may be echoed back from the system.
         if (ctx.sender.equals(uniqueName)) {
             Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
-    		return;
-    	}
-         // Drop signals on the hosted session unless we are joined-to-self.
-        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
-            Log.i(TAG, "Chat(): dropped signal received on hosted session " + ctx.sessionId + " when not joined-to-self");
     		return;
     	}
         
@@ -1440,6 +1415,9 @@ public class Networking {
             Log.i(TAG, "Chat(): dropped signal received on hosted session " + ctx.sessionId + " when not joined-to-self");
     		return;
     	}
+        
+        Log.i(TAG, "got info from server: unique name="+unique_name
+        		+", well-known name="+well_known_name);
         
         handleClientJoined(unique_name, well_known_name);
     }   
