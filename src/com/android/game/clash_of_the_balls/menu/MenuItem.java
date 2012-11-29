@@ -1,6 +1,9 @@
 package com.android.game.clash_of_the_balls.menu;
 
+import android.opengl.GLES20;
+
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.game.GameObject;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
@@ -16,7 +19,7 @@ public class MenuItem extends GameObject {
 	protected VertexBufferFloat m_color_data;
 	protected VertexBufferFloat m_position_data;
 	
-	private Vector m_size = new Vector();
+	protected Vector m_size = new Vector();
 	
 	public Vector size() { return m_size; }
 	
@@ -24,8 +27,6 @@ public class MenuItem extends GameObject {
 	public MenuItem(Vector position, Vector size) {
 		m_position.set(position);
 		m_size.set(size);
-		//TODO
-		
 	}
 	
 	
@@ -36,11 +37,25 @@ public class MenuItem extends GameObject {
 	}
 	
 	public void draw(RenderHelper renderer) {
-		// TODO Auto-generated method stub
+	}
+	
+	protected void drawTexture(RenderHelper renderer, Texture texture) {
+		renderer.shaderManager().activateTexture(0);
+		texture.useTexture(renderer);
+		// position
+		int position_handle = renderer.shaderManager().a_Position_handle;
+		if(position_handle != -1)
+			m_position_data.apply(position_handle);
+        // color
+		int color_handle = renderer.shaderManager().a_Color_handle;
+		if(color_handle != -1)
+			m_color_data.apply(color_handle);      
+		renderer.apply();
+        // Draw
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 	}
 
 	public void move(float dsec) {
-		// TODO Auto-generated method stub
 		
 	}
 	

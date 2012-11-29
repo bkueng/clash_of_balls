@@ -43,35 +43,19 @@ public class MenuItemButton extends MenuItem {
 	public boolean isPressed(){return m_pressed;}
 
 	public void draw(RenderHelper renderer) {		
-		Texture m_texture;
+		Texture texture;
 		if(m_pressed){
-			m_texture=m_texture_pressed;
+			texture=m_texture_pressed;
 		}else{
-			m_texture=m_texture_unpressed;
+			texture=m_texture_unpressed;
 		}
 		
-		renderer.shaderManager().activateTexture(0);
-		m_texture.useTexture(renderer);
 		int model_mat_pos = renderer.pushModelMat();
 		float model_mat[] = renderer.modelMat();
-		Matrix.setIdentityM(model_mat, model_mat_pos);
 		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
 		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
 		
-		// position
-		int position_handle = renderer.shaderManager().a_Position_handle;
-		if(position_handle != -1)
-			m_position_data.apply(position_handle);
-		
-        // color
-		int color_handle = renderer.shaderManager().a_Color_handle;
-		if(color_handle != -1)
-			m_color_data.apply(color_handle);      
-
-		renderer.apply();
-		
-        // Draw
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);                               
+		drawTexture(renderer, texture);
         
         // Render font
         m_item_font.draw(renderer);

@@ -11,7 +11,7 @@ import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.Vector;
-import com.android.game.clash_of_the_balls.menu.MenuItemPresiArrow.PresiArrow;
+import com.android.game.clash_of_the_balls.menu.MenuItemArrow.ArrowType;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 
@@ -91,11 +91,11 @@ public class CreationMenu extends GameMenuBase {
 				new Vector(grey_button_width, grey_button_height), m_tex_manager));
 
 		// Group 2
-		m_menu_items.add(m_presiLeft_button = new MenuItemPresiArrow(
+		m_menu_items.add(m_presiLeft_button = new MenuItemArrow(
 				new Vector(pos.x + size.x / 3.f, pos.y + size.y / 4.f
 						+ offset_y), new Vector(grey_button_width,
 						grey_button_height), m_tex_manager,
-				PresiArrow.LEFT));
+				ArrowType.LEFT));
 
 		// Create List for PresiView---
 
@@ -109,12 +109,12 @@ public class CreationMenu extends GameMenuBase {
 		m_menu_items.add(m_presi_rounds = new MenuItemPresi(list_pos,
 				list_size, presi_round_list));
 
-		m_menu_items.add(m_presiRight_button = new MenuItemPresiArrow(
+		m_menu_items.add(m_presiRight_button = new MenuItemArrow(
 				new Vector(pos.x + size.x / 3.f + 2
 						* (grey_button_width + distanceButtons), pos.y + size.y
 						/ 4.f + offset_y), new Vector(grey_button_width,
 						grey_button_height), m_tex_manager,
-				PresiArrow.RIGHT));
+				ArrowType.RIGHT));
 
 		// Last Line
 		// Buttons

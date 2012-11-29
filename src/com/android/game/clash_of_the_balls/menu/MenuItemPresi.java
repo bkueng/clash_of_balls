@@ -17,7 +17,7 @@ import com.android.game.clash_of_the_balls.game.Vector;
 
 public class MenuItemPresi extends MenuItem {
 
-	private String LOG_TAG = "debug";
+	private static final String LOG_TAG = "MenuItemPresi";
 	
 	private ArrayList<MenuItemGreyButton> m_list;
 	private int curr_pos;
