@@ -47,10 +47,17 @@ public interface AlljoynInterface {
     @BusSignal(signature="i")
     public void ack(int ack_seq_num) throws BusException;
     
+    //let the server know our well-known name
+    @BusSignal
+    public void clientInfoToServer(String well_known_name);
     
     /* server --> clients */
     
     @BusSignal
     public void gameCommand(byte[] data) throws BusException;
+    
+    //let all clients know the well-known name of a newly joined member
+    @BusSignal
+    public void clientInfoToClients(String unique_name, String well_known_name);
     
 }

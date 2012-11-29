@@ -64,6 +64,8 @@ public class Networking {
 	public synchronized void init(Context context) {
 		if(m_bInit) return;
 		Log.d(TAG, "init Network Object");
+		//clear connected clients
+		m_connected_clients = new ArrayList<ConnectedClient>();
 		m_context = context;
 		if(mBus == null)
 			mBus = new BusAttachment(context.getPackageName()
@@ -164,10 +166,12 @@ public class Networking {
     
 	public static class ConnectedClient {
 		public String unique_id; //same as packet sender
-		public String well_known_name; //TODO
+		public String well_known_name; //can be null, until signals are sent to everyone
+			//use getNameFromServerId to get the name from this
+		
 		public short id = -1; //game id: server decides which client gets which id
 	}
-	private List<ConnectedClient> m_connected_clients = new ArrayList<ConnectedClient>();
+	private List<ConnectedClient> m_connected_clients;
 	
 	public synchronized ConnectedClient connectedClient(int idx) {
 		if(idx < m_connected_clients.size())
@@ -1089,7 +1093,7 @@ public class Networking {
         	if (wellKnownNameToJoin.equals(getWellKnownName())) {              
              	mUseChannelState = UseChannelState.JOINED;
         		mJoinedToSelf = true;
-        		handleClientJoined(getUniqueName());
+        		handleClientJoined(getUniqueName(), getWellKnownName());
         		Log.d(TAG, "JoinSession: we are joined to ourself");
                 return;
         	}
@@ -1125,7 +1129,7 @@ public class Networking {
             }
             
             public void sessionMemberAdded(int sessionId, String uniqueName) {
-            	handleClientJoined(uniqueName);
+            	handleClientJoined(uniqueName, null);
             }
             
             public void sessionMemberRemoved(int sessionId, String uniqueName) {
@@ -1145,6 +1149,10 @@ public class Networking {
         SignalEmitter emitter = new SignalEmitter(m_network_service, wellKnownNameToJoin, 
         		mUseSessionId, SignalEmitter.GlobalBroadcast.Off);
         mChatInterface = emitter.getInterface(AlljoynInterface.class);
+        
+        //now that we joined the session we must let the server know which 
+        //well-known name we have
+        mChatInterface.clientInfoToServer(getWellKnownName());
         
      	mUseChannelState = UseChannelState.JOINED;
     }
@@ -1176,22 +1184,29 @@ public class Networking {
     	mBus=null;
     }
     
-    private synchronized void handleClientJoined(String unique_name) {
+    private synchronized void handleClientJoined(String unique_name
+    		, String well_known_name) {
     	if(unique_name != null) {
     		Log.i(TAG, "Client joined: "+unique_name);
 
     		//check if already added
     		boolean exists=false;
     		for(ConnectedClient client : m_connected_clients) {
-    			if(client.unique_id.equals(unique_name)) exists=true;
+    			if(client.unique_id.equals(unique_name)) {
+    				exists=true;
+    				if(well_known_name != null && client.well_known_name==null)
+    					client.well_known_name = well_known_name;
+    			}
     		}
     		if(!exists) {
     			ConnectedClient c=new ConnectedClient();
+    			c.well_known_name = well_known_name;
     			c.unique_id = unique_name;
     			m_connected_clients.add(c);
+    			
+    			sendEventToListeners(HANDLE_CLIENT_JOINED);
     		}
-
-    		sendEventToListeners(HANDLE_CLIENT_JOINED);
+    		
     	} else {
     		Log.e(TAG, "handleClientJoined: unique_name is NULL!");
     	}
@@ -1238,7 +1253,14 @@ public class Networking {
 		public void ack(int ack_seq_num) throws BusException { }
 		
 		@BusSignal
-		public void gameCommand(byte[] data) throws BusException { }     
+		public void gameCommand(byte[] data) throws BusException { }
+
+		@BusSignal
+		public void clientInfoToServer(String well_known_name) { }
+
+		@BusSignal
+		public void clientInfoToClients(String unique_name,
+				String well_known_name) { }     
     }
 
     /**
@@ -1364,6 +1386,60 @@ public class Networking {
         m_game_commands.add(data);
         sendEventToListeners(HANDLE_RECEIVED_SIGNAL);
     }
+    
+    @BusSignalHandler(iface = "com.android.game.clash_of_the_balls.alljoyn", signal = "clientInfoToServer")
+	public void clientInfoToServer(String well_known_name) {
+    	
+    	String uniqueName = mBus.getUniqueName();
+    	MessageContext ctx = mBus.getMessageContext();
+        
+         // Always drop our own signals which may be echoed back from the system.
+        if (ctx.sender.equals(uniqueName)) {
+            Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
+    		return;
+    	}
+         // Drop signals on the hosted session unless we are joined-to-self.
+        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
+            Log.i(TAG, "Chat(): dropped signal received on hosted session " + ctx.sessionId + " when not joined-to-self");
+    		return;
+    	}
+        
+        Log.i(TAG, "got client info: unique name="+ctx.sender
+        		+", well-known name="+well_known_name);
+        
+        handleClientJoined(ctx.sender, well_known_name);
+        // send update to all clients
+        synchronized (this) {
+        	if (mHostChatInterface != null) {
+        		for(int i=0; i<m_connected_clients.size(); ++i) {
+        			ConnectedClient c = m_connected_clients.get(i);
+        			if(c.unique_id!=null && c.well_known_name!=null)
+        				mHostChatInterface.clientInfoToClients(c.unique_id, c.well_known_name);
+        		}
+        	}
+		}
+    }
+
+    @BusSignalHandler(iface = "com.android.game.clash_of_the_balls.alljoyn", signal = "clientInfoToClients")
+	public void clientInfoToClients(String unique_name,
+			String well_known_name) {
+    	
+    	String uniqueName = mBus.getUniqueName();
+    	MessageContext ctx = mBus.getMessageContext();
+        
+         // Always drop our own signals which may be echoed back from the system.
+        if (ctx.sender.equals(uniqueName)) {
+            Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
+    		return;
+    	}
+         // Drop signals on the hosted session unless we are joined-to-self.
+        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
+            Log.i(TAG, "Chat(): dropped signal received on hosted session " + ctx.sessionId + " when not joined-to-self");
+    		return;
+    	}
+        
+        handleClientJoined(unique_name, well_known_name);
+    }   
     
     
     /* error handling */
