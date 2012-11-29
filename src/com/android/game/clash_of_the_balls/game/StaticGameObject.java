@@ -30,6 +30,8 @@ public class StaticGameObject extends GameObject {
 						   //(it is not used for background objects)
 						   //the lowest id is 1
 	
+	protected float m_rotation_angle=0.f; //in rad, texture rotation
+	
 	protected Texture m_texture;
 	protected VertexBufferFloat m_color_data;
 	protected VertexBufferFloat m_position_data;
@@ -43,6 +45,7 @@ public class StaticGameObject extends GameObject {
 		
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
+		
 	}
 
 	public void draw(RenderHelper renderer) {
@@ -83,8 +86,18 @@ public class StaticGameObject extends GameObject {
 		//translate
 		int model_mat_pos = renderer.pushModelMat();
 		float model_mat[] = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, 
-				m_position.x-0.5f, m_position.y-0.5f, 0.f);
+		if(m_rotation_angle == 0.f) {
+			Matrix.translateM(model_mat, model_mat_pos, 
+					m_position.x-0.5f, m_position.y-0.5f, 0.f);
+		} else {
+			Log.e("", "doing rotation: "+m_rotation_angle);
+			Matrix.translateM(model_mat, model_mat_pos, 
+					m_position.x, m_position.y, 0.f);
+			Matrix.rotateM(model_mat, model_mat_pos, m_rotation_angle*180.f/(float)Math.PI
+					, 0.f, 0.f, 1.f);
+			Matrix.translateM(model_mat, model_mat_pos, 
+					-0.5f, -0.5f, 0.f);
+		}
 	}
 	
 	protected void undoModelTransformation(RenderHelper renderer) {
@@ -93,7 +106,6 @@ public class StaticGameObject extends GameObject {
 	
 
 	public void move(float dsec) {
-
 		// nothing to do
 	}
 }
