@@ -63,13 +63,15 @@ public class Networking {
 		if(m_bInit) return;
 		Log.d(TAG, "init Network Object");
 		m_context = context;
-		mBus = new BusAttachment(context.getPackageName()
-	    		, BusAttachment.RemoteMessage.Receive);
+		if(mBus == null)
+			mBus = new BusAttachment(context.getPackageName()
+					, BusAttachment.RemoteMessage.Receive);
+		m_network_service = new NetworkService();
 		startBusThread();
 		m_background_handler.connect();
 		m_bInit=true;
 	}
-	public synchronized void deinit() {
+	public void deinit() {
 		if(!m_bInit) return;
 		Log.d(TAG, "deinit Network Object");
 		if(isBusConnected()) {
@@ -570,7 +572,7 @@ public class Networking {
      * handle long-lived remote operations, we provide thsi method to do so.
      */
     private void startBusThread() {
-        HandlerThread busThread = new HandlerThread("BackgroundHandler");
+    	HandlerThread busThread = new HandlerThread("BackgroundHandler");
         busThread.start();
     	m_background_handler = new BackgroundHandler(busThread.getLooper());
     }
@@ -584,7 +586,7 @@ public class Networking {
         m_background_handler.exit();
         //wait for the background thread to quit
         try {
-			m_background_handler.getLooper().getThread().join(500);
+			m_background_handler.getLooper().getThread().join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -595,7 +597,7 @@ public class Networking {
      * clients.  Pretty much all communiation with AllJoyn is going to go through
      * this obejct.
      */
-    private volatile BusAttachment mBus;
+    private volatile BusAttachment mBus = null;
     
     /**
      * The well-known name prefix which all bus attachments hosting a channel
@@ -1162,6 +1164,7 @@ public class Networking {
     }
     
     private void doExit() {
+    	Log.i(TAG, "doExit()");
     	mBus.unregisterBusObject((BusObject)m_network_service);
     	mBus=null;
     }
@@ -1235,7 +1238,7 @@ public class Networking {
      * The ChatService is the instance of an AllJoyn interface that is exported
      * on the bus and allows us to send signals implementing messages
      */
-    private NetworkService m_network_service = new NetworkService();
+    private NetworkService m_network_service;
 
     /**
      * The signal handler for messages received from the AllJoyn bus.
