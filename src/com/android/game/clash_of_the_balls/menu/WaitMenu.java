@@ -7,6 +7,8 @@ import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.Vector;
+import com.android.game.clash_of_the_balls.game.event.Event;
+import com.android.game.clash_of_the_balls.network.NetworkClient;
 import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
 import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
@@ -28,13 +30,15 @@ public class WaitMenu extends GameMenuBase {
 	private float m_item_height;
 	
 	private Networking m_networking;
+	private NetworkClient m_network_client;
 	
 
 	public WaitMenu(MenuBackground background,
 			float screen_width, float screen_height
 			, TextureManager tex_manager, GameSettings settings
 			, Context context, Font2D.Font2DSettings font_settings
-			, Networking networking) {
+			, Networking networking
+			, NetworkClient network_client) {
 		super(background, context);
 
 		Vector pos = new Vector(0.f, 0.f);
@@ -46,6 +50,7 @@ public class WaitMenu extends GameMenuBase {
 		m_settings = settings;
 		m_tex_manager = tex_manager;
 		m_networking = networking;
+		m_network_client = network_client;
 
 		// add menu items
 		float button_width = size.x * 0.35f;
@@ -112,6 +117,22 @@ public class WaitMenu extends GameMenuBase {
 			}
 		}
 		
+		//check for game start signal if we are not the game creator
+		if(!m_settings.is_host) {
+			m_network_client.handleReceive();
+			Event e = m_network_client.peekNextEvent();
+			while(e != null) {
+				if(e.type == Event.type_game_info) {
+					m_ui_change = UIChange.GAME_START_CLIENT;
+					e=null; //exit loop
+				} else {
+					Log.w(LOG_TAG, "we received an unwanted game event from the server (type="
+						+ (int)e.type+"). We ignore it");
+					m_network_client.getNextEvent(); //discard event
+				}
+			}
+		}
+		
 		
 		m_start_button.enable(m_settings.is_host
 				&& (m_client_list.itemCount() > 1 || GameSettings.debug));
@@ -133,10 +154,11 @@ public class WaitMenu extends GameMenuBase {
 	@Override
 	protected void onTouchUp(MenuItem item) {
 		if (item == m_start_button) {
-			//TODO: start the game
-			
-			
-			// m_ui_change = UIChange.MAIN_MENU;
+			if (m_settings.is_host) {
+				
+				m_ui_change = UIChange.GAME_START_SERVER;
+				
+			}
 		} else if (item == m_cancel_button) {
 			if (m_settings.is_host) {
 				m_settings.is_host = false;

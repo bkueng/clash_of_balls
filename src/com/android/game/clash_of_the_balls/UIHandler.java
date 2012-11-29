@@ -14,6 +14,7 @@ import com.android.game.clash_of_the_balls.game.GameServer;
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.IMoveable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
+import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.menu.CreationMenu;
 import com.android.game.clash_of_the_balls.menu.JoinMenu;
 import com.android.game.clash_of_the_balls.menu.MainMenu;
@@ -65,7 +66,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		WAIT_MENU,
 		JOIN_MENU,
 		
-		GAME
+		GAME_START_CLIENT,
+		GAME_START_SERVER
 	}
 	
 	public UIHandler(int screen_width, int screen_height
@@ -119,7 +121,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_wait_menu_ui = new WaitMenu(m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager
 				, m_settings,m_activity_context, m_font_settings
-				, Networking.getInstance());
+				, Networking.getInstance(), m_network_client);
 
 		
 		progress_view.setProgress(50);
@@ -132,8 +134,12 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		progress_view.setProgress(60);
 		
-		m_active_ui = m_main_menu; //show main menu
+		//Game
+		m_game_ui = new Game(m_activity_context, m_settings, m_tex_manager
+				, m_network_client);
 		
+		
+		m_active_ui = m_main_menu; //show main menu
 		
 		progress_view.setProgress(100); //finish progress bar
 	}
@@ -149,7 +155,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			m_active_ui.move(dsec);
 
 			switch(m_active_ui.UIChange()) {
-			case GAME: uiChange(m_active_ui, m_game_ui);
+			case GAME_START_CLIENT: uiChange(m_active_ui, m_game_ui);
+			break;
+			case GAME_START_SERVER: startGameServer();
 			break;
 			case CREATION_MENU: uiChange(m_active_ui,m_creation_menu_ui);
 			break;
@@ -171,6 +179,18 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			old_ui.onDeactivate();
 			new_ui.onActivate();
 			m_active_ui = new_ui;
+		}
+	}
+	
+	private void startGameServer() {
+		if(m_settings.selected_level != null) {
+			m_game_server = new GameServer(m_settings, Networking.getInstance()
+					, m_network_server);
+			m_game_server.initGame(m_settings.selected_level);
+			m_game_server.startThread();
+			m_active_ui = m_game_ui;
+		} else {
+			Log.e(LOG_TAG, "Trying to start server but the level is not set! cannot start server!");
 		}
 	}
 	

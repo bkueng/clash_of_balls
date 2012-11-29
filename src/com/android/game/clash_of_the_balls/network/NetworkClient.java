@@ -74,6 +74,8 @@ public class NetworkClient {
 	
 	public boolean hasEvents() { return !m_available_events.isEmpty(); }
 	public Event getNextEvent() { return m_available_events.poll(); }
+		//does not remove the element from the queue
+	public Event peekNextEvent() { return m_available_events.peek(); }
 	
 	
 	//call this every frame, or in a regular time period
