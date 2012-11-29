@@ -79,6 +79,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_tex_manager = new TextureManager(m_activity_context);
 		onSurfaceChanged(screen_width, screen_height);
 		
+		//TODO: load username from file
+		if(GameSettings.debug) m_settings.user_name = "test";
+		
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
 		
@@ -174,9 +177,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	public void onDestroy() {
 		if(m_game_ui!=null) m_game_ui.onDestroy();
 		m_game_ui=null;
-		//TODO: stop the server if running
-		
 		if(m_game_server != null) m_game_server.stopThread();
+		//TODO: store username to a file
+		
 	}
 
 	public void draw(RenderHelper renderer) {
