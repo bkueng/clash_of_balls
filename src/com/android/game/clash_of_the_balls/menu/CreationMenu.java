@@ -190,6 +190,7 @@ public class CreationMenu extends GameMenuBase {
 			m_network_server.setMaxClientCount(m_settings.selected_level.player_count);
 			//create game
 			m_network_server.startAdvertise();
+			m_network_server.joinSessionToSelf();
 			
 			m_ui_change = UIChange.WAIT_MENU;
 		} else if (item == m_cancel_button) {

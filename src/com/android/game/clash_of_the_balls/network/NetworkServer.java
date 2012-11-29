@@ -58,6 +58,9 @@ public class NetworkServer {
 	public void setMaxClientCount(int max_count) {
 		m_networking.setMaxClientCount(max_count);
 	}
+	public void joinSessionToSelf() {
+		m_networking.joinSessionToSelf();
+	}
 	//open a game
 	public void startAdvertise() {
 		m_networking.startAdvertise();

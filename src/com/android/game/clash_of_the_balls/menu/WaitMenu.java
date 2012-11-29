@@ -114,7 +114,7 @@ public class WaitMenu extends GameMenuBase {
 		
 		
 		m_start_button.enable(m_settings.is_host
-				&& (m_client_list.itemCount() > 0 || GameSettings.debug));
+				&& (m_client_list.itemCount() > 1 || GameSettings.debug));
 	}
 	
 	private void addListItem(String str_display, Object additional) {
@@ -141,7 +141,6 @@ public class WaitMenu extends GameMenuBase {
 			if (m_settings.is_host) {
 				m_settings.is_host = false;
 				
-				
 				m_networking.stopAdvertise();
 				
 				m_ui_change = UIChange.CREATION_MENU;
@@ -149,6 +148,7 @@ public class WaitMenu extends GameMenuBase {
 				m_settings.is_host = false;
 				m_ui_change = UIChange.JOIN_MENU;
 			}
+			m_networking.leaveSession();
 		}
 	}
 	
