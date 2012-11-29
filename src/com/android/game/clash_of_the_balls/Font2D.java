@@ -77,6 +77,9 @@ public class Font2D implements IDrawable {
 		
 		Log.d(LOG_TAG, "Font succesfully created");
 	}
+	
+	public VertexBufferFloat colorData() { return m_color_data; }
+	public void setColorData(VertexBufferFloat color_data) { m_color_data = color_data; }
 
 	private void doInit(String string) {
 		
@@ -151,6 +154,7 @@ public class Font2D implements IDrawable {
 	public void setString(String string) {
 		doInit(string);
 	}
+	public String getString() { return m_string; }
 	
 	public static void reloadFonts() {
 		Font2D tmpFont2D;
