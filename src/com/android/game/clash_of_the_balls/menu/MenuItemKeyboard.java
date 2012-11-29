@@ -51,7 +51,7 @@ public class MenuItemKeyboard extends MenuItem {
 		
 		super(position, size);
 		
-		m_item_font = new Font2D(tex_manager, size, font_settings, (int)Math.round(size.y * 0.7));
+		m_item_font = new Font2D(tex_manager, size, font_settings, (int)Math.round(size.y * 0.5));
 		m_dialog_text = text;
 		m_tex_manager=tex_manager;
 		m_activity_context = activity_context;
