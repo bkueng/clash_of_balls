@@ -46,7 +46,7 @@ public class MenuItemList extends MenuItem {
 			, TextureManager tex_manager) {
 		super(position, size);
 		
-		m_item_spacing = size.y / 40.f;
+		m_item_spacing = size.y / 50.f;
 		
 		float button_y_offset = arrow_button_size.y/4.f;
 		float button_x_offset = arrow_button_size.x/3.f;
@@ -89,6 +89,8 @@ public class MenuItemList extends MenuItem {
 	}
 	public void removeItem(int idx) {
 		m_items.remove(idx);
+		if(m_first_drawn_item >= m_items.size()) 
+			m_first_drawn_item = m_items.size()-1;
 		handleItemsChanged();
 	}
 	public int itemCount() { return m_items.size(); }
@@ -117,6 +119,7 @@ public class MenuItemList extends MenuItem {
 	private void handleItemsChanged() {
 		//adjust m_last_drawn_item && item positions
 		int i=m_first_drawn_item;
+		if(i<0) i=0;
 		float y_offset = m_position.y + m_size.y;
 		float y_offset_min = y_offset - m_view_height;
 		while(i<m_items.size() && y_offset >= y_offset_min-m_item_spacing) {
@@ -164,7 +167,9 @@ public class MenuItemList extends MenuItem {
 		//items
 		int last_drawn = m_last_drawn_item;
 		if(last_drawn >= m_items.size()) last_drawn = m_items.size()-1;
-		for(int i=m_first_drawn_item; i<=last_drawn; ++i) {
+		int first_drawn = m_first_drawn_item;
+		if(first_drawn<0) first_drawn = 0;
+		for(int i=first_drawn; i<=last_drawn; ++i) {
 			m_items.get(i).draw(renderer);
 		}
         
@@ -186,7 +191,9 @@ public class MenuItemList extends MenuItem {
 		//items
 		int last_drawn = m_last_drawn_item;
 		if(last_drawn >= m_items.size()) last_drawn = m_items.size()-1;
-		for(int i=m_first_drawn_item; i<=last_drawn; ++i) {
+		int first_drawn = m_first_drawn_item;
+		if(first_drawn<0) first_drawn = 0;
+		for(int i=first_drawn; i<=last_drawn; ++i) {
 			MenuItem item = m_items.get(i);
 			if(item.isInside(x, y)) item.onTouchDown(x, y);
 		}
@@ -208,7 +215,9 @@ public class MenuItemList extends MenuItem {
 		//items
 		int last_drawn = m_last_drawn_item;
 		if(last_drawn >= m_items.size()) last_drawn = m_items.size()-1;
-		for(int i=m_first_drawn_item; i<=last_drawn; ++i) {
+		int first_drawn = m_first_drawn_item;
+		if(first_drawn<0) first_drawn = 0;
+		for(int i=first_drawn; i<=last_drawn; ++i) {
 			MenuItem item = m_items.get(i);
 			if(item.isInside(x, y)) {
 				item.onTouchUp(x, y);
