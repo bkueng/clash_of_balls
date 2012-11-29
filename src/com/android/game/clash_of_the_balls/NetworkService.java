@@ -8,16 +8,19 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class NetworkService extends Service {
+	private static final String LOG_TAG = "NetworkService";
 
 	public IBinder onBind(Intent intent) {
         return null;
 	}
 	
 	public void onCreate() {
+		Log.i(LOG_TAG, "NetworkServer: onCreate()");
         Networking.getInstance().init(this);
  	}
 	
 	public void onDestroy() {
+		Log.i(LOG_TAG, "NetworkServer: onDestroy()");
 		Networking.getInstance().deinit();
  	}
     
