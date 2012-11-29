@@ -53,8 +53,8 @@ public class NetworkServer {
 	}
 	
 	//open a game
-	public void startAdvertise(String server_name) {
-		m_networking.startAdvertise(server_name);
+	public void startAdvertise() {
+		m_networking.startAdvertise();
 	}
 	public void stopAdvertise() {
 		m_networking.stopAdvertise();

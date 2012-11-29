@@ -37,6 +37,8 @@ import android.util.Log;
  * a call to receive* will remove the message from the queue.
  * call registerEventListener to get notifications on receive updates.
  * 
+ * call setServerName before calling startAdvertise or joinSession
+ * 
  * Note that AllJoyn has a maximum packet size of 2^17 bytes
  * (BusAttachment.ALLJOYN_MAX_PACKET_LEN)
  *
@@ -211,12 +213,16 @@ public class Networking {
     	return m_error;
     }
 	
-	/* advertising */
-	//call this to let the others discover me
     //Note: server_name must NOT contain '.'
     //it can only consist of: [A-Z][a-z][0-9]_-
-	public void startAdvertise(String server_name) {
-		m_host_server_name = new String(server_name);
+    public void setServerName(String server_name) {
+    	m_host_server_name = new String(server_name);
+    }
+    
+	/* advertising */
+	//call this to let the others discover me
+    //first call setServerName
+	public void startAdvertise() {
 		m_background_handler.requestName();
 		m_background_handler.bindSession();
 		m_background_handler.advertise();
@@ -235,10 +241,11 @@ public class Networking {
 		 m_background_handler.cancelDiscovery();
 	}
 	
-	//join a network
-	//server_id is one of the returned receiveServerFound() Strings
-	public void joinSession(String server_id) {
-		m_server_id_to_join = new String(server_id);
+	/* join a network */
+	//server_id_to_join is one of the returned receiveServerFound() Strings
+    //first call setServerName
+	public void joinSession(String server_id_to_join) {
+		m_server_id_to_join = new String(server_id_to_join);
 		m_background_handler.joinSession();
 	}
 	public void joinSessionToSelf() {
