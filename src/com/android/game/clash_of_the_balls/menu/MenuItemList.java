@@ -88,6 +88,7 @@ public class MenuItemList extends MenuItem {
 		handleItemsChanged();
 	}
 	public void removeItem(int idx) {
+		if(idx == m_sel_item) m_sel_item=-1;
 		m_items.remove(idx);
 		if(m_first_drawn_item >= m_items.size()) 
 			m_first_drawn_item = m_items.size()-1;

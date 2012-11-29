@@ -24,6 +24,8 @@ public class MenuItemString extends MenuItem {
 	private Texture m_normal_texture;
 	private Texture m_selected_texture;
 	
+	public Object obj; //additional data connected with this object
+	
 	public MenuItemString(Vector position, Vector size, 
 			Font2DSettings font_settings, String entry, TextureManager tex_manager) {
 		

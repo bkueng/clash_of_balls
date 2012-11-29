@@ -37,6 +37,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private IMoveable m_fps_counter;
 	private TextureManager m_tex_manager;
 	private LevelManager m_level_manager;
+	private NetworkClient m_network_client;
+	private NetworkServer m_network_server;
 	
 	private Font2DSettings m_font_settings;
 	private Typeface m_font_typeface;
@@ -80,6 +82,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
 		
+		m_network_client = new NetworkClient(Networking.getInstance());
+		m_network_server = new NetworkServer(Networking.getInstance());
+		
 		// Initialize Font2D.Font2DSetting for all menus
 		m_font_typeface = Typeface.createFromAsset(m_activity_context.getAssets(),  "alphafridgemagnets.ttf");
 		m_font_color = 0xddffffff;
@@ -117,7 +122,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		//Join Menu
 		m_join_menu_ui = new JoinMenu(m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager
-				, m_activity_context, m_font_settings);
+				, m_activity_context, m_font_settings, m_network_client);
 		
 		progress_view.setProgress(60);
 		
