@@ -15,6 +15,7 @@ import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.menu.MenuItemArrow.ArrowType;
+import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 
@@ -24,11 +25,12 @@ public class CreationMenu extends GameMenuBase {
 
 	private GameSettings m_settings;
 	private TextureManager m_tex_manager;
+	private NetworkServer m_network_server;
 
 	private Font2D.Font2DSettings m_font_settings;
 	
-	MenuItem m_create_button;
-	MenuItem m_cancel_button;
+	MenuItemButton m_create_button;
+	MenuItemButton m_cancel_button;
 
 	MenuItemKeyboard m_name_button;
 	
@@ -39,7 +41,8 @@ public class CreationMenu extends GameMenuBase {
 	public CreationMenu(MenuBackground background,
 			float screen_width, float screen_height
 			, TextureManager tex_manager, GameSettings settings, Context context
-			, Font2D.Font2DSettings font_settings, LevelManager level_manager) {
+			, Font2D.Font2DSettings font_settings, LevelManager level_manager
+			, NetworkServer network_server) {
 		super(background, context);
 
 		Vector pos = new Vector(0.f, 0.f);
@@ -47,6 +50,7 @@ public class CreationMenu extends GameMenuBase {
 
 		m_settings = settings;
 		m_tex_manager = tex_manager;
+		m_network_server = network_server;
 		
 		// bind font setting
 		m_font_settings = font_settings;
@@ -86,7 +90,7 @@ public class CreationMenu extends GameMenuBase {
 		m_menu_items.add(m_name_button = new MenuItemKeyboard(
 				new Vector(pos.x + size.x / 2.f
 						, pos.y + size.y * 3.f / 4.f + offset_y),
-				new Vector(4 * grey_button_width, grey_button_height),
+				new Vector(4 * grey_button_width, size.x * 0.35f * 0.25f),
 				m_font_settings, m_tex_manager, m_activity_context,
 				"Please Enter your Nickname:"));
 
@@ -149,6 +153,16 @@ public class CreationMenu extends GameMenuBase {
 		}
 	}
 	
+	public void move(float dsec) {
+		super.move(dsec);
+		
+		String name =  m_name_button.getString();
+		m_create_button.enable(m_level_list.getSelectedItem()!=null
+				&& name.length() > 0);
+		if(name.length() > 0) m_settings.user_name = new String(name);
+
+	}
+	
 	
 	
 	public void draw(RenderHelper renderer) {
@@ -172,11 +186,23 @@ public class CreationMenu extends GameMenuBase {
 			m_settings.selected_level = item_level.level();
 			
 			m_settings.user_name = m_name_button.getString();
+			m_network_server.setOwnName(m_name_button.getString());
+			m_network_server.setMaxClientCount(m_settings.selected_level.player_count);
+			//create game
+			m_network_server.startAdvertise();
+			
 			m_ui_change = UIChange.WAIT_MENU;
 		} else if (item == m_cancel_button) {
 			m_settings.is_host = false;
 			m_ui_change = UIChange.MAIN_MENU;
 		}
+	}
+	
+	public void onActivate() {
+		super.onActivate();
+		
+		String name =  m_settings.user_name;
+		if(name.length() > 0) m_name_button.setString(name);
 	}
 
 }

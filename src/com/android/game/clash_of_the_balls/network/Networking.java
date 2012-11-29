@@ -188,6 +188,9 @@ public class Networking {
     public void setMaxClientCount(int max_count) {
     	m_max_client_count = max_count;
     }
+    public int maxClientCount() {
+    	return m_max_client_count;
+    }
     
     
     private volatile int m_max_client_count = -1;

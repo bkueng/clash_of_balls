@@ -107,14 +107,16 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 				m_tex_manager.get(R.raw.texture_bg_normal),1600.f/960.f);
 		m_creation_menu_ui = new CreationMenu(m_normal_menu_background
 				, screen_width, screen_height, m_tex_manager, m_settings
-				, m_activity_context, m_font_settings, m_level_manager);
+				, m_activity_context, m_font_settings, m_level_manager
+				, m_network_server);
 		
 		progress_view.setProgress(40);
 		
 		//Wait Menu
 		m_wait_menu_ui = new WaitMenu(m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager
-				, m_settings,m_activity_context, m_font_settings);
+				, m_settings,m_activity_context, m_font_settings
+				, Networking.getInstance());
 
 		
 		progress_view.setProgress(50);
@@ -122,7 +124,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		//Join Menu
 		m_join_menu_ui = new JoinMenu(m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager
-				, m_activity_context, m_font_settings, m_network_client);
+				, m_activity_context, m_font_settings, m_settings
+				, m_network_client);
 		
 		progress_view.setProgress(60);
 		

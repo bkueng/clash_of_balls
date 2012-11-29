@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls.menu;
 import android.content.Context;
 
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
@@ -25,6 +26,7 @@ public class JoinMenu extends GameMenuBase {
 	
 	private Font2DSettings m_list_item_font_settings;
 	
+	private GameSettings m_settings;
 	private NetworkClient m_network_client;
 	
 	
@@ -32,6 +34,7 @@ public class JoinMenu extends GameMenuBase {
 			, float screen_width, float screen_height
 			, TextureManager tex_manager, Context context
 			, Font2D.Font2DSettings font_settings
+			, GameSettings settings
 			, NetworkClient network_client) {
 		super(background,context);
 		
@@ -40,6 +43,7 @@ public class JoinMenu extends GameMenuBase {
 		
 		m_tex_manager = tex_manager;
 		m_network_client = network_client;
+		m_settings = settings;
 		
 		if(m_background != null)
 			m_background.getViewport(screen_width, screen_height, pos, size);
@@ -109,17 +113,20 @@ public class JoinMenu extends GameMenuBase {
 					found = true;
 			}
 			if(!found)
-				addItem(Networking.getNameFromServerId(m_network_client.serverId(k))
+				addListItem(Networking.getNameFromServerId(m_network_client.serverId(k))
 						, m_network_client.serverId(k));
 		}
 		
-		m_join_button.enable(m_game_list.getSelectedItem() != null);
+		String name =  m_name_button.getString();
+		m_join_button.enable(m_game_list.getSelectedItem() != null 
+				&& name.length() > 0);
+		if(name.length() > 0) m_settings.user_name = new String(name);
 	}
 	
-	private void addItem(String str_display, Object additional) {
+	private void addListItem(String str_display, Object additional) {
 		MenuItemString item = new MenuItemString(new Vector()
-		, new Vector(m_game_list.size().x, m_item_height)
-		, m_list_item_font_settings, str_display, m_tex_manager);
+			, new Vector(m_game_list.size().x, m_item_height)
+			, m_list_item_font_settings, str_display, m_tex_manager);
 		item.obj = additional;
 		m_game_list.addItem(item);
 		
@@ -136,9 +143,11 @@ public class JoinMenu extends GameMenuBase {
 				//get the server to join
 				MenuItem sel_item = m_game_list.getSelectedItem();
 				if(sel_item!=null) {
-					Object obj = ((MenuItemString)item).obj;
+					Object obj = ((MenuItemString)sel_item).obj;
 					if(obj != null) {
 						String server_id = (String)obj;
+						m_settings.user_name = m_name_button.getString();
+						m_network_client.setOwnName(m_name_button.getString());
 						m_network_client.connectToServer(server_id);
 						m_ui_change = UIChange.WAIT_MENU;
 					}
@@ -152,6 +161,9 @@ public class JoinMenu extends GameMenuBase {
 	public void onActivate() {
 		super.onActivate();
 		m_network_client.startDiscovery();
+		
+		String name =  m_settings.user_name;
+		if(name.length() > 0) m_name_button.setString(name);
 	}
 	
 	public void onDeactivate() {

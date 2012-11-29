@@ -63,6 +63,9 @@ public class NetworkClient {
 		m_networking.stopDiscovery();
 	}
 	
+	public void setOwnName(String name) {
+		m_networking.setServerName(name);
+	}
 	//join a game
 	public void connectToServer(String server_id) {
 		m_networking.joinSession(server_id);

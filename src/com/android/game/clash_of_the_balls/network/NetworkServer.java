@@ -52,6 +52,12 @@ public class NetworkServer {
 		m_next_sequence_num = 0;
 	}
 	
+	public void setOwnName(String name) {
+		m_networking.setServerName(name);
+	}
+	public void setMaxClientCount(int max_count) {
+		m_networking.setMaxClientCount(max_count);
+	}
 	//open a game
 	public void startAdvertise() {
 		m_networking.startAdvertise();
