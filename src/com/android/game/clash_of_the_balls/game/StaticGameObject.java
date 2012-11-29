@@ -32,6 +32,10 @@ public class StaticGameObject extends GameObject {
 	
 	protected float m_rotation_angle=0.f; //in rad, texture rotation
 	
+	public void setRotation(float angle_rad) {
+		m_rotation_angle = angle_rad;
+	}
+	
 	protected Texture m_texture;
 	protected VertexBufferFloat m_color_data;
 	protected VertexBufferFloat m_position_data;
