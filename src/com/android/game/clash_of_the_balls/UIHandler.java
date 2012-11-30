@@ -138,6 +138,10 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_game_ui = new Game(m_activity_context, m_settings, m_tex_manager
 				, m_network_client);
 		
+		m_game_server = new GameServer(m_settings, Networking.getInstance()
+				, m_network_server);
+		m_game_server.startThread();
+		
 		
 		m_active_ui = m_main_menu; //show main menu
 		
@@ -184,10 +188,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	
 	private void startGameServer() {
 		if(m_settings.selected_level != null) {
-			m_game_server = new GameServer(m_settings, Networking.getInstance()
-					, m_network_server);
 			m_game_server.initGame(m_settings.selected_level);
-			m_game_server.startThread();
+			m_game_server.startGame();
 			m_active_ui = m_game_ui;
 		} else {
 			Log.e(LOG_TAG, "Trying to start server but the level is not set! cannot start server!");

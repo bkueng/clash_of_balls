@@ -31,7 +31,9 @@ import com.android.game.clash_of_the_balls.network.Networking;
  * network advertisement & listening should be disabled at this point
  * 
  * call initGame before starting the game thread (when all clients are connected)!
- * -> stop the thread between every game & reinit
+ * call startGame to start the game
+ * -> after game end the game can be reinit & restarted 
+ * 		(thread does not need to be destroyed)
  *
  */
 public class GameServer extends GameBase implements Runnable {
@@ -40,7 +42,9 @@ public class GameServer extends GameBase implements Runnable {
 	private Looper m_looper=null;
 	private NetworkServer m_network_server;
 	private Networking m_networking;
-	private IncomingHandler m_network_handler;
+	private IncomingHandler m_msg_handler;
+	
+	public static final int HANDLE_GAME_START = 1000;
 	
 	static class IncomingHandler extends Handler {
 		private final WeakReference<GameServer> m_service; 
@@ -146,11 +150,23 @@ public class GameServer extends GameBase implements Runnable {
 		return ret;
 	}
 	
+	//this can be called from another thread to start a game
+	//call this after the game is initialized
+	//it sends game start commands to the connected clients
+	public void startGame() {
+		Message msg = m_msg_handler.obtainMessage(HANDLE_GAME_START);
+		m_msg_handler.sendMessage(msg);
+	}
 	
+	
+	
+	/* here start the thread internal methods */
 	
 	private void handleMessage(Message msg) {
 		switch(msg.what) {
 		case Networking.HANDLE_RECEIVED_SIGNAL: handleNetworkReceivedSignal();
+		break;
+		case HANDLE_GAME_START: handleGameStart();
 		break;
 		}
 	}
@@ -182,6 +198,33 @@ public class GameServer extends GameBase implements Runnable {
 		}
 		
 	}
+	
+	private void handleGameStart() {
+		m_network_server.resetSequenceNum();
+		
+		//first throw away all waiting incoming sensor updates & acks
+		while(m_networking.receiveAck()!=null) {}
+		while(m_networking.receiveSensorUpdate()!=null) {}
+		
+		
+		/* first send 'game about to start' event with level information */
+		addEvent(new EventGameInfo(this, getNextSequenceNum()));
+		sendAllEvents();
+		
+		//wait for start ...
+		try {
+			Thread.sleep(wait_to_start_game * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		//ok let's do it...
+		gameStartNow();
+		
+		m_last_time = SystemClock.elapsedRealtime();
+		
+	}
+	
 	
 	private long m_last_time; //for timestepping
 	
@@ -240,35 +283,12 @@ public class GameServer extends GameBase implements Runnable {
 		Looper.prepare();
 		m_looper = Looper.myLooper();
 		
-		m_network_handler = new IncomingHandler(this);
-		m_networking.registerEventListener(m_network_handler);
-		
-		m_network_server.resetSequenceNum();
-		
-		//first throw away all waiting incoming sensor updates & acks
-		while(m_networking.receiveAck()!=null) {}
-		while(m_networking.receiveSensorUpdate()!=null) {}
-		
-		
-		/* first send 'game about to start' event with level information */
-		addEvent(new EventGameInfo(this, getNextSequenceNum()));
-		sendAllEvents();
-		
-		//wait for start ...
-		try {
-			Thread.sleep(wait_to_start_game * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		//ok let's do it...
-		gameStartNow();
-		
-		m_last_time = SystemClock.elapsedRealtime();
+		m_msg_handler = new IncomingHandler(this);
+		m_networking.registerEventListener(m_msg_handler);
 		
 		Looper.loop();
 		
-		m_networking.unregisterEventListener(m_network_handler);
+		m_networking.unregisterEventListener(m_msg_handler);
 		m_looper = null;
 	}
 	
