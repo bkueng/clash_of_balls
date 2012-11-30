@@ -27,6 +27,8 @@ public class Game extends GameBase implements UIBase {
 	
 	private GamePlayer m_own_player;
 	
+	private float m_calibration_timeout=0.f; //[sec]
+	
 	
 	public Game(Context c, GameSettings s, TextureManager texture_manager, 
 			NetworkClient network_client) {
@@ -47,8 +49,8 @@ public class Game extends GameBase implements UIBase {
 				null, (float)level.width, (float)level.height);
 		if(scaling > 0.f) m_view.setZoomToTileSize(scaling);
 		
-		//TODO: start calibration
-		
+		//start calibration
+		m_calibration_timeout = (float)wait_to_start_game - 1.f;
 	}
 	
 	public void initPlayers(PlayerInfo[] players) {
@@ -85,6 +87,14 @@ public class Game extends GameBase implements UIBase {
 	private boolean m_bReceived_events = false; //send new sensor data if true
 
 	public void move(float dsec) {
+		//calibration
+		if(m_calibration_timeout > 0.f) {
+			m_calibration_timeout -= dsec;
+			if(m_calibration_timeout <= 0.f) {
+				m_sensor_thread.calibrate();
+			}
+		}
+		
 		if(m_bIs_game_running) {
 
 			//get sensor values & send to server
@@ -151,6 +161,7 @@ public class Game extends GameBase implements UIBase {
 	public void gameStartNow() {
 		super.gameStartNow();
 		m_bReceived_events = true;
+		m_sensor_thread.stopCalibrate();
 		//TODO
 	}
 	public void gameEnd() {

@@ -24,6 +24,7 @@ public abstract class GameBase {
 	
 	protected final static int wait_to_start_game = 3; //[sec]
 					//time between press of play and actual game start
+					//in the last second of this, the sensor calibration will be done
 	
 	protected GameSettings m_settings;
 	protected final TextureManager m_texture_manager;
