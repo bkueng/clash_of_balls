@@ -48,7 +48,7 @@ public class EventGameInfo extends Event {
 	public EventGameInfo(GameBase game, int seq_num) {
 		super(type_game_info, seq_num);
 		//players
-		m_player_count = game.playerCount();
+		m_player_count = game.currentPlayerCount();
 		m_players = new PlayerInfo[m_player_count];
 		int i=0;
 		for (Map.Entry<Short, DynamicGameObject> entry : game.m_game_objects.entrySet()) {

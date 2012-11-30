@@ -85,9 +85,9 @@ public class GameServer extends GameBase implements Runnable {
 		//update networking
 		m_network_server.handleReceive();
 		
-		m_player_count = m_network_server.getConnectedClientCount();
+		m_initial_player_count = m_network_server.getConnectedClientCount();
 		
-		Log.d(TAG_SERVER, "init game: "+m_player_count+" players");
+		Log.d(TAG_SERVER, "init game: "+m_initial_player_count+" players");
 		
 		//get the player positions 
 		Vector player_pos[] = new Vector[m_level.player_count];
@@ -111,9 +111,9 @@ public class GameServer extends GameBase implements Runnable {
 			indexes[k2] = tmp;
 		}
 		
-		int colors[] = getDiffColors(m_player_count);
+		int colors[] = getDiffColors(m_initial_player_count);
 		
-		for(int i=0; i< m_player_count; ++i) {
+		for(int i=0; i< m_initial_player_count; ++i) {
 			short id = getNextItemId();
 			m_network_server.getConnectedClient(i).id = id;
 			//create the player (without textures)
