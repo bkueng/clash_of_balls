@@ -159,6 +159,7 @@ public class WaitMenu extends GameMenuBase {
 		if (item == m_start_button) {
 			if (m_settings.is_host && !m_start_button.isDisabled()) {
 				
+				m_networking.stopAdvertise();
 				m_ui_change = UIChange.GAME_START_SERVER;
 				
 			}
