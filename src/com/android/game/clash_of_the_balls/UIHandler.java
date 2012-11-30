@@ -67,6 +67,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		JOIN_MENU,
 		
 		GAME_START_CLIENT,
+		GAME_ROUND_END,
 		GAME_START_SERVER
 	}
 	
@@ -161,6 +162,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			switch(m_active_ui.UIChange()) {
 			case GAME_START_CLIENT: uiChange(m_active_ui, m_game_ui);
 			break;
+			case GAME_ROUND_END: handleGameRoundEnded();
+			break;
 			case GAME_START_SERVER: startGameServer();
 			break;
 			case CREATION_MENU: uiChange(m_active_ui,m_creation_menu_ui);
@@ -186,13 +189,35 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		}
 	}
 	
+	//initialize & run the server with the selected level & show the game
 	private void startGameServer() {
 		if(m_settings.selected_level != null) {
 			m_game_server.initGame(m_settings.selected_level);
 			m_game_server.startGame();
-			m_active_ui = m_game_ui;
+			uiChange(m_active_ui, m_game_ui);
 		} else {
 			Log.e(LOG_TAG, "Trying to start server but the level is not set! cannot start server!");
+		}
+	}
+	
+	private void handleGameRoundEnded() {
+		Log.i(LOG_TAG, "Game round "+m_settings.game_current_round+"/"+
+				m_settings.game_rounds + " ended");
+		
+		++m_settings.game_current_round;
+		if(m_settings.game_current_round > m_settings.game_rounds) {
+			//TODO: show results page
+			
+			//TODO: disconnect
+			
+		} else {
+			//TODO: also show current results page?
+			
+			if(m_settings.is_host) {
+				startGameServer();
+			} else {
+				uiChange(m_active_ui, m_game_ui);
+			}
 		}
 	}
 	

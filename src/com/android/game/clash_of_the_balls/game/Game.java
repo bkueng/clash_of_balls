@@ -23,6 +23,8 @@ public class Game extends GameBase implements UIBase {
 	private SensorThread m_sensor_thread;
 	private GameView m_view;
 	
+	private UIHandler.UIChange m_ui_change;
+	
 	private NetworkClient m_network_client;
 	
 	private GamePlayer m_own_player;
@@ -37,6 +39,7 @@ public class Game extends GameBase implements UIBase {
 		m_sensor_thread=new SensorThread(c);
 		m_sensor_thread.startThread();
 		m_network_client = network_client;
+		m_ui_change = UIHandler.UIChange.NO_CHANGE;
 	}
 	
 	public void initGame(GameLevel level) {
@@ -162,12 +165,10 @@ public class Game extends GameBase implements UIBase {
 		super.gameStartNow();
 		m_bReceived_events = true;
 		m_sensor_thread.stopCalibrate();
-		//TODO
 	}
 	public void gameEnd() {
 		super.gameEnd();
-		//TODO
-		
+		m_ui_change = UIHandler.UIChange.GAME_ROUND_END;
 	}
 	
 	public int getNextSequenceNum() {
@@ -175,9 +176,7 @@ public class Game extends GameBase implements UIBase {
 	}
 
 	public UIHandler.UIChange UIChange() {
-		// TODO Auto-generated method stub
-		
-		return UIHandler.UIChange.NO_CHANGE;
+		return m_ui_change;
 	}
 
 	public void onActivate() {
@@ -185,7 +184,7 @@ public class Game extends GameBase implements UIBase {
 	}
 
 	public void onDeactivate() {
-		// ignore
+		m_ui_change = UIHandler.UIChange.NO_CHANGE;
 	}
 	
 	public String getUniqueNameFromPlayerId(short player_id) {
