@@ -6,7 +6,7 @@ package com.android.game.clash_of_the_balls;
  *
  */
 public class GameSettings {
-	public static final boolean debug = false; //debugging variable
+	public static final boolean debug = true; //debugging variable
 						//this allows us some special things for testing if true
 						//eg starting a game without any connected clients
 	
@@ -15,6 +15,7 @@ public class GameSettings {
 	public boolean is_host=false;
 	
 	public int game_rounds;
+	public int game_current_round; //[1-game_rounds]
 	public GameLevel selected_level=null;
 	
 	public int m_screen_width;
