@@ -16,6 +16,7 @@ import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
+import com.android.game.clash_of_the_balls.game.event.EventGameEnd;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo;
 import com.android.game.clash_of_the_balls.game.event.EventGameStartNow;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
@@ -162,19 +163,22 @@ public class GameServer extends GameBase implements Runnable {
 		
 		m_network_server.handleReceive();
 		
-		short id;
-		while((id=m_network_server.getSensorUpdate(m_sensor_vector)) != -1) {
-			DynamicGameObject obj = getGameObject(id);
-			if(obj != null && obj.type == Type.Player) {
-				GamePlayer p = (GamePlayer)obj;
-				p.acceleration().set(m_sensor_vector);
-				++m_sensor_update_count;
-			}
-		}
+		if(m_bIs_game_running) {
 		
-		if(m_sensor_update_count >= m_player_count) {
-			m_sensor_update_count = 0;
-			moveGame();
+			short id;
+			while((id=m_network_server.getSensorUpdate(m_sensor_vector)) != -1) {
+				DynamicGameObject obj = getGameObject(id);
+				if(obj != null && obj.type == Type.Player) {
+					GamePlayer p = (GamePlayer)obj;
+					p.acceleration().set(m_sensor_vector);
+					++m_sensor_update_count;
+				}
+			}
+
+			if(m_sensor_update_count >= currentPlayerCount()) {
+				m_sensor_update_count = 0;
+				moveGame();
+			}
 		}
 		
 	}
@@ -194,10 +198,29 @@ public class GameServer extends GameBase implements Runnable {
 		move(elapsed_time);
 		doCollisionHandling();
 		applyMove();
-		//TODO: check for game end
+		checkGameEnd(elapsed_time);
 		
 		sendAllEvents();
 		generate_events = false;
+	}
+	
+	private boolean m_is_game_ending = false;
+	private float m_game_ending_timeout;
+	
+	private void checkGameEnd(float elapsed_time) {
+		//in debug mode we allow a single player -> don't end the game
+		if(GameSettings.debug && currentPlayerCount()==1) return;
+		
+		//game ends if there is only 1 player left (or 0)
+		//a small timeout is used after only 1 or 0 player is left
+		if(m_is_game_ending) {
+			if((m_game_ending_timeout -= elapsed_time) < 0.f) {
+				gameEnd();
+			}
+		} else if(currentPlayerCount() <= 1) {
+			m_game_ending_timeout = 1.f; //wait for 1 sec until game end
+			m_is_game_ending = true;
+		}
 	}
 	
 	public void move(float dsec) {
@@ -253,6 +276,14 @@ public class GameServer extends GameBase implements Runnable {
 		super.gameStartNow();
 		addEvent(new EventGameStartNow(getNextSequenceNum()));
 		sendAllEvents();
+		m_is_game_ending=false;
+	}
+	
+	public void gameEnd() {
+		super.gameEnd();
+		addEvent(new EventGameEnd(getNextSequenceNum()));
+		//after here the game stopped & this thread is simply waiting 
+		//for next game initialization & game start (called from UIHandler)
 	}
 	
 	//this also deletes all events from the queue
