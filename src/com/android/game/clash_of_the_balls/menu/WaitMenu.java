@@ -85,6 +85,7 @@ public class WaitMenu extends GameMenuBase {
 	
 	public void move(float dsec) {
 		//update the connected clients
+		boolean is_self_connected=false; //is our own name on the list?
 		//remove old ones
 		for(int i=0; i<m_client_list.itemCount(); ++i) {
 			MenuItemString item = (MenuItemString)m_client_list.item(i);
@@ -114,6 +115,8 @@ public class WaitMenu extends GameMenuBase {
 				if(!found)
 					addListItem(Networking.getNameFromServerId(c.well_known_name)
 							, c.well_known_name);
+				if(c.unique_id.equals(m_networking.getUniqueName())) 
+						is_self_connected = true;
 			}
 		}
 		
@@ -133,9 +136,9 @@ public class WaitMenu extends GameMenuBase {
 			}
 		}
 		
-		
 		m_start_button.enable(m_settings.is_host
-				&& (m_client_list.itemCount() > 1 || GameSettings.debug));
+				&& (m_client_list.itemCount() > 1 || GameSettings.debug)
+				&& is_self_connected);
 	}
 	
 	private void addListItem(String str_display, Object additional) {
@@ -154,7 +157,7 @@ public class WaitMenu extends GameMenuBase {
 	@Override
 	protected void onTouchUp(MenuItem item) {
 		if (item == m_start_button) {
-			if (m_settings.is_host) {
+			if (m_settings.is_host && !m_start_button.isDisabled()) {
 				
 				m_ui_change = UIChange.GAME_START_SERVER;
 				
