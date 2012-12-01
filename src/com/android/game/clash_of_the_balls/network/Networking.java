@@ -236,8 +236,11 @@ public class Networking {
 	}
 	public void stopAdvertise() {
 		m_background_handler.cancelAdvertise();
+		/*
+		//this leads to a disconnect of the clients, so we don't do this
 		m_background_handler.unbindSession();
 		m_background_handler.releaseName();
+		 */
 	}
 	
 	//listen for other servers
