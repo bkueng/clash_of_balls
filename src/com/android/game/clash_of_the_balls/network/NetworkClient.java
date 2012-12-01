@@ -61,6 +61,8 @@ public class NetworkClient {
 	}
 	public void stopDiscovery() {
 		m_networking.stopDiscovery();
+		//clear the server list
+		m_available_servers=new ArrayList<String>();
 	}
 	
 	public void setOwnName(String name) {
