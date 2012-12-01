@@ -72,6 +72,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		GAME_START_CLIENT,
 		GAME_ROUND_END,
 		GAME_START_SERVER,
+		GAME_ABORT, //in case of an error -> also abort the server
 		
 		/* popup menus */
 		POPUP_SHOW, //set the GameSettings.popup_menu variable to show a popup
@@ -145,7 +146,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		//Game
 		m_game_ui = new Game(m_activity_context, m_settings, m_tex_manager
-				, m_network_client, m_font_typeface);
+				, m_network_client, m_font_settings);
 		
 		m_game_server = new GameServer(m_settings, Networking.getInstance()
 				, m_network_server);
@@ -175,6 +176,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			case GAME_ROUND_END: handleGameRoundEnded();
 			break;
 			case GAME_START_SERVER: startGameServer();
+			break;
+			case GAME_ABORT: handleGameAbort();
 			break;
 			case CREATION_MENU: uiChange(m_active_ui,m_creation_menu_ui);
 			break;
@@ -223,6 +226,16 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		} else {
 			Log.e(LOG_TAG, "Trying to start server but the level is not set! cannot start server!");
 		}
+	}
+	
+	private void handleGameAbort() {
+		Log.i(LOG_TAG, "Game abort call");
+		
+		//TODO: try to restore network
+		
+		//stop game thread
+		
+		uiChange(m_active_ui, m_main_menu);
 	}
 	
 	private void handleGameRoundEnded() {

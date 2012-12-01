@@ -12,11 +12,16 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
+import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
+import com.android.game.clash_of_the_balls.menu.PopupBase;
 import com.android.game.clash_of_the_balls.menu.PopupGameStart;
+import com.android.game.clash_of_the_balls.menu.PopupMsg;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
+import com.android.game.clash_of_the_balls.network.Networking;
+import com.android.game.clash_of_the_balls.network.Networking.AllJoynError;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
 
 
@@ -27,9 +32,9 @@ public class Game extends GameBase implements UIBase {
 	private GameView m_view;
 	
 	private UIHandler.UIChange m_ui_change;
-	private PopupGameStart m_popup = null;
+	private PopupBase m_error_popup = null;
 	private Context m_activity_context;
-	private Typeface m_font_typeface;
+	private Font2DSettings m_font_settings;
 	
 	private NetworkClient m_network_client;
 	
@@ -39,12 +44,12 @@ public class Game extends GameBase implements UIBase {
 	
 	
 	public Game(Context c, GameSettings s, TextureManager texture_manager, 
-			NetworkClient network_client, Typeface font_typeface) {
+			NetworkClient network_client, Font2DSettings font_settings) {
 		super(false, s, texture_manager);
 		
 		m_sensor_thread=new SensorThread(c);
 		m_activity_context = c;
-		m_font_typeface = font_typeface;
+		m_font_settings = font_settings;
 		m_sensor_thread.startThread();
 		m_network_client = network_client;
 		m_ui_change = UIHandler.UIChange.NO_CHANGE;
@@ -90,10 +95,13 @@ public class Game extends GameBase implements UIBase {
 		m_calibration_timeout = (float)wait_to_start_game - 1.f;
 		
 		//show game start popup
-		m_settings.popup_menu = m_popup = new PopupGameStart(m_activity_context
-				, m_texture_manager, m_settings.m_screen_width, m_settings.m_screen_height
-				, (float)wait_to_start_game, m_own_player.color(), m_font_typeface);
-		m_ui_change = UIChange.POPUP_SHOW;
+		if(m_error_popup == null) {
+			m_settings.popup_menu = new PopupGameStart(m_activity_context
+					, m_texture_manager, m_settings.m_screen_width, m_settings.m_screen_height
+					, (float)wait_to_start_game, m_own_player.color()
+					, m_font_settings.m_typeface);
+			m_ui_change = UIChange.POPUP_SHOW;
+		}
 	}
 	
 	public void onDestroy() {
@@ -108,46 +116,54 @@ public class Game extends GameBase implements UIBase {
 	private boolean m_bReceived_events = false; //send new sensor data if true
 
 	public void move(float dsec) {
-		//calibration
-		if(m_calibration_timeout > 0.f) {
-			m_calibration_timeout -= dsec;
-			if(m_calibration_timeout <= 0.f) {
-				m_sensor_thread.calibrate();
+		if(m_error_popup != null) {
+			//check for button pressed
+			if(m_error_popup.UIChange() == UIChange.POPUP_RESULT_BUTTON1) {
+				m_ui_change = UIChange.GAME_ABORT;
+				m_error_popup = null;
 			}
-		}
-		
-		if(m_bIs_game_running) {
-
-			//get sensor values & send to server
-			Vector sensor_vec = m_sensor_thread.getCurrentVector();
-			if(m_bReceived_events) 
-				m_network_client.sensorUpdate(sensor_vec);
-			//TODO: apply sensor values to own player
-
-			handleNetworkError(m_network_client.getNetworkError());
-
-			m_network_client.handleReceive();
-			if(m_network_client.hasEvents()) {
-				//TODO: undo prediction...
-				
-				//apply the updates from the server
-				applyIncomingEvents();
-				
-				m_bReceived_events = true;
-			} else {
-				//TODO: do predicted move
-				
-				m_bReceived_events = false;
-			}
-			m_game_field.move(dsec);
-
-
-			m_view.move(dsec);
-			m_game_field.move(dsec);
-			
 		} else {
-			m_network_client.handleReceive();
-			applyIncomingEvents();
+			//calibration
+			if(m_calibration_timeout > 0.f) {
+				m_calibration_timeout -= dsec;
+				if(m_calibration_timeout <= 0.f) {
+					m_sensor_thread.calibrate();
+				}
+			}
+
+			if(m_bIs_game_running) {
+
+				//get sensor values & send to server
+				Vector sensor_vec = m_sensor_thread.getCurrentVector();
+				if(m_bReceived_events) 
+					m_network_client.sensorUpdate(sensor_vec);
+				//TODO: apply sensor values to own player
+
+				handleNetworkError(m_network_client.getNetworkError());
+
+				m_network_client.handleReceive();
+				if(m_network_client.hasEvents()) {
+					//TODO: undo prediction...
+
+					//apply the updates from the server
+					applyIncomingEvents();
+
+					m_bReceived_events = true;
+				} else {
+					//TODO: do predicted move
+
+					m_bReceived_events = false;
+				}
+				m_game_field.move(dsec);
+
+
+				m_view.move(dsec);
+				m_game_field.move(dsec);
+
+			} else {
+				m_network_client.handleReceive();
+				applyIncomingEvents();
+			}
 		}
 	}
 	
@@ -160,8 +176,22 @@ public class Game extends GameBase implements UIBase {
 	
 	private void handleNetworkError(AllJoynErrorData data) {
 		if(data != null) {
-			//TODO
-
+			//this is bad: here it's very difficult to recover, so we 
+			//show a message to the user and abort the game
+			
+			switch(data.error) {
+			case CONNECT_ERROR:
+			case JOIN_SESSION_ERROR:
+			case SEND_ERROR:
+			case BUS_EXCEPTION:
+				m_settings.popup_menu = m_error_popup = new PopupMsg(m_activity_context 
+						, m_texture_manager, m_settings.m_screen_width
+						, m_settings.m_screen_height 
+						, m_font_settings.m_typeface, m_font_settings.m_color
+						, "Error", Networking.getErrorMsgMultiline(data.error), "Ok");
+				m_ui_change = UIChange.POPUP_SHOW;
+			}
+			
 		}
 	}
 

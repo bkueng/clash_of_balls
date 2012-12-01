@@ -1443,6 +1443,27 @@ public class Networking {
 		SEND_ERROR,
 		BUS_EXCEPTION
 	}
+	public static String getErrorMsgMultiline(AllJoynError error) {
+		switch(error) {
+		case ADVERTISE_CANCEL_ERROR: return "Failed to stop\n"+
+				"advertisement of \n"+
+				"server name";
+		case ADVERTISE_ERROR: return "Failed to start\n"+
+				"advertisement of \n"+
+				"server name";
+		case BUS_EXCEPTION: return "Networking bus exception.\n"+
+				"cannot send or receive data";
+		case CONNECT_ERROR: return "Network: failed to connect";
+		case JOIN_SESSION_ERROR: return "Failed to join\n"+
+				"network session";
+		case SEND_ERROR: return "Failed to send data\n"+
+				"over the network";
+		case START_DISCOVERY_ERROR: return "Network error happened\n"+
+				"when trying to look\n"+
+				"for other servers";
+		}
+		return "Unknown network error";
+	}
 	public static class AllJoynErrorData {
 		public Module module;
 		public AllJoynError error;
