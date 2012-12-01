@@ -814,22 +814,23 @@ public class Networking {
          */
         int stateRelation = mBusAttachmentState.compareTo(BusAttachmentState.DISCONNECTED);
     	assert (stateRelation >= 0);
-    	
-    	/*
-    	 * We depend on the user interface and model to work together to not
-    	 * get this process started until a valid name is set in the channel name.
-    	 */
-    	String wellKnownName = getWellKnownName();
-    	Log.i(TAG, "Well-known name: "+wellKnownName);
-        Status status = mBus.requestName(wellKnownName, BusAttachment.ALLJOYN_REQUESTNAME_FLAG_DO_NOT_QUEUE
-        		| BusAttachment.ALLJOYN_NAME_FLAG_ALLOW_REPLACEMENT
-        		| BusAttachment.ALLJOYN_REQUESTNAME_FLAG_REPLACE_EXISTING);
-        if (status == Status.OK) {
-          	mHostChannelState = HostChannelState.NAMED;
-        } else {
-    		alljoynError(Module.USE, AllJoynError.CONNECT_ERROR, 
-    				"Unable to acquire well-known name: (" + status + ")");
-        }
+    	if(mHostChannelState == HostChannelState.IDLE) {
+	    	/*
+	    	 * We depend on the user interface and model to work together to not
+	    	 * get this process started until a valid name is set in the channel name.
+	    	 */
+	    	String wellKnownName = getWellKnownName();
+	    	Log.i(TAG, "Well-known name: "+wellKnownName);
+	        Status status = mBus.requestName(wellKnownName, BusAttachment.ALLJOYN_REQUESTNAME_FLAG_DO_NOT_QUEUE
+	        		| BusAttachment.ALLJOYN_NAME_FLAG_ALLOW_REPLACEMENT
+	        		| BusAttachment.ALLJOYN_REQUESTNAME_FLAG_REPLACE_EXISTING);
+	        if (status == Status.OK) {
+	          	mHostChannelState = HostChannelState.NAMED;
+	        } else {
+	    		alljoynError(Module.USE, AllJoynError.CONNECT_ERROR, 
+	    				"Unable to acquire well-known name: (" + status + ")");
+	        }
+    	}
     }
     
     /**
@@ -876,70 +877,74 @@ public class Networking {
     private void doBindSession() {
         Log.i(TAG, "doBindSession()");
         
-        Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
-        SessionOpts sessionOpts = new SessionOpts(SessionOpts.TRAFFIC_MESSAGES
-        		, true, SessionOpts.PROXIMITY_ANY, SessionOpts.TRANSPORT_ANY);
-        
-        Status status = mBus.bindSessionPort(contactPort, sessionOpts, new SessionPortListener() {
-            /**
-             * This method is called when a client tries to join the session
-             * we have bound.  It asks us if we want to accept the client into
-             * our session.
-             *
-             * In the class documentation for the SessionPortListener note that
-             * it is a requirement for this method to be multithread safe.
-             * Since we never access any shared state, this requirement is met.
-             */
-        	public boolean acceptSessionJoiner(short sessionPort, String joiner, SessionOpts sessionOpts) {
-                Log.i(TAG, "SessionPortListener.acceptSessionJoiner(" + sessionPort + ", " + joiner + ", " + sessionOpts.toString() + ")");
+        if(mHostChannelState == HostChannelState.IDLE 
+        		|| mHostChannelState == HostChannelState.NAMED) {
         	
-                /*
-        		 * Accept anyone who can get our contact port correct.
-        		 */
-        		if (sessionPort == CONTACT_PORT && m_clients_can_join) {
-        			
-        			
-        			int connected_clients = connectedClientCount();
-        			
-        			if(m_max_client_count==-1 || connected_clients < m_max_client_count) {
-        				
-        				return true;
-        				
-        			}
-        		}
-        		return false;
-            }
-            
-            /**
-             * If we return true in acceptSessionJoiner, we admit a new client
-             * into our session.  The session does not really exist until a 
-             * client joins, at which time the session is created and a session
-             * ID is assigned.  This method communicates to us that this event
-             * has happened, and provides the new session ID for us to use.
-             *
-             * In the class documentation for the SessionPortListener note that
-             * it is a requirement for this method to be multithread safe.
-             * Since we never access any shared state, this requirement is met.
-             * 
-             * See comments in joinSession for why the hosted chat interface is
-             * created here. 
-             */
-            public void sessionJoined(short sessionPort, int id, String joiner) {
-                Log.i(TAG, "SessionPortListener.sessionJoined(" + sessionPort + ", " + id + ", " + joiner + ")");
-                mHostSessionId = id;
-                SignalEmitter emitter = new SignalEmitter(m_network_service, id
-                		, SignalEmitter.GlobalBroadcast.Off);
-                mHostChatInterface = emitter.getInterface(AlljoynInterface.class);
-            }             
-        });
-        
-        if (status == Status.OK) {
-        	mHostChannelState = HostChannelState.BOUND;
-        } else {
-    		alljoynError(Module.HOST, AllJoynError.CONNECT_ERROR,
-    				"Unable to bind session contact port: (" + status + ")");
-        	return;
-        }
+	        Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
+	        SessionOpts sessionOpts = new SessionOpts(SessionOpts.TRAFFIC_MESSAGES
+	        		, true, SessionOpts.PROXIMITY_ANY, SessionOpts.TRANSPORT_ANY);
+	        
+	        Status status = mBus.bindSessionPort(contactPort, sessionOpts, new SessionPortListener() {
+	            /**
+	             * This method is called when a client tries to join the session
+	             * we have bound.  It asks us if we want to accept the client into
+	             * our session.
+	             *
+	             * In the class documentation for the SessionPortListener note that
+	             * it is a requirement for this method to be multithread safe.
+	             * Since we never access any shared state, this requirement is met.
+	             */
+	        	public boolean acceptSessionJoiner(short sessionPort, String joiner, SessionOpts sessionOpts) {
+	                Log.i(TAG, "SessionPortListener.acceptSessionJoiner(" + sessionPort + ", " + joiner + ", " + sessionOpts.toString() + ")");
+	        	
+	                /*
+	        		 * Accept anyone who can get our contact port correct.
+	        		 */
+	        		if (sessionPort == CONTACT_PORT && m_clients_can_join) {
+	        			
+	        			
+	        			int connected_clients = connectedClientCount();
+	        			
+	        			if(m_max_client_count==-1 || connected_clients < m_max_client_count) {
+	        				
+	        				return true;
+	        				
+	        			}
+	        		}
+	        		return false;
+	            }
+	            
+	            /**
+	             * If we return true in acceptSessionJoiner, we admit a new client
+	             * into our session.  The session does not really exist until a 
+	             * client joins, at which time the session is created and a session
+	             * ID is assigned.  This method communicates to us that this event
+	             * has happened, and provides the new session ID for us to use.
+	             *
+	             * In the class documentation for the SessionPortListener note that
+	             * it is a requirement for this method to be multithread safe.
+	             * Since we never access any shared state, this requirement is met.
+	             * 
+	             * See comments in joinSession for why the hosted chat interface is
+	             * created here. 
+	             */
+	            public void sessionJoined(short sessionPort, int id, String joiner) {
+	                Log.i(TAG, "SessionPortListener.sessionJoined(" + sessionPort + ", " + id + ", " + joiner + ")");
+	                mHostSessionId = id;
+	                SignalEmitter emitter = new SignalEmitter(m_network_service, id
+	                		, SignalEmitter.GlobalBroadcast.Off);
+	                mHostChatInterface = emitter.getInterface(AlljoynInterface.class);
+	            }             
+	        });
+	        
+	        if (status == Status.OK) {
+	        	mHostChannelState = HostChannelState.BOUND;
+	        } else {
+	    		alljoynError(Module.HOST, AllJoynError.CONNECT_ERROR,
+	    				"Unable to bind session contact port: (" + status + ")");
+	        	return;
+	        }
+	    }
     }
     
     /**
