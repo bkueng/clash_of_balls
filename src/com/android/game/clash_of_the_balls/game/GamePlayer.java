@@ -16,6 +16,9 @@ import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
  */
 public class GamePlayer extends DynamicGameObject {
 	
+	public final float m_radius = 0.5f;
+	public final float m_mass = 10;
+	
 	private int m_color; //ARGB
 	private VertexBufferFloat m_color_data_colored;
 	
