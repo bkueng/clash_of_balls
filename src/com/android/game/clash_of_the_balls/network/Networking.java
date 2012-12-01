@@ -242,11 +242,11 @@ public class Networking {
 	public void stopAdvertise() {
 		m_clients_can_join = false;
 		m_background_handler.cancelAdvertise();
-		/*
-		//this leads to a disconnect of the clients, so we don't do this
 		m_background_handler.unbindSession();
 		m_background_handler.releaseName();
-		 */
+	}
+	public void setClientsCanJoin(boolean can_join) {
+		m_clients_can_join = can_join;
 	}
 	
 	//listen for other servers
@@ -270,6 +270,8 @@ public class Networking {
 	}
 	public void leaveSession() {
 		m_background_handler.leaveSession();
+		//clear the connected client list
+		m_connected_clients = new ArrayList<ConnectedClient>();
 	}
 	
 	public static String getNameFromServerId(String server_id) {

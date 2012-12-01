@@ -196,7 +196,7 @@ public class WaitMenu extends GameMenuBase {
 		if (item == m_start_button) {
 			if (m_settings.is_host && !m_start_button.isDisabled()) {
 				
-				m_networking.stopAdvertise();
+				m_networking.setClientsCanJoin(false);
 				m_ui_change = UIChange.GAME_START_SERVER;
 				
 			}
@@ -218,6 +218,11 @@ public class WaitMenu extends GameMenuBase {
 	public void onActivate() {
 		super.onActivate();
 		m_start_button.enable(m_settings.is_host);
+	}
+	public void onDeactivate() {
+		super.onDeactivate();
+		//clear the list
+		while(m_client_list.itemCount() > 0) m_client_list.removeItem(0);
 	}
 
 }

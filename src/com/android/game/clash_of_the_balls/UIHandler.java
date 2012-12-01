@@ -234,6 +234,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		Log.i(LOG_TAG, "Game abort call");
 		
 		Networking networking = Networking.getInstance();
+		if(m_settings.is_host) networking.stopAdvertise();
 		networking.leaveSession();
 		
 		m_game_server.stopThread();
@@ -255,7 +256,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			m_game_server.stopThread();
 			
 			Networking networking = Networking.getInstance();
+			if(m_settings.is_host) networking.stopAdvertise();
 			networking.leaveSession();
+			networking.resetErrors();
 			
 		} else {
 			//TODO: also show current results page?
