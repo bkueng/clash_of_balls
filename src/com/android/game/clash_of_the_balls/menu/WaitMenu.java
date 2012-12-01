@@ -125,7 +125,8 @@ public class WaitMenu extends GameMenuBase {
 							found = true;
 					}
 					if(!found)
-						addListItem(Networking.getNameFromServerId(c.well_known_name)
+						addListItem(Networking.toDisplayableName(
+								Networking.getNameFromServerId(c.well_known_name))
 								, c.well_known_name);
 					if(c.unique_id.equals(m_networking.getUniqueName())) 
 							is_self_connected = true;

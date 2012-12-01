@@ -38,10 +38,12 @@ public class MenuItemKeyboard extends MenuItem {
 	private String m_dialog_text;
 	private String m_text_input="";
 	
+	private final int m_max_text_len = 15;
+	
 	private String m_new_str;
 	
-	private String m_regex = "^[a-zA-Z0-9]+$";
-	private String m_regex_msg = "Please enter only letters or numbers";
+	private String m_regex = "^[a-zA-Z0-9 ]+$";
+	private String m_regex_msg = "Please enter only letters or numbers or spaces";
 
 	private Font2D m_item_font;
 	
@@ -100,10 +102,15 @@ public class MenuItemKeyboard extends MenuItem {
             	    public String validate(EditText textView, String text) {
             	    	Log.d(LOG_TAG,"validate: "+text);	    	
             	    	if(text.length()>0){
-            	    	if(!text.matches(m_regex)){
-            	    		text=text.substring(0,text.length()-1);
-            	    		Toast.makeText(m_activity_context, m_regex_msg, Toast.LENGTH_SHORT).show();
-            	    	}}
+	            	    	if(!text.matches(m_regex)){
+	            	    		text=text.substring(0,text.length()-1);
+	            	    		Toast.makeText(m_activity_context, m_regex_msg
+	            	    				, Toast.LENGTH_SHORT).show();
+	            	    	}
+	            	    	if(text.length() > m_max_text_len) {
+	            	    		text = text.substring(0,m_max_text_len);
+	            	    	}
+            	    	}
 						return text;
             	    }
             	});

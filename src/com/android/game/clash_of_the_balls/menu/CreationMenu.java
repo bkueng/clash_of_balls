@@ -16,6 +16,7 @@ import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.menu.MenuItemArrow.ArrowType;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
+import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 
@@ -156,7 +157,7 @@ public class CreationMenu extends GameMenuBase {
 	public void move(float dsec) {
 		super.move(dsec);
 		
-		String name =  m_name_button.getString();
+		String name = Networking.fromDisplayableName(m_name_button.getString());
 		m_create_button.enable(m_level_list.getSelectedItem()!=null
 				&& name.length() > 0);
 		if(name.length() > 0) m_settings.user_name = new String(name);
@@ -186,8 +187,9 @@ public class CreationMenu extends GameMenuBase {
 			MenuItemLevel item_level = (MenuItemLevel)m_level_list.getSelectedItem();
 			m_settings.selected_level = item_level.level();
 			
-			m_settings.user_name = m_name_button.getString();
-			m_network_server.setOwnName(m_name_button.getString());
+			String user_name = Networking.fromDisplayableName(m_name_button.getString());
+			m_settings.user_name = user_name;
+			m_network_server.setOwnName(user_name);
 			m_network_server.setMaxClientCount(m_settings.selected_level.player_count);
 			//create game
 			m_network_server.startAdvertise();
@@ -203,7 +205,7 @@ public class CreationMenu extends GameMenuBase {
 	public void onActivate() {
 		super.onActivate();
 		
-		String name =  m_settings.user_name;
+		String name =  Networking.toDisplayableName(m_settings.user_name);
 		if(name.length() > 0) m_name_button.setString(name);
 	}
 

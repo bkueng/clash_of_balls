@@ -113,11 +113,12 @@ public class JoinMenu extends GameMenuBase {
 					found = true;
 			}
 			if(!found)
-				addListItem(Networking.getNameFromServerId(m_network_client.serverId(k))
+				addListItem(Networking.toDisplayableName(
+						Networking.getNameFromServerId(m_network_client.serverId(k)))
 						, m_network_client.serverId(k));
 		}
 		
-		String name =  m_name_button.getString();
+		String name = Networking.fromDisplayableName(m_name_button.getString());
 		m_join_button.enable(m_game_list.getSelectedItem() != null 
 				&& name.length() > 0);
 		if(name.length() > 0) m_settings.user_name = new String(name);
@@ -146,8 +147,10 @@ public class JoinMenu extends GameMenuBase {
 					Object obj = ((MenuItemString)sel_item).obj;
 					if(obj != null) {
 						String server_id = (String)obj;
-						m_settings.user_name = m_name_button.getString();
-						m_network_client.setOwnName(m_name_button.getString());
+						String user_name = Networking.fromDisplayableName(
+								m_name_button.getString());
+						m_settings.user_name = user_name;
+						m_network_client.setOwnName(user_name);
 						m_network_client.connectToServer(server_id);
 						m_ui_change = UIChange.WAIT_MENU;
 					}
@@ -162,7 +165,7 @@ public class JoinMenu extends GameMenuBase {
 		super.onActivate();
 		m_network_client.startDiscovery();
 		
-		String name =  m_settings.user_name;
+		String name =  Networking.toDisplayableName(m_settings.user_name);
 		if(name.length() > 0) m_name_button.setString(name);
 	}
 	

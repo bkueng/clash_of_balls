@@ -275,12 +275,18 @@ public class Networking {
 	public static String getNameFromServerId(String server_id) {
 		//server id is: NAME_PREFIX.<guid>.server_name
     	int lastDot = server_id.lastIndexOf('.');
-    	if (lastDot < 0) {
+    	if (lastDot < 0 || lastDot+2 > server_id.length()) {
     		//this is a format error. we could throw an exception.
     		//but we do our best here to avoid errors
     		return server_id;
     	}
-        return server_id.substring(lastDot + 1);
+        return server_id.substring(lastDot + 2);
+	}
+	public static String toDisplayableName(String server_name) {
+		return server_name.replaceAll("_", " ");
+	}
+	public static String fromDisplayableName(String server_name_displ) {
+		return server_name_displ.replaceAll(" ", "_");
 	}
 	
 	//incoming data
@@ -634,7 +640,7 @@ public class Networking {
     private volatile String m_server_id_to_join; //this is the well-known name
     
     private String getWellKnownName() {
-    	return NAME_PREFIX + ".g" + mBus.getGlobalGUIDString() + "."
+    	return NAME_PREFIX + ".g" + mBus.getGlobalGUIDString() + ".n"
     			+ m_host_server_name;
     }
     private String getWellKnownNameToJoin() {
