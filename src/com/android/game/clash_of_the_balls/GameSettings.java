@@ -1,5 +1,7 @@
 package com.android.game.clash_of_the_balls;
 
+import com.android.game.clash_of_the_balls.menu.PopupBase;
+
 /**
  * Settings
  * This stores all user settings
@@ -20,4 +22,7 @@ public class GameSettings {
 	
 	public int m_screen_width;
 	public int m_screen_height;
+	
+	public PopupBase popup_menu; //if an ui wants to show a popup
+					// it sets this variable and returns POPUP_SHOW in UIChange()
 }

@@ -19,6 +19,7 @@ import com.android.game.clash_of_the_balls.menu.CreationMenu;
 import com.android.game.clash_of_the_balls.menu.JoinMenu;
 import com.android.game.clash_of_the_balls.menu.MainMenu;
 import com.android.game.clash_of_the_balls.menu.MenuBackground;
+import com.android.game.clash_of_the_balls.menu.PopupBase;
 import com.android.game.clash_of_the_balls.menu.WaitMenu;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
@@ -57,6 +58,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private MenuBackground m_main_menu_background;
 	private MenuBackground m_normal_menu_background;
 	
+	private PopupBase m_cur_popup = null;
+	
 	GameServer m_game_server;
 	
 	public enum UIChange {
@@ -68,7 +71,12 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		GAME_START_CLIENT,
 		GAME_ROUND_END,
-		GAME_START_SERVER
+		GAME_START_SERVER,
+		
+		/* popup menus */
+		POPUP_SHOW, //set the GameSettings.popup_menu variable to show a popup
+		POPUP_HIDE,
+		POPUP_RESULT_BUTTON1
 	}
 	
 	public UIHandler(int screen_width, int screen_height
@@ -158,6 +166,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	public void move(float dsec) {
 		if(m_active_ui != null) {
 			m_active_ui.move(dsec);
+			
+			if(m_cur_popup != null) m_cur_popup.move(dsec);
 
 			switch(m_active_ui.UIChange()) {
 			case GAME_START_CLIENT: uiChange(m_active_ui, m_game_ui);
@@ -174,6 +184,11 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			break;
 			case MAIN_MENU: uiChange(m_active_ui, m_main_menu);
 			break;
+			case POPUP_SHOW: showPopup();
+			break;
+			case POPUP_HIDE: hidePopup();
+			break;
+			case POPUP_RESULT_BUTTON1: assert(false); //a menu should not return this
 			case NO_CHANGE: //nothing to do
 			}
 		}
@@ -186,7 +201,17 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			old_ui.onDeactivate();
 			new_ui.onActivate();
 			m_active_ui = new_ui;
+			hidePopup();
 		}
+	}
+	
+	private void showPopup() {
+		assert(m_settings.popup_menu!=null);
+		m_cur_popup = m_settings.popup_menu;
+		m_settings.popup_menu = null;
+	}
+	private void hidePopup() {
+		m_cur_popup = null;
 	}
 	
 	//initialize & run the server with the selected level & show the game
@@ -231,12 +256,17 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 
 	public void draw(RenderHelper renderer) {
 		if(m_active_ui != null) m_active_ui.draw(renderer);
+		if(m_cur_popup != null) m_cur_popup.draw(renderer);
 	}
 
 	public void onTouchEvent(float x, float y, int event) {
 		Log.v(LOG_TAG, "Touch event: x="+x+", y="+y+", event="+event);
 		
-		if(m_active_ui != null) m_active_ui.onTouchEvent(x, y, event);
+		if(m_cur_popup != null) {
+			m_cur_popup.onTouchEvent(x, y, event);
+		} else {
+			if(m_active_ui != null) m_active_ui.onTouchEvent(x, y, event);
+		}
 		
 	}
 	
