@@ -136,12 +136,12 @@ public abstract class GameBase {
 			//assume that the game objects are not larger than 1.0 (one sprite)
 			
 			if(obj.hasMoved()) {
-				int x_start = (int)(obj.pos().x) - 1;
+				int x_start = (int)(obj.newPosition().x) - 1;
 				if(x_start < 0) x_start = 0;
 				int x_end = x_start + 2;
 				if(x_end >= m_game_field.width()) x_end = m_game_field.width()-1;
 				
-				int y_start = (int)(obj.pos().y) - 1;
+				int y_start = (int)(obj.newPosition().y) - 1;
 				if(y_start < 0) y_start = 0;
 				int y_end = y_start + 2;
 				if(y_end >= m_game_field.height()) y_end = m_game_field.height()-1;
@@ -157,7 +157,7 @@ public abstract class GameBase {
 								switch(field_obj.type) {
 								case Hole:
 									
-									if ( eucDist(obj.pos(), field_obj.pos()) < ((GamePlayer) obj).m_radius ) {
+									if ( eucDist(obj.newPosition(), field_obj.pos()) < ((GamePlayer) obj).m_radius ) {
 										// player falls down hole and dies
 										((GamePlayer) obj).die();
 									}
@@ -214,32 +214,47 @@ public abstract class GameBase {
 							switch(objb.type) {
 							case Player:
 								//TODO
-								if ( eucDist(obja.pos(), objb.pos()) < ((GamePlayer) obja).m_radius + ((GamePlayer) objb).m_radius ) {
+								GamePlayer player_a = ((GamePlayer) obja);
+								GamePlayer player_b = ((GamePlayer) objb);
+								
+								if ( eucDist(obja.newPosition(), objb.newPosition()) < player_a.m_radius + player_b.m_radius ) {
 									
 									// Calculate collision angle phi
-									float phi = (float) Math.atan2(obja.pos().y - objb.pos().y, obja.pos().x - objb.pos().x);
+									float phi = (float) Math.atan2(obja.newPosition().y - objb.newPosition().y, obja.newPosition().x - objb.newPosition().x);
 									
 									// Derive x/y velocity in rotated coordinate system
 									float u1 = obja.speed().length();
 									float u2 = objb.speed().length();
 									
 									// object a
-									float v1x = u1 * (float) Math.cos(obja.speed().angle());
-									float v1y = u1 * (float) Math.cos(obja.speed().angle());
+									float v1x = u1 * (float) Math.cos(obja.speed().angle() - phi);
+									float v1y = u1 * (float) Math.cos(obja.speed().angle() - phi);
 									
 									// object b
-									float v2x = u2 * (float) Math.cos(objb.speed().angle());
-									float v2y = u2 * (float) Math.cos(objb.speed().angle());
+									float v2x = u2 * (float) Math.cos(objb.speed().angle() - phi);
+									float v2y = u2 * (float) Math.cos(objb.speed().angle() - phi);
 									
 									// 1D collision detection
-									float m1 = ((GamePlayer) obja).m_mass;
-									float m2 = ((GamePlayer) objb).m_mass;
+									float m1 = player_a.m_mass;
+									float m2 = player_b.m_mass;
 									
 									float f1x = v1x * (m1 - m2) + 2 * m2 * v2x;
 									float f2x = v2x * (m1 - m2) + 2 * m2 * v1x;
 									
 									// rotate everything back to normal coordinate system
-									float v1 = (float) Math.sqrt(f1x * f1x );
+									// final velocity v1, v2
+									float v1 = (float) Math.sqrt(f1x * f1x * f1x * f1x + v1y * v1y * v1y);
+									float v2 = (float) Math.sqrt(f2x * f2x * f2x * f2x + v2y * v2y * v2y);
+									// final direction d1, d2
+									float d1 = (float) Math.atan2(v1y, f1x) + phi;
+									float d2 = (float) Math.atan2(v2y, f2x) + phi;
+									
+									// calculate and set new velocity to each player
+									player_a.speed().x = (float) Math.cos(d1) * v1;
+									player_a.speed().y = (float) Math.sin(d1) * v1;
+									
+									player_b.speed().x = (float) Math.cos(d2) * v2;
+									player_b.speed().y = (float) Math.sin(d2) * v2;
 								}
 								
 								break;
