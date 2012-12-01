@@ -217,12 +217,13 @@ public abstract class GameBase {
 								if ( eucDist(obja.pos(), objb.pos()) < ((GamePlayer) obja).m_radius + ((GamePlayer) objb).m_radius ) {
 									
 									// Calculate collision angle phi
-									float phi = (float) Math.atan2(obj.pos().y - field_obj.pos().y, obj.pos().x - field_obj.pos().x);
+									float phi = (float) Math.atan2(obja.pos().y - objb.pos().y, obja.pos().x - objb.pos().x);
 									
 									// Derive x/y velocity in rotated coordinate system
-									float u1 = obj.speed().length();
-									float v1x = obj.speed().length() * (float) Math.cos(obj.speed().angle());
-									float v1y = obj.
+									float u1 = obja.speed().length();
+									float u2 = objb.speed().length();
+									float v1x = obja.speed().length() * (float) Math.cos(obja.speed().angle());
+									
 								}
 								
 								break;
