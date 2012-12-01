@@ -157,7 +157,7 @@ public abstract class GameBase {
 									//TODO
 									
 									break;
-								case Obstacle:
+								case Wall:
 									//TODO
 									
 									break;

@@ -18,7 +18,7 @@ public class StaticGameObject extends GameObject {
 	public enum Type {
 		Background,
 		Hole,
-		Obstacle,
+		Wall,
 		Player,
 		Item
 	}
