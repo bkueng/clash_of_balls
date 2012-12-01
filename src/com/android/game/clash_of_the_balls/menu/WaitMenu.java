@@ -123,11 +123,11 @@ public class WaitMenu extends GameMenuBase {
 		//check for game start signal if we are not the game creator
 		if(!m_settings.is_host) {
 			m_network_client.handleReceive();
-			Event e = m_network_client.peekNextEvent();
-			while(e != null) {
+			Event e;
+			while((e = m_network_client.peekNextEvent()) != null) {
 				if(e.type == Event.type_game_info) {
 					m_ui_change = UIChange.GAME_START_CLIENT;
-					e=null; //exit loop
+					break;
 				} else {
 					Log.w(LOG_TAG, "we received an unwanted game event from the server (type="
 						+ (int)e.type+"). We ignore it");
