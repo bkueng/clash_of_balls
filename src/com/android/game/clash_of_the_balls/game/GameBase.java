@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import android.util.FloatMath;
+
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.R;
@@ -155,10 +157,17 @@ public abstract class GameBase {
 								switch(field_obj.type) {
 								case Hole:
 									//TODO
+									if ( eucDist(obj.pos(), field_obj.pos()) < ((GamePlayer) obj).m_radius ) {
+										// player falls down hole and dies
+										((GamePlayer) obj).die();
+									}
 									
 									break;
 								case Obstacle:
 									//TODO
+									if ( eucDist(obj.pos(), field_obj.pos()) < ((GamePlayer) obj).m_radius ) {
+										
+									}
 									
 									break;
 								default: throw new RuntimeException("collision detection for type "+
@@ -236,5 +245,10 @@ public abstract class GameBase {
 		}
 	}
 	
+	
+	
+	private float eucDist(Vector v1, Vector v2) {
+		return (float) FloatMath.sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y));
+	}
 	
 }
