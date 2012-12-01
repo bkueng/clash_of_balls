@@ -150,7 +150,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		m_game_server = new GameServer(m_settings, Networking.getInstance()
 				, m_network_server);
-		m_game_server.startThread();
 		
 		
 		m_active_ui = m_main_menu; //show main menu
@@ -220,6 +219,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	//initialize & run the server with the selected level & show the game
 	private void startGameServer() {
 		if(m_settings.selected_level != null) {
+			m_game_server.startThread();
 			m_game_server.initGame(m_settings.selected_level);
 			m_game_server.startGame();
 			uiChange(m_active_ui, m_game_ui);
@@ -231,9 +231,12 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private void handleGameAbort() {
 		Log.i(LOG_TAG, "Game abort call");
 		
-		//TODO: try to restore network
+		Networking networking = Networking.getInstance();
+		networking.leaveSession();
 		
-		//stop game thread
+		m_game_server.stopThread();
+		
+		networking.resetErrors();
 		
 		uiChange(m_active_ui, m_main_menu);
 	}
@@ -246,7 +249,11 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		if(m_settings.game_current_round > m_settings.game_rounds) {
 			//TODO: show results page
 			
-			//TODO: disconnect
+			
+			m_game_server.stopThread();
+			
+			Networking networking = Networking.getInstance();
+			networking.leaveSession();
 			
 		} else {
 			//TODO: also show current results page?

@@ -235,6 +235,7 @@ public class Game extends GameBase implements UIBase {
 	}
 
 	public void onDeactivate() {
+		gameEnd();
 		m_ui_change = UIHandler.UIChange.NO_CHANGE;
 	}
 	

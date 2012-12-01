@@ -42,7 +42,8 @@ public class GameServer extends GameBase implements Runnable {
 	private Looper m_looper=null;
 	private NetworkServer m_network_server;
 	private Networking m_networking;
-	private IncomingHandler m_msg_handler;
+	private volatile IncomingHandler m_msg_handler = null;
+	private Thread m_thread = null;
 	
 	public static final int HANDLE_GAME_START = 1000;
 	
@@ -69,10 +70,24 @@ public class GameServer extends GameBase implements Runnable {
 	
 	//called from another thread:
 	public void startThread() {
-		Thread t=new Thread(this);
-		t.start();
+		if(m_thread != null) return; //thread is already running
+		
+		Log.d(TAG_SERVER, "Server: starting the thread");
+		
+		m_thread=new Thread(this);
+		m_thread.start();
+		//wait until started
+		while(m_msg_handler == null) {
+			try {
+				Thread.sleep(3);
+			} catch (InterruptedException e) { }
+		}
 	}
 	public void stopThread() {
+		if(m_thread == null) return;
+		
+		Log.d(TAG_SERVER, "Server: stopping the thread");
+		
 		Looper looper = m_looper;
 		if(looper != null) {
 			looper.quit();
@@ -83,6 +98,7 @@ public class GameServer extends GameBase implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		m_thread = null;
 	}
 	public void initGame(GameLevel level) {
 		super.initGame(level);
@@ -200,6 +216,8 @@ public class GameServer extends GameBase implements Runnable {
 	}
 	
 	private void handleGameStart() {
+		Log.d(TAG_SERVER, "Server: starting the game");
+		
 		m_network_server.resetSequenceNum();
 		
 		//first throw away all waiting incoming sensor updates & acks
@@ -289,6 +307,7 @@ public class GameServer extends GameBase implements Runnable {
 		Looper.loop();
 		
 		m_networking.unregisterEventListener(m_msg_handler);
+		m_msg_handler = null;
 		m_looper = null;
 	}
 	

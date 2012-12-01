@@ -220,6 +220,9 @@ public class Networking {
     public AllJoynErrorData getError() {
     	return m_error;
     }
+    public void resetErrors() {
+    	m_error = null;
+    }
 	
     //Note: server_name must NOT contain '.'
     //it can only consist of: [A-Z][a-z][0-9]_-
