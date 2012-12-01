@@ -228,6 +228,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		}
 	}
 	
+	//this is called in case of a networking error
+	//it can also happen before starting the game!
 	private void handleGameAbort() {
 		Log.i(LOG_TAG, "Game abort call");
 		
