@@ -156,18 +156,18 @@ public abstract class GameBase {
 								
 								switch(field_obj.type) {
 								case Hole:
-									//TODO
+									
 									if ( eucDist(obj.pos(), field_obj.pos()) < ((GamePlayer) obj).m_radius ) {
 										// player falls down hole and dies
 										((GamePlayer) obj).die();
 									}
 									
 									break;
+									
 								case Obstacle:
-									//TODO
-									if ( eucDist(obj.pos(), field_obj.pos()) < ((GamePlayer) obj).m_radius ) {
-										
-									}
+									
+									//!!! TODO: Adjust minimum distance, regarding the size of the obstacle!!!
+
 									
 									break;
 								default: throw new RuntimeException("collision detection for type "+
@@ -214,6 +214,16 @@ public abstract class GameBase {
 							switch(objb.type) {
 							case Player:
 								//TODO
+								if ( eucDist(obja.pos(), objb.pos()) < ((GamePlayer) obja).m_radius + ((GamePlayer) objb).m_radius ) {
+									
+									// Calculate collision angle phi
+									float phi = (float) Math.atan2(obj.pos().y - field_obj.pos().y, obj.pos().x - field_obj.pos().x);
+									
+									// Derive x/y velocity in rotated coordinate system
+									float u1 = obj.speed().length();
+									float v1x = obj.speed().length() * (float) Math.cos(obj.speed().angle());
+									float v1y = obj.
+								}
 								
 								break;
 							case Item:
@@ -244,8 +254,6 @@ public abstract class GameBase {
 			}
 		}
 	}
-	
-	
 	
 	private float eucDist(Vector v1, Vector v2) {
 		return (float) FloatMath.sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y));
