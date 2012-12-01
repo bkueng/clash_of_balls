@@ -4,6 +4,7 @@ package com.android.game.clash_of_the_balls.game;
 import java.util.Map;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.GameLevel;
@@ -11,8 +12,10 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
+import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
+import com.android.game.clash_of_the_balls.menu.PopupGameStart;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
 
@@ -24,6 +27,9 @@ public class Game extends GameBase implements UIBase {
 	private GameView m_view;
 	
 	private UIHandler.UIChange m_ui_change;
+	private PopupGameStart m_popup = null;
+	private Context m_activity_context;
+	private Typeface m_font_typeface;
 	
 	private NetworkClient m_network_client;
 	
@@ -33,10 +39,12 @@ public class Game extends GameBase implements UIBase {
 	
 	
 	public Game(Context c, GameSettings s, TextureManager texture_manager, 
-			NetworkClient network_client) {
+			NetworkClient network_client, Typeface font_typeface) {
 		super(false, s, texture_manager);
 		
 		m_sensor_thread=new SensorThread(c);
+		m_activity_context = c;
+		m_font_typeface = font_typeface;
 		m_sensor_thread.startThread();
 		m_network_client = network_client;
 		m_ui_change = UIHandler.UIChange.NO_CHANGE;
@@ -45,6 +53,9 @@ public class Game extends GameBase implements UIBase {
 	public void initGame(GameLevel level) {
 		super.initGame(level);
 		
+		//after this call (and initPlayers) we should have wait_to_start_game 
+		//seconds until the game starts
+		
 		//view: save & restore scaling if it exists
 		float scaling = -1.f;
 		if(m_view != null) scaling = m_view.getZoomToTileSize();
@@ -52,8 +63,6 @@ public class Game extends GameBase implements UIBase {
 				null, (float)level.width, (float)level.height);
 		if(scaling > 0.f) m_view.setZoomToTileSize(scaling);
 		
-		//start calibration
-		m_calibration_timeout = (float)wait_to_start_game - 1.f;
 	}
 	
 	public void initPlayers(PlayerInfo[] players) {
@@ -76,6 +85,15 @@ public class Game extends GameBase implements UIBase {
 		}
 		
 		m_view.setObjectToTrack(m_own_player);
+		
+		//start calibration
+		m_calibration_timeout = (float)wait_to_start_game - 1.f;
+		
+		//show game start popup
+		m_settings.popup_menu = m_popup = new PopupGameStart(m_activity_context
+				, m_texture_manager, m_settings.m_screen_width, m_settings.m_screen_height
+				, (float)wait_to_start_game, m_own_player.color(), m_font_typeface);
+		m_ui_change = UIChange.POPUP_SHOW;
 	}
 	
 	public void onDestroy() {
@@ -165,6 +183,7 @@ public class Game extends GameBase implements UIBase {
 		super.gameStartNow();
 		m_bReceived_events = true;
 		m_sensor_thread.stopCalibrate();
+		m_ui_change = UIChange.POPUP_HIDE;
 	}
 	public void gameEnd() {
 		super.gameEnd();
@@ -176,7 +195,9 @@ public class Game extends GameBase implements UIBase {
 	}
 
 	public UIHandler.UIChange UIChange() {
-		return m_ui_change;
+		UIHandler.UIChange ret = m_ui_change;
+		m_ui_change = UIChange.NO_CHANGE;
+		return ret;
 	}
 
 	public void onActivate() {

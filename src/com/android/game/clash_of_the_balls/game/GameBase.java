@@ -23,7 +23,7 @@ import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 public abstract class GameBase {
 	private static final String TAG = "GameBase";
 	
-	protected final static int wait_to_start_game = 3; //[sec]
+	protected final static int wait_to_start_game = 5; //[sec]
 					//time between press of play and actual game start
 					//in the last second of this, the sensor calibration will be done
 	

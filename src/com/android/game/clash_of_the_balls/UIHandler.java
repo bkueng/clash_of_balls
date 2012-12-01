@@ -145,7 +145,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		//Game
 		m_game_ui = new Game(m_activity_context, m_settings, m_tex_manager
-				, m_network_client);
+				, m_network_client, m_font_typeface);
 		
 		m_game_server = new GameServer(m_settings, Networking.getInstance()
 				, m_network_server);
