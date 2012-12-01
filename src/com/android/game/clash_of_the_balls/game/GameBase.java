@@ -164,7 +164,7 @@ public abstract class GameBase {
 									
 									break;
 									
-								case Obstacle:
+								case Wall:
 									
 									//!!! TODO: Adjust minimum distance, regarding the size of the obstacle!!!
 
@@ -222,8 +222,24 @@ public abstract class GameBase {
 									// Derive x/y velocity in rotated coordinate system
 									float u1 = obja.speed().length();
 									float u2 = objb.speed().length();
-									float v1x = obja.speed().length() * (float) Math.cos(obja.speed().angle());
 									
+									// object a
+									float v1x = u1 * (float) Math.cos(obja.speed().angle());
+									float v1y = u1 * (float) Math.cos(obja.speed().angle());
+									
+									// object b
+									float v2x = u2 * (float) Math.cos(objb.speed().angle());
+									float v2y = u2 * (float) Math.cos(objb.speed().angle());
+									
+									// 1D collision detection
+									float m1 = ((GamePlayer) obja).m_mass;
+									float m2 = ((GamePlayer) objb).m_mass;
+									
+									float f1x = v1x * (m1 - m2) + 2 * m2 * v2x;
+									float f2x = v2x * (m1 - m2) + 2 * m2 * v1x;
+									
+									// rotate everything back to normal coordinate system
+									float v1 = (float) Math.sqrt(f1x * f1x );
 								}
 								
 								break;
