@@ -194,6 +194,7 @@ public class Networking {
     
     
     private volatile int m_max_client_count = -1;
+    private volatile boolean m_clients_can_join = false; //clients can only join when advertising
     
 	public synchronized void registerEventListener(Handler h) {
 		m_event_listeners.add(h);
@@ -230,11 +231,13 @@ public class Networking {
 	//call this to let the others discover me
     //first call setServerName
 	public void startAdvertise() {
+		m_clients_can_join = true;
 		m_background_handler.requestName();
 		m_background_handler.bindSession();
 		m_background_handler.advertise();
 	}
 	public void stopAdvertise() {
+		m_clients_can_join = false;
 		m_background_handler.cancelAdvertise();
 		/*
 		//this leads to a disconnect of the clients, so we don't do this
@@ -757,10 +760,11 @@ public class Networking {
      */
     private boolean doDisconnect() {
         Log.i(TAG, "doDisonnect()");
-    	assert(mBusAttachmentState == BusAttachmentState.CONNECTED);
-    	mBus.unregisterBusListener(mBusListener);
-    	mBus.disconnect();
-		mBusAttachmentState = BusAttachmentState.DISCONNECTED;
+    	if(mBusAttachmentState == BusAttachmentState.CONNECTED) {
+    		mBus.unregisterBusListener(mBusListener);
+    		mBus.disconnect();
+    		mBusAttachmentState = BusAttachmentState.DISCONNECTED;
+    	}
     	return true;
     }
     
@@ -836,27 +840,30 @@ public class Networking {
          * In order to release a name, the bus attachment must at least be
          * connected.
          */
-    	assert(mBusAttachmentState == BusAttachmentState.CONNECTED || mBusAttachmentState == BusAttachmentState.DISCOVERING);
+    	if(mBusAttachmentState == BusAttachmentState.CONNECTED 
+    			|| mBusAttachmentState == BusAttachmentState.DISCOVERING) {
     	
-    	/*
-    	 * We need to progress monotonically down the hosted channel states
-    	 * for sanity.
-    	 */
-    	assert(mHostChannelState == HostChannelState.NAMED);
-    	
-    	/*
-    	 * We depend on the user interface and model to work together to not
-    	 * change the name out from under us while we are running.
-    	 */
-    	String wellKnownName = getWellKnownName();
-
-    	/*
-    	 * There's not a lot we can do if the bus attachment refuses to release
-    	 * the name.  It is not a fatal error, though, if it doesn't.  This is
-    	 * because bus attachments can have multiple names.
-    	 */
-    	mBus.releaseName(wellKnownName);
-    	mHostChannelState = HostChannelState.IDLE;
+	    	/*
+	    	 * We need to progress monotonically down the hosted channel states
+	    	 * for sanity.
+	    	 */
+	    	if(mHostChannelState == HostChannelState.NAMED) {
+		    	
+		    	/*
+		    	 * We depend on the user interface and model to work together to not
+		    	 * change the name out from under us while we are running.
+		    	 */
+		    	String wellKnownName = getWellKnownName();
+		
+		    	/*
+		    	 * There's not a lot we can do if the bus attachment refuses to release
+		    	 * the name.  It is not a fatal error, though, if it doesn't.  This is
+		    	 * because bus attachments can have multiple names.
+		    	 */
+		    	mBus.releaseName(wellKnownName);
+		    	mHostChannelState = HostChannelState.IDLE;
+	    	}
+	    }
     }
     
     /**
@@ -886,7 +893,7 @@ public class Networking {
                 /*
         		 * Accept anyone who can get our contact port correct.
         		 */
-        		if (sessionPort == CONTACT_PORT) {
+        		if (sessionPort == CONTACT_PORT && m_clients_can_join) {
         			
         			
         			int connected_clients = connectedClientCount();
@@ -1457,8 +1464,7 @@ public class Networking {
 		case BUS_EXCEPTION: return "Networking bus exception.\n"+
 				"cannot send or receive data";
 		case CONNECT_ERROR: return "Network: failed to connect";
-		case JOIN_SESSION_ERROR: return "Failed to join\n"+
-				"network session";
+		case JOIN_SESSION_ERROR: return "Networking session error";
 		case SEND_ERROR: return "Failed to send data\n"+
 				"over the network";
 		case START_DISCOVERY_ERROR: return "Network error happened\n"+
