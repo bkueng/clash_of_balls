@@ -15,6 +15,8 @@ import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
+import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
+import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 
 /**
@@ -52,6 +54,8 @@ public abstract class GameBase {
 	public DynamicGameObject getGameObject(short id) {
 		return m_game_objects.get(id); //can return null!
 	}
+	
+	public GameStatistics statistics() { return m_settings.game_statistics; }
 	
 	public GameBase(boolean is_server, GameSettings s, TextureManager texture_manager) {
 		this.is_server = is_server;

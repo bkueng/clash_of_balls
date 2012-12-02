@@ -139,6 +139,7 @@ public class WaitMenu extends GameMenuBase {
 				Event e;
 				while((e = m_network_client.peekNextEvent()) != null) {
 					if(e.type == Event.type_game_info) {
+						onGameStart();
 						m_ui_change = UIChange.GAME_START_CLIENT;
 						break;
 					} else {
@@ -178,6 +179,10 @@ public class WaitMenu extends GameMenuBase {
 		}
 	}
 	
+	private void onGameStart() {
+		m_settings.game_statistics.resetGameStatistics();
+	}
+	
 	private void addListItem(String str_display, Object additional) {
 		MenuItemString item = new MenuItemString(new Vector()
 			, new Vector(m_client_list.size().x, m_item_height)
@@ -196,6 +201,7 @@ public class WaitMenu extends GameMenuBase {
 		if (item == m_start_button) {
 			if (m_settings.is_host && !m_start_button.isDisabled()) {
 				
+				onGameStart();
 				m_networking.setClientsCanJoin(false);
 				m_ui_change = UIChange.GAME_START_SERVER;
 				

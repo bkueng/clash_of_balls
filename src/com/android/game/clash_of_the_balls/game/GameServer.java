@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
+import com.android.game.clash_of_the_balls.game.GameStatistics.Statistic;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameEnd;
@@ -324,9 +325,27 @@ public class GameServer extends GameBase implements Runnable {
 	
 	public void gameEnd() {
 		super.gameEnd();
-		addEvent(new EventGameEnd(getNextSequenceNum()));
+		//update statistics: points of the still living player(s)
+		Statistic stat = m_settings.game_statistics.currentRoundStatistics();
+		for(DynamicGameObject item : m_game_objects.values()) {
+			if(item.type == Type.Player) {
+				stat.setPlayerPoints(item.m_id, initialPlayerCount() - currentPlayerCount()-1);
+			}
+		}
+		m_settings.game_statistics.applyCurrentRoundStatistics();
+		
+		addEvent(new EventGameEnd(getNextSequenceNum(), m_settings.game_statistics));
 		//after here the game stopped & this thread is simply waiting 
 		//for next game initialization & game start (called from UIHandler)
+	}
+	
+	protected void handleObjectDied(DynamicGameObject obj) {
+		super.handleObjectDied(obj);
+		//statistics
+		if(obj.type == Type.Player) {
+			Statistic stat = m_settings.game_statistics.currentRoundStatistics();
+			stat.setPlayerPoints(obj.m_id, initialPlayerCount() - currentPlayerCount()-1);
+		}
 	}
 	
 	//this also deletes all events from the queue
