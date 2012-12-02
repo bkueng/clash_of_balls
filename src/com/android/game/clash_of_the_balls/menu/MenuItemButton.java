@@ -56,6 +56,10 @@ public class MenuItemButton extends MenuItem {
 		}
 		m_color_data_disabled = new VertexBufferFloat(color_data, 4);
 	}
+	
+	public void setString(String str) {
+		m_item_font.setString(str);
+	}
 
 	public boolean isDisabled() { return m_is_disabled; }
 	public void disable() { m_is_disabled=true; }
