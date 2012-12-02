@@ -62,12 +62,20 @@ public class GameServer extends GameBase implements Runnable {
 			if (service != null) service.handleMessage(msg);
 		}
 	}
-
+	
+	private final Runnable m_timeout_check;
+	
 	public GameServer(GameSettings s, Networking networking
 			, NetworkServer network_server) {
 		super(true, s, null);
 		m_network_server = network_server;
 		m_networking = networking;
+		
+		m_timeout_check = new Runnable() {
+				public void run() {
+					handleTimeout();
+				}
+			}; 
 	}
 	
 	
@@ -185,18 +193,37 @@ public class GameServer extends GameBase implements Runnable {
 	
 	private void handleMessage(Message msg) {
 		switch(msg.what) {
-		case Networking.HANDLE_RECEIVED_SIGNAL: handleNetworkReceivedSignal();
+		case Networking.HANDLE_RECEIVED_SIGNAL: handleNetworkReceivedSignal(false);
 		break;
 		case HANDLE_GAME_START: handleGameStart();
 		break;
 		}
 	}
 	
+	private static final int network_receive_timeout = 100; //[ms]
+								//if we did not receive any network updates within
+								//this timeout, we force a game move update
+	
+	private void handleTimeout() {
+		if(!m_had_network_packets) {
+			Log.w(TAG_SERVER, "Server: did not receive any client updates in "+
+					network_receive_timeout+" ms. forcing update now");
+			handleNetworkReceivedSignal(true);
+		}
+		m_had_network_packets = false;
+		if(m_bIs_game_running) {
+			m_msg_handler.postDelayed(m_timeout_check, network_receive_timeout);
+		}
+	}
+	
 	private int m_sensor_update_count=0;
 	private Vector m_sensor_vector = new Vector();
+	private boolean m_had_network_packets=false;
 	
-	private void handleNetworkReceivedSignal() {
+	private void handleNetworkReceivedSignal(boolean force_move) {
 		Log.v(TAG_SERVER, "Server: received a network signal");
+		
+		m_had_network_packets = true;
 		
 		m_network_server.handleReceive();
 		
@@ -214,7 +241,7 @@ public class GameServer extends GameBase implements Runnable {
 				}
 			}
 
-			if(m_sensor_update_count >= currentPlayerCount()) {
+			if(m_sensor_update_count >= currentPlayerCount() || force_move) {
 				m_sensor_update_count = 0;
 				moveGame();
 			}
@@ -311,6 +338,7 @@ public class GameServer extends GameBase implements Runnable {
 		addEvent(new EventGameStartNow(getNextSequenceNum()));
 		sendAllEvents();
 		m_is_game_ending=false;
+		m_msg_handler.postDelayed(m_timeout_check, network_receive_timeout);
 	}
 	
 	public void gameEnd() {
