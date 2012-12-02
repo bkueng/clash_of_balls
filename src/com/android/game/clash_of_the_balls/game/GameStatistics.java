@@ -79,6 +79,33 @@ public class GameStatistics {
 	public Statistic currentRoundStatistics() { return m_cur_round_stat; }
 	public void resetRoundStatistics() { m_cur_round_stat.reset(); }
 	
+	//iteration: is ordered, first is player with max game points
+	//returns -1 at end of list, player_id=-1 gets the first
+	public short nextPlayer(short player_id) {
+		int max_points = -1;
+		short id_ret = -1;
+		int old_max;
+		if(player_id == -1) old_max = 999999;
+		else old_max = m_game_stat.stats.get(player_id).points;
+		boolean found_old_id = false; //we must be able to handle players 
+		//with same amount of points
+		for(Map.Entry<Short, PlayerStats> entry : m_game_stat.stats.entrySet()) {
+			if(entry.getValue().points == old_max && found_old_id && id_ret==-1) {
+				max_points = entry.getValue().points;
+				id_ret = entry.getKey();
+			}
+			if(player_id == entry.getKey()) found_old_id = true;
+		}
+		for(Map.Entry<Short, PlayerStats> entry : m_game_stat.stats.entrySet()) {
+			if(entry.getValue().points > max_points && entry.getValue().points < old_max) {
+				max_points = entry.getValue().points;
+				id_ret = entry.getKey();
+			}
+		}
+		
+		return id_ret;
+	}
+	
 	//make a copy from another statistic
 	public void set(GameStatistics statistics) {
 		m_game_stat.set(statistics.gameStatistics());
