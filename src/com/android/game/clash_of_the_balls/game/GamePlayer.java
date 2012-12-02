@@ -69,6 +69,15 @@ public class GamePlayer extends DynamicGameObject {
 		
 		m_has_moved = true;
 		
+	
+	public void die() {
+		if(!m_bIs_dead) {
+			//TODO: dying effect
+
+			m_bIs_dead = true;
+			m_bIs_dying = true;
+			m_owner.handleObjectDied(this);
+		}
 	}
 	
 	public void draw(RenderHelper renderer) {

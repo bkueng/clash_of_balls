@@ -19,6 +19,7 @@ import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameEnd;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo;
 import com.android.game.clash_of_the_balls.game.event.EventGameStartNow;
+import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.network.Networking;
 
@@ -259,6 +260,7 @@ public class GameServer extends GameBase implements Runnable {
 		move(elapsed_time);
 		doCollisionHandling();
 		applyMove();
+		removeDeadObjects();
 		checkGameEnd(elapsed_time);
 		
 		sendAllEvents();

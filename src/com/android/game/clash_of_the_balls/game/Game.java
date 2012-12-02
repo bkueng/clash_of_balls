@@ -145,11 +145,16 @@ public class Game extends GameBase implements UIBase {
 				if(m_network_client.hasEvents()) {
 					//TODO: undo prediction...
 
+					generate_events = false;
 					//apply the updates from the server
 					applyIncomingEvents();
+					
+					removeDeadObjects();
 
 					m_bReceived_events = true;
 				} else {
+					
+					generate_events = true;
 					//TODO: do predicted move
 
 					m_bReceived_events = false;

@@ -127,6 +127,21 @@ public abstract class GameBase {
 	
 	public abstract String getUniqueNameFromPlayerId(short player_id);
 	
+	protected void removeDeadObjects() {
+		for (Iterator<Map.Entry<Short, DynamicGameObject>> i 
+				= m_game_objects.entrySet().iterator(); i.hasNext(); ) {  
+			
+		    Map.Entry<Short, DynamicGameObject> entry = i.next();  
+		    if (entry.getValue().isReallyDead()) {
+		        i.remove();  
+		    }  
+		}  
+	}
+	protected void handleObjectDied(DynamicGameObject obj) {
+		if(generate_events) {
+			addEvent(new EventItemRemoved(getNextSequenceNum(), obj.m_id));
+		}
+	}
 	
 	protected void doCollisionHandling() {
 		
