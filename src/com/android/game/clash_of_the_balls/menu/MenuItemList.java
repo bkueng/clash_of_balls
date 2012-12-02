@@ -225,11 +225,24 @@ public class MenuItemList extends MenuItem {
 				selectItem(i);
 			}
 		}
+		deselectOtherItems();
+	}
+	
+	private void deselectOtherItems() {
+		//deselect all items except for the currently selected item
+		int last_drawn = m_last_drawn_item;
+		if(last_drawn >= m_items.size()) last_drawn = m_items.size()-1;
+		int first_drawn = m_first_drawn_item;
+		if(first_drawn<0) first_drawn = 0;
+		for(int i=first_drawn; i<=last_drawn; ++i) {
+			if(i!=m_sel_item) m_items.get(i).deselect();
+		}
 	}
 	
 	public void deselect() {
 		m_right_arrow.deselect();
 		m_left_arrow.deselect();
+		deselectOtherItems();
 	}
 	
 
