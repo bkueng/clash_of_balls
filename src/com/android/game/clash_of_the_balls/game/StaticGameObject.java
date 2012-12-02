@@ -94,7 +94,6 @@ public class StaticGameObject extends GameObject {
 			Matrix.translateM(model_mat, model_mat_pos, 
 					m_position.x-0.5f, m_position.y-0.5f, 0.f);
 		} else {
-			Log.e("", "doing rotation: "+m_rotation_angle);
 			Matrix.translateM(model_mat, model_mat_pos, 
 					m_position.x, m_position.y, 0.f);
 			Matrix.rotateM(model_mat, model_mat_pos, m_rotation_angle*180.f/(float)Math.PI
