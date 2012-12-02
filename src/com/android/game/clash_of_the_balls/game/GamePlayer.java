@@ -1,10 +1,8 @@
 package com.android.game.clash_of_the_balls.game;
 
-import java.nio.FloatBuffer;
-
 import android.graphics.Color;
 import android.opengl.GLES20;
-import android.util.Log;
+import android.opengl.Matrix;
 
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
@@ -21,6 +19,9 @@ public class GamePlayer extends DynamicGameObject {
 	
 	private int m_color; //ARGB
 	private VertexBufferFloat m_color_data_colored;
+	
+	private float m_scaling=1.f; //for drawing, used for dying effect
+	private float m_scaling_speed;
 	
 	public int color() { return m_color; }
 	
@@ -60,6 +61,7 @@ public class GamePlayer extends DynamicGameObject {
 	
 	
 	public void move(float dsec) {
+		
 		//update position
 		m_new_pos.x = m_position.x + (m_speed.x + dsec * m_acceleration.x / 2.f) * dsec;
 		m_new_pos.y = m_position.y + (m_speed.y + dsec * m_acceleration.y / 2.f) * dsec;
@@ -69,11 +71,21 @@ public class GamePlayer extends DynamicGameObject {
 		
 		m_has_moved = true;
 		
+		
+		if(m_bIs_dying) {
+			m_scaling -= (m_scaling_speed + dsec) * dsec;
+			m_scaling_speed += dsec * 2.f;
+			if(m_scaling < 0.01f) {
+				m_bIs_dying = false;
+				m_scaling = 0.01f;
+			}
+		}
+	}
 	
 	public void die() {
 		if(!m_bIs_dead) {
-			//TODO: dying effect
-
+			m_scaling = 1.f;
+			m_scaling_speed = 0.f;
 			m_bIs_dead = true;
 			m_bIs_dying = true;
 			m_owner.handleObjectDied(this);
@@ -81,8 +93,7 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	public void draw(RenderHelper renderer) {
-		if(!m_bIs_dead) {
-			super.draw(renderer);
+		if(!isReallyDead()) {
 			
 			doModelTransformation(renderer);
 			
@@ -135,6 +146,20 @@ public class GamePlayer extends DynamicGameObject {
 	        undoModelTransformation(renderer);
 			
 		}
+	}
+	
+	protected void doModelTransformation(RenderHelper renderer) {
+		//scale & translate
+		int model_mat_pos = renderer.pushModelMat();
+		float model_mat[] = renderer.modelMat();
+		Matrix.translateM(model_mat, model_mat_pos, 
+				m_position.x, m_position.y, 0.f);
+		Matrix.scaleM(model_mat, model_mat_pos, m_scaling, m_scaling, 0.f);
+		Matrix.translateM(model_mat, model_mat_pos, 
+				-0.5f, -0.5f, 0.f);
+	}
+	protected void undoModelTransformation(RenderHelper renderer) {
+		renderer.popModelMat();
 	}
 
 }

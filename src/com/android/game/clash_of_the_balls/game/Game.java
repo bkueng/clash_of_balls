@@ -158,15 +158,20 @@ public class Game extends GameBase implements UIBase {
 					applyIncomingEvents();
 					
 					removeDeadObjects();
-
+					
 					m_bReceived_events = true;
 				} else {
 					
-					generate_events = true;
-					//TODO: do predicted move
-
 					m_bReceived_events = false;
 				}
+				
+				generate_events = true;
+				//TODO: do predicted move
+				
+				super.move(dsec);
+				//do not apply moves for now...
+				
+				
 				m_game_field.move(dsec);
 
 

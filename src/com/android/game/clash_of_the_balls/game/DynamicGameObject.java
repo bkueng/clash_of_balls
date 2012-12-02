@@ -45,7 +45,7 @@ public class DynamicGameObject extends StaticGameObject {
 
 	@Override
 	public void draw(RenderHelper renderer) {
-		if(!m_bIs_dead) {
+		if(!isReallyDead()) {
 			super.draw(renderer);
 		}
 	}
