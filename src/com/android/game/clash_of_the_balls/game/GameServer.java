@@ -22,6 +22,7 @@ import com.android.game.clash_of_the_balls.game.event.EventGameStartNow;
 import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.network.Networking;
+import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
 
 /**
  * GameServer
@@ -137,7 +138,8 @@ public class GameServer extends GameBase implements Runnable {
 		
 		for(int i=0; i< m_initial_player_count; ++i) {
 			short id = getNextItemId();
-			m_network_server.getConnectedClient(i).id = id;
+			ConnectedClient client = m_network_server.getConnectedClient(i);
+			if(client!=null) client.id = id;
 			//create the player (without textures)
 			GamePlayer p = new GamePlayer(this, id, player_pos[indexes[i]]
 					, colors[i], null, null);

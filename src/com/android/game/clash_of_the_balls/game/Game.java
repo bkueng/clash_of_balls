@@ -23,6 +23,7 @@ import com.android.game.clash_of_the_balls.network.NetworkClient;
 import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynError;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
+import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
 
 
 public class Game extends GameBase implements UIBase {
@@ -81,6 +82,13 @@ public class Game extends GameBase implements UIBase {
 					
 					Log.d(TAG_GAME, "we got our player at x="+m_own_player.pos().x
 							+", y="+m_own_player.pos().y);
+				}
+				//set network client id
+				for(int k=0; k<m_network_client.getConnectedClientCount(); ++k) {
+					ConnectedClient client=m_network_client.getConnectedClient(k);
+					if(client!=null && client.unique_id.equals(players[i].unique_name)) {
+						client.id = players[i].id;
+					}
 				}
 			}
 		}

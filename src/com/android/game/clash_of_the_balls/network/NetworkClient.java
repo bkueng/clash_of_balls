@@ -16,6 +16,7 @@ import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynError;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
+import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
 import com.android.game.clash_of_the_balls.network.Networking.NetworkData;
 
 /**
@@ -43,6 +44,10 @@ public class NetworkClient {
 	public NetworkClient(Networking networking) {
 		m_networking = networking;
 	}
+	
+	public ConnectedClient getConnectedClient(int idx) 
+		{ return m_networking.connectedClient(idx); }
+	public int getConnectedClientCount() { return m_networking.connectedClientCount(); }
 	
 	public String getOwnUniqueName() {
 		return m_networking.getUniqueName();
