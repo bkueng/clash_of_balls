@@ -20,6 +20,7 @@ import com.android.game.clash_of_the_balls.menu.JoinMenu;
 import com.android.game.clash_of_the_balls.menu.MainMenu;
 import com.android.game.clash_of_the_balls.menu.MenuBackground;
 import com.android.game.clash_of_the_balls.menu.PopupBase;
+import com.android.game.clash_of_the_balls.menu.ResultsMenu;
 import com.android.game.clash_of_the_balls.menu.WaitMenu;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
@@ -53,6 +54,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private UIBase m_creation_menu_ui;
 	private UIBase m_wait_menu_ui;
 	private UIBase m_join_menu_ui;
+	private UIBase m_results_menu_ui;
 	private Game m_game_ui;
 	
 	private MenuBackground m_main_menu_background;
@@ -71,6 +73,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		GAME_START_CLIENT,
 		GAME_ROUND_END,
+		GAME_END,
 		GAME_START_SERVER,
 		GAME_ABORT, //in case of an error -> also abort the server
 		
@@ -132,7 +135,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 				, screen_width, screen_height,m_tex_manager
 				, m_settings,m_activity_context, m_font_settings
 				, Networking.getInstance(), m_network_client);
-
 		
 		progress_view.setProgress(50);
 		
@@ -143,6 +145,14 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 				, m_network_client);
 		
 		progress_view.setProgress(60);
+		
+		//Result Menu
+		m_results_menu_ui = new ResultsMenu(m_normal_menu_background
+				, screen_width, screen_height,m_tex_manager
+				, m_settings,m_activity_context, m_font_settings
+				, Networking.getInstance(), m_network_client);
+		
+		progress_view.setProgress(70);
 		
 		//Game
 		m_game_ui = new Game(m_activity_context, m_settings, m_tex_manager
@@ -173,6 +183,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			case GAME_START_CLIENT: startGameClient();
 			break;
 			case GAME_ROUND_END: handleGameRoundEnded();
+			break;
+			case GAME_END: handleGameEnded();
 			break;
 			case GAME_START_SERVER: startGameServer();
 			break;
@@ -245,7 +257,6 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		networking.leaveSession();
 		
 		m_game_server.stopThread();
-		
 		networking.resetErrors();
 		
 		uiChange(m_active_ui, m_main_menu);
@@ -256,26 +267,20 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 				m_settings.game_rounds + " ended");
 		
 		++m_settings.game_current_round;
-		if(m_settings.isGameFinished()) {
-			//TODO: show results page
-			
-			
-			m_game_server.stopThread();
-			
-			Networking networking = Networking.getInstance();
-			if(m_settings.is_host) networking.stopAdvertise();
-			networking.leaveSession();
-			networking.resetErrors();
-			
-		} else {
-			//TODO: also show current results page?
-			
-			if(m_settings.is_host) {
-				startGameServer();
-			} else {
-				uiChange(m_active_ui, m_game_ui);
-			}
-		}
+		
+		uiChange(m_active_ui, m_results_menu_ui);
+	}
+	
+	private void handleGameEnded() {
+		
+		m_game_server.stopThread();
+		
+		Networking networking = Networking.getInstance();
+		if(m_settings.is_host) networking.stopAdvertise();
+		networking.leaveSession();
+		networking.resetErrors();
+		
+		uiChange(m_active_ui, m_main_menu);
 	}
 	
 	public void onDestroy() {

@@ -181,7 +181,7 @@ public class CreationMenu extends GameMenuBase {
 			for(int i=0; i<m_round_buttons.length; ++i)
 				if(m_round_buttons[i].isPressed()) idx = i;
 			Log.d(LOG_TAG, "Game Creation: selected rounds: "+idx);
-			m_settings.game_rounds=idx;
+			m_settings.game_rounds=idx+1;
 			m_settings.game_current_round = 1;
 			
 			MenuItemLevel item_level = (MenuItemLevel)m_level_list.getSelectedItem();

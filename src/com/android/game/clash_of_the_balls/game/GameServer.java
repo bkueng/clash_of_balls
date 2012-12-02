@@ -329,7 +329,7 @@ public class GameServer extends GameBase implements Runnable {
 		//update statistics: points of the still living player(s)
 		Statistic stat = m_settings.game_statistics.currentRoundStatistics();
 		for(DynamicGameObject item : m_game_objects.values()) {
-			if(item.type == Type.Player) {
+			if(item.type == Type.Player && !item.isDead()) {
 				stat.setPlayerPoints(item.m_id, initialPlayerCount() - currentPlayerCount()-1);
 			}
 		}

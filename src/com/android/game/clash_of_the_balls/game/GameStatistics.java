@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import android.util.Log;
+
 /**
  * holds the statistics of the currently running game.
  * each game round has its own statistics
@@ -30,7 +32,9 @@ public class GameStatistics {
 	
 	public static class Statistic {
 		//this is either for a single round or for current game
-		public Map<Short, PlayerStats> stats = new TreeMap<Short, PlayerStats>();
+		private Map<Short, PlayerStats> stats = new TreeMap<Short, PlayerStats>();
+		
+		public PlayerStats get(Short player_id) { return stats.get(player_id); }
 		
 		public void reset() {
 			stats = new TreeMap<Short, PlayerStats>(); //key is the player id
@@ -73,7 +77,7 @@ public class GameStatistics {
 	
 	private Statistic m_game_stat = new Statistic();
 	public Statistic gameStatistics() { return m_game_stat; }
-	public void resetGameStatistics() { m_game_stat.reset(); }
+	public void resetGameStatistics() { m_cur_round_stat.reset(); m_game_stat.reset(); }
 	
 	private Statistic m_cur_round_stat = new Statistic();
 	public Statistic currentRoundStatistics() { return m_cur_round_stat; }
