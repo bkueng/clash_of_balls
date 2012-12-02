@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 
 import android.util.FloatMath;
+import android.util.Log;
 
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
@@ -145,6 +146,20 @@ public abstract class GameBase {
 			addEvent(new EventItemRemoved(getNextSequenceNum(), obj.m_id));
 		}
 		if(obj.type == Type.Player) --m_current_player_count;
+	}
+	
+	
+	public void move(float dsec) {
+		m_game_field.move(dsec);
+		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
+			entry.getValue().move(dsec);
+		}
+	}
+	
+	public void applyMove() {
+		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
+			entry.getValue().applyMove();
+		}
 	}
 	
 	protected void doCollisionHandling() {

@@ -290,19 +290,6 @@ public class GameServer extends GameBase implements Runnable {
 		}
 	}
 	
-	public void move(float dsec) {
-		m_game_field.move(dsec);
-		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
-			entry.getValue().move(dsec);
-		}
-	}
-	
-	public void applyMove() {
-		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
-			entry.getValue().applyMove();
-		}
-	}
-	
 	public void run() {
 		Looper.prepare();
 		m_looper = Looper.myLooper();
