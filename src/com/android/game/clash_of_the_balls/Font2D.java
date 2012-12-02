@@ -201,6 +201,12 @@ public class Font2D implements IDrawable {
 				return;
 			}
 		}
+		if(m_texture != null) {
+			int[] textureHandle = new int[1];
+			textureHandle[0] = m_texture.textureHandle();
+
+			GLES20.glDeleteTextures(1, textureHandle, 0);
+		}
 	}
 	
 	
