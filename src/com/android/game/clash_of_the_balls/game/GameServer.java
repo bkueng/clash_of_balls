@@ -110,6 +110,7 @@ public class GameServer extends GameBase implements Runnable {
 		m_network_server.handleReceive();
 		
 		m_initial_player_count = m_network_server.getConnectedClientCount();
+		m_current_player_count = m_initial_player_count;
 		
 		Log.d(TAG_SERVER, "init game: "+m_initial_player_count+" players");
 		

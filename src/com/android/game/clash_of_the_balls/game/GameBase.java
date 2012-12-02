@@ -36,6 +36,7 @@ public abstract class GameBase {
 	
 	protected GameField m_game_field;
 	protected int m_initial_player_count;
+	protected int m_current_player_count;
 	protected GameLevel m_level;
 	
 	protected boolean m_bIs_game_running = false;
@@ -56,6 +57,7 @@ public abstract class GameBase {
 	}
 	
 	public GameStatistics statistics() { return m_settings.game_statistics; }
+	public GameSettings settings() { return m_settings; }
 	
 	public GameBase(boolean is_server, GameSettings s, TextureManager texture_manager) {
 		this.is_server = is_server;
@@ -88,6 +90,7 @@ public abstract class GameBase {
 	//initGame must be called before this!
 	public void initPlayers(PlayerInfo[] players) {
 		m_initial_player_count = players.length;
+		m_current_player_count = m_initial_player_count;
 		for(int i=0; i<players.length; ++i) {
 			Texture texture=null;
 			Texture texture_overlay=null;
@@ -108,11 +111,7 @@ public abstract class GameBase {
 	}
 	
 	public int currentPlayerCount() {
-		int ret=0;
-		for(DynamicGameObject item : m_game_objects.values()) {
-			if(item.type == Type.Player && !item.isDead()) ++ret;
-		}
-		return ret;
+		return m_current_player_count;
 	}
 	
 	protected short getNextItemId() {
@@ -145,6 +144,7 @@ public abstract class GameBase {
 		if(generate_events) {
 			addEvent(new EventItemRemoved(getNextSequenceNum(), obj.m_id));
 		}
+		if(obj.type == Type.Player) --m_current_player_count;
 	}
 	
 	protected void doCollisionHandling() {
