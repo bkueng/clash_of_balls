@@ -60,6 +60,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private MenuBackground m_main_menu_background;
 	private MenuBackground m_normal_menu_background;
 	
+	private boolean m_back_button_pressed = false;
+	
 	private PopupBase m_cur_popup = null;
 	
 	GameServer m_game_server;
@@ -172,10 +174,24 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_settings.m_screen_height = height;
 		m_tex_manager.reloadAllTextures();
 	}
+	
+    //handle back button (called from another thread!)
+    public boolean onBackPressed() {
+    	//only do minimal stuff and return immediately
+    	if(m_active_ui == m_main_menu) return false;
+    	m_back_button_pressed = true;
+    	return true;
+    }
 
 	public void move(float dsec) {
+
 		if(m_active_ui != null) {
 			m_active_ui.move(dsec);
+			
+			if(m_back_button_pressed) {
+				m_back_button_pressed = false;
+				m_active_ui.onBackButtonPressed();
+			}
 			
 			if(m_cur_popup != null) m_cur_popup.move(dsec);
 

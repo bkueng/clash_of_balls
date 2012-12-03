@@ -173,4 +173,12 @@ public class ResultsMenu extends GameMenuInGame {
 		//clear the list
 		while(m_result_list.itemCount() > 0) m_result_list.removeItem(0);
 	}
+	
+	public void onBackButtonPressed() {
+		if(m_settings.isGameFinished()) {
+			m_ui_change = UIChange.MAIN_MENU;
+		} else {
+			m_ui_change = UIChange.GAME_ABORT;
+		}
+	}
 }

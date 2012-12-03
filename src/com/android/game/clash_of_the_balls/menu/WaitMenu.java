@@ -153,18 +153,22 @@ public class WaitMenu extends GameMenuInGame {
 				
 			}
 		} else if (item == m_cancel_button) {
-			if (m_settings.is_host) {
-				m_settings.is_host = false;
-				
-				m_networking.stopAdvertise();
-				
-				m_ui_change = UIChange.CREATION_MENU;
-			} else {
-				m_settings.is_host = false;
-				m_ui_change = UIChange.JOIN_MENU;
-			}
-			m_networking.leaveSession();
+			onCancelPressed();
 		}
+	}
+	
+	private void onCancelPressed() {
+		if (m_settings.is_host) {
+			
+			m_networking.stopAdvertise();
+			
+			m_ui_change = UIChange.CREATION_MENU;
+		} else {
+			
+			m_ui_change = UIChange.JOIN_MENU;
+		}
+		m_settings.is_host = false;
+		m_networking.leaveSession();
 	}
 	
 	public void onActivate() {
@@ -175,6 +179,10 @@ public class WaitMenu extends GameMenuInGame {
 		super.onDeactivate();
 		//clear the list
 		while(m_client_list.itemCount() > 0) m_client_list.removeItem(0);
+	}
+	
+	public void onBackButtonPressed() {
+		onCancelPressed();
 	}
 
 }

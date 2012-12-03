@@ -88,4 +88,9 @@ public class PopupBase extends GameMenuBase {
 	protected void onTouchUp(MenuItem item) {
 	}
 
+	public void onBackButtonPressed() {
+		//we do nothing here. this event is handled inside the menus
+		//and not in the popup's
+	}
+
 }

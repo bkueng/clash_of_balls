@@ -285,4 +285,8 @@ public class Game extends GameBase implements UIBase {
 		m_ui_change = UIChange.GAME_ABORT;
 	}
 	
+	public void onBackButtonPressed() {
+		//ok the user wants it this way: abort the game
+		gameAbort();
+	}
 }

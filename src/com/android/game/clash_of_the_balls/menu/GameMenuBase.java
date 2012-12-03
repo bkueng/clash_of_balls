@@ -88,5 +88,10 @@ public abstract class GameMenuBase implements UIBase {
 	public void onDeactivate() {
 		m_ui_change = UIChange.NO_CHANGE;
 	}
+	
+	public void onBackButtonPressed() {
+		//default behaviour is go back to main menu
+		m_ui_change = UIChange.MAIN_MENU;
+	}
 
 }

@@ -73,6 +73,12 @@ public class MainActivity extends Activity {
     	stopService(new Intent(this, NetworkService.class));
     	m_gl_view.onDestroy();
     }
+    
+    @Override
+    public void onBackPressed() {
+    	if(m_gl_view != null && !m_gl_view.onBackPressed())
+    		super.onBackPressed();
+    }
 
     
     public class LoadViewTask extends AsyncTask<Void, Integer, Void>
@@ -175,6 +181,11 @@ class MyGLSurfaceView extends GLSurfaceView {
 
         
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+    }
+    
+    //returns true if back button is handled, false if system should handle it
+    public boolean onBackPressed() {
+    	return m_renderer.onBackPressed();
     }
     
     public void onDestroy() {

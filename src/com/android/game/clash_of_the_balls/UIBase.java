@@ -12,4 +12,6 @@ public interface UIBase extends ITouchInput, IMoveable, IDrawable {
 	/* called when ui is changed */
 	public void onActivate();
 	public void onDeactivate();
+	
+	public void onBackButtonPressed();
 }
