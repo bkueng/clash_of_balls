@@ -2,6 +2,7 @@ package com.android.game.clash_of_the_balls;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 
 import android.util.Log;
@@ -34,6 +35,9 @@ import com.android.game.clash_of_the_balls.network.Networking;
 public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	
 	private static final String LOG_TAG = "UIHandler";
+	
+	public static final String PREFS_NAME = "clash_of_balls_prefs.7834727";
+	public static final String USER_NAME_KEY = "user_name";
 	
 	private GameSettings m_settings;
 	private Context m_activity_context;
@@ -96,8 +100,9 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_tex_manager = new TextureManager(m_activity_context);
 		onSurfaceChanged(screen_width, screen_height);
 		
-		//TODO: load username from file
-		if(GameSettings.debug) m_settings.user_name = "test";
+		//load username from file
+		SharedPreferences settings = m_activity_context.getSharedPreferences(PREFS_NAME, 0);
+		m_settings.user_name = settings.getString(USER_NAME_KEY, "");
 		
 		m_level_manager = new LevelManager(m_activity_context);
 		m_level_manager.loadLevels();
@@ -303,8 +308,13 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		if(m_game_ui!=null) m_game_ui.onDestroy();
 		m_game_ui=null;
 		if(m_game_server != null) m_game_server.stopThread();
-		//TODO: store username to a file
 		
+		//store username to a file
+		SharedPreferences settings = m_activity_context.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString(USER_NAME_KEY, m_settings.user_name);
+		editor.commit();
+
 	}
 
 	public void draw(RenderHelper renderer) {
