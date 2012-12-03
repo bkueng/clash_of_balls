@@ -33,7 +33,8 @@ public class MainActivity extends Activity {
         // making it full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
         LoadViewTask progress_view = new LoadViewTask();
         progress_view.execute();
