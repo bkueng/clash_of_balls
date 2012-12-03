@@ -1467,7 +1467,8 @@ public class Networking {
 		ADVERTISE_CANCEL_ERROR,
 		JOIN_SESSION_ERROR,
 		SEND_ERROR,
-		BUS_EXCEPTION
+		BUS_EXCEPTION,
+		RECEIVE_TIMEOUT
 	}
 	public static String getErrorMsgMultiline(AllJoynError error) {
 		switch(error) {
@@ -1486,6 +1487,7 @@ public class Networking {
 		case START_DISCOVERY_ERROR: return "Network error happened\n"+
 				"when trying to look\n"+
 				"for other servers";
+		case RECEIVE_TIMEOUT: return "Network receive timeout";
 		}
 		return "Unknown network error";
 	}

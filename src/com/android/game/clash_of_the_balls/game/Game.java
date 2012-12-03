@@ -122,6 +122,8 @@ public class Game extends GameBase implements UIBase {
 	}
 	
 	private boolean m_bReceived_events = false; //send new sensor data if true
+	private float m_time_since_last_data_receive=0.f; //[sec]
+	private static final float network_receive_timeout = 4.f; //[sec]
 
 	public void move(float dsec) {
 		if(m_error_popup != null) {
@@ -160,6 +162,7 @@ public class Game extends GameBase implements UIBase {
 					removeDeadObjects();
 					
 					m_bReceived_events = true;
+					m_time_since_last_data_receive = 0.f;
 				} else {
 					
 					m_bReceived_events = false;
@@ -177,6 +180,14 @@ public class Game extends GameBase implements UIBase {
 
 				m_view.move(dsec);
 				m_game_field.move(dsec);
+				
+				//check for receive timeout
+				if((m_time_since_last_data_receive+=dsec) > network_receive_timeout) {
+					AllJoynErrorData error = new AllJoynErrorData();
+					error.error_string = "";
+					error.error = AllJoynError.RECEIVE_TIMEOUT;
+					handleNetworkError(error);
+				}
 
 			} else {
 				m_network_client.handleReceive();
@@ -202,6 +213,7 @@ public class Game extends GameBase implements UIBase {
 			case JOIN_SESSION_ERROR:
 			case SEND_ERROR:
 			case BUS_EXCEPTION:
+			case RECEIVE_TIMEOUT:
 				m_settings.popup_menu = m_error_popup = new PopupMsg(m_activity_context 
 						, m_texture_manager, m_settings.m_screen_width
 						, m_settings.m_screen_height 
@@ -230,6 +242,7 @@ public class Game extends GameBase implements UIBase {
 	public void gameStartNow() {
 		super.gameStartNow();
 		m_bReceived_events = true;
+		m_time_since_last_data_receive = 0.f;
 		m_sensor_thread.stopCalibrate();
 		m_ui_change = UIChange.POPUP_HIDE;
 	}
