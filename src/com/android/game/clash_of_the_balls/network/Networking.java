@@ -101,7 +101,7 @@ public class Networking {
 				//	mHostChatInterface.sensorUpdate(ack_seq_num, pos);
 				receivedSensorUpdate(mBus.getUniqueName(), ack_seq_num, pos.x, pos.y); //send to ourself
 			} else {
-				mChatInterface.sensorUpdate(ack_seq_num, pos.x, pos.y);
+				if(mChatInterface!=null) mChatInterface.sensorUpdate(ack_seq_num, pos.x, pos.y);
 			}
 		} catch (BusException ex) {
     		alljoynError(Module.USE, AllJoynError.SEND_ERROR, 
@@ -116,7 +116,7 @@ public class Networking {
 				//	mHostChatInterface.ack(ack_seq_num);
 				receivedAck(mBus.getUniqueName(), ack_seq_num); //send to ourself
 			} else {
-				mChatInterface.ack(ack_seq_num);
+				if(mChatInterface!=null) mChatInterface.ack(ack_seq_num);
 			}
 		} catch (BusException ex) {
     		alljoynError(Module.USE, AllJoynError.SEND_ERROR, 
@@ -131,7 +131,7 @@ public class Networking {
 					mHostChatInterface.gameCommand(data);
 				receivedGameCommand(mBus.getUniqueName(), data); //send to ourself
 			} else {
-				mChatInterface.gameCommand(data);
+				if(mChatInterface!=null) mChatInterface.gameCommand(data);
 			}
 		} catch (BusException ex) {
     		alljoynError(Module.USE, AllJoynError.SEND_ERROR, 
