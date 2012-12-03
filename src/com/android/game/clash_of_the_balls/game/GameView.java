@@ -20,6 +20,9 @@ public class GameView extends GameObject {
 	private float m_level_width;
 	private float m_level_height;
 	
+	public float levelWidth() { return m_level_width; }
+	public float levelHeight() { return m_level_height; }
+	
 	private float m_scaling; //game_pos * m_scaling = output pos
 	// m_position is in output coordinates
 	

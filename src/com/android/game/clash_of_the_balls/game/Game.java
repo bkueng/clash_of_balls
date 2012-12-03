@@ -64,10 +64,16 @@ public class Game extends GameBase implements UIBase {
 		
 		//view: save & restore scaling if it exists
 		float scaling = -1.f;
-		if(m_view != null) scaling = m_view.getZoomToTileSize();
+		float old_width=0.f, old_height=0.f;
+		if(m_view != null) {
+			scaling = m_view.getZoomToTileSize();
+			old_width = m_view.levelWidth();
+			old_height = m_view.levelHeight();
+		}
 		m_view = new GameView(m_settings.m_screen_width, m_settings.m_screen_height, 
 				null, (float)level.width, (float)level.height);
-		if(scaling > 0.f) m_view.setZoomToTileSize(scaling);
+		if(scaling > 0.f && old_width==m_view.levelWidth() && old_height==m_view.levelHeight())
+			m_view.setZoomToTileSize(scaling);
 		
 	}
 	
