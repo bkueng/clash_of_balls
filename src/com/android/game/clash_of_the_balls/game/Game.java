@@ -135,7 +135,7 @@ public class Game extends GameBase implements UIBase {
 		if(m_error_popup != null) {
 			//check for button pressed
 			if(m_error_popup.UIChange() == UIChange.POPUP_RESULT_BUTTON1) {
-				m_ui_change = UIChange.GAME_ABORT;
+				gameAbort();
 				m_error_popup = null;
 			}
 		} else {
@@ -279,4 +279,10 @@ public class Game extends GameBase implements UIBase {
 	public String getUniqueNameFromPlayerId(short player_id) {
 		throw new RuntimeException("getUniqueNameFromPlayerId should not be called inside Game object");
 	}
+	
+	private void gameAbort() {
+		m_bIs_game_running = false;
+		m_ui_change = UIChange.GAME_ABORT;
+	}
+	
 }

@@ -331,6 +331,7 @@ public class GameServer extends GameBase implements Runnable {
 		m_networking.unregisterEventListener(m_msg_handler);
 		m_msg_handler = null;
 		m_looper = null;
+		m_bIs_game_running = false;
 	}
 	
 	public void gameStartNow() {
