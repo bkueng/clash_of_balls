@@ -72,6 +72,7 @@ public class MainActivity extends Activity {
     	super.onDestroy();
     	stopService(new Intent(this, NetworkService.class));
     	m_gl_view.onDestroy();
+    	dismissDialog();
     }
     
     @Override
@@ -79,6 +80,13 @@ public class MainActivity extends Activity {
     	if(m_gl_view != null && !m_gl_view.onBackPressed())
     		super.onBackPressed();
     }
+    
+	public void dismissDialog() {
+		//close the progress dialog
+    	ProgressDialog dialog = progressDialog;
+    	if(dialog != null) dialog.dismiss();
+    	progressDialog = null;
+	}
 
     
     public class LoadViewTask extends AsyncTask<Void, Integer, Void>
@@ -147,17 +155,16 @@ public class MainActivity extends Activity {
 		protected void onProgressUpdate(Integer... values) 
 		{
 			//set the current progress of the progress dialog
-			progressDialog.setProgress(values[0]);
+			if(progressDialog!=null) progressDialog.setProgress(values[0]);
 		}
 
 		//after executing the code in the thread
 		@Override
 		protected void onPostExecute(Void result) 
 		{
-			//close the progress dialog
-			progressDialog.dismiss();
-			progressDialog = null;
+			dismissDialog();
 		} 	
+		
     }
 
 }
