@@ -22,6 +22,10 @@ public class StaticGameObject extends GameObject {
 		Boarder_up,
 		Boarder_right,
 		Boarder_down,
+		Corner_up_right,
+		Corner_up_left,
+		Corner_down_right,
+		Corner_down_left,
 		Wall,
 		Player,
 		Item
