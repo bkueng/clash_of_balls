@@ -69,7 +69,7 @@ public class GameLevel {
 	
 	public static int rawResTexIdFromBackground(int bg_field) {
 		switch(bg_field) {
-		case TYPE_NORMAL: return R.raw.texture_bg_normal;
+		case TYPE_NORMAL: return R.raw.texture_game_bg;
 		}
 		return -1;
 	}
