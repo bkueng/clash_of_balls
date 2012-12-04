@@ -113,6 +113,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		// Initialize Font2D.Font2DSetting for all menus
 		m_font_typeface = Typeface.createFromAsset(m_activity_context.getAssets(),  "alphafridgemagnets.ttf");
 		m_font_color = 0xddeeeeff;
+		int label_font_color = 0xddcccccc;
 		m_font_align = Font2D.TextAlign.CENTER;
 		m_font_settings = new Font2D.Font2DSettings(m_font_typeface, m_font_align, m_font_color);
 		
@@ -132,8 +133,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 				m_tex_manager.get(R.raw.texture_bg_normal),1600.f/960.f);
 		m_creation_menu_ui = new CreationMenu(m_normal_menu_background
 				, screen_width, screen_height, m_tex_manager, m_settings
-				, m_activity_context, m_font_settings, m_level_manager
-				, m_network_server);
+				, m_activity_context, m_font_settings, label_font_color
+				, m_level_manager, m_network_server);
 		
 		progress_view.setProgress(40);
 		
@@ -148,8 +149,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		//Join Menu
 		m_join_menu_ui = new JoinMenu(m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager
-				, m_activity_context, m_font_settings, m_settings
-				, m_network_client);
+				, m_activity_context, m_font_settings, label_font_color
+				, m_settings, m_network_client);
 		
 		progress_view.setProgress(60);
 		

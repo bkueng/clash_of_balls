@@ -1,9 +1,7 @@
 package com.android.game.clash_of_the_balls.menu;
 
-import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Font2D;
@@ -20,20 +18,31 @@ public class MenuItemGreyButton extends MenuItem {
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
 	private boolean m_pressed=false;
+	
+	private MenuItemStringMultiline m_label;
 
 	public MenuItemGreyButton(Vector position, Vector size
-			, TextureManager m_tex_manager) {
+			, TextureManager tex_manager, String label, 
+			Font2D.Font2DSettings font_settings) {
 		
 		super(position, size);
 		
-		m_texture_pressed=m_tex_manager
+		m_texture_pressed=tex_manager
 				.get(R.raw.texture_grey_pressed_button);
-		m_texture_unpressed=m_tex_manager
+		m_texture_unpressed=tex_manager
 				.get(R.raw.texture_grey_unpressed_button);
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_color_data_white, 4);
+		
+		m_label = new MenuItemStringMultiline(
+				m_position, m_size,
+				font_settings, label, tex_manager);
+	}
+	
+	public void setLabel(String label) {
+		m_label.setString(label);
 	}
 
 	public void draw(RenderHelper renderer) {		
@@ -52,6 +61,8 @@ public class MenuItemGreyButton extends MenuItem {
 		drawTexture(renderer, texture);
         
         renderer.popModelMat();
+        
+        m_label.draw(renderer);
 	}
 
 	public void select() {

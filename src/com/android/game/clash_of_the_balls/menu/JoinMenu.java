@@ -37,7 +37,7 @@ public class JoinMenu extends GameMenuBase {
 	public JoinMenu(MenuBackground background
 			, float screen_width, float screen_height
 			, TextureManager tex_manager, Context context
-			, Font2D.Font2DSettings font_settings
+			, Font2D.Font2DSettings font_settings, int label_font_color
 			, GameSettings settings
 			, NetworkClient network_client) {
 		super(background,context);
@@ -47,7 +47,10 @@ public class JoinMenu extends GameMenuBase {
 		
 		Font2D.Font2DSettings label_font_settings 
 			= new Font2D.Font2DSettings(font_settings.m_typeface,
-				TextAlign.LEFT, font_settings.m_color);
+				TextAlign.LEFT, label_font_color);
+		Font2D.Font2DSettings keyboard_font_settings 
+			= new Font2D.Font2DSettings(font_settings.m_typeface,
+					font_settings.m_align, font_settings.m_color);
 		
 		m_tex_manager = tex_manager;
 		m_network_client = network_client;
@@ -90,7 +93,7 @@ public class JoinMenu extends GameMenuBase {
 				new Vector(pos.x+size.x - offset_x - button_width
 						, pos.y + size.y - button_height - label_height),
 				new Vector(button_width, button_height),
-				font_settings, m_tex_manager, m_activity_context,
+				keyboard_font_settings, m_tex_manager, m_activity_context,
 				"Please Enter your Nickname:"));
 
 		//right Column
