@@ -81,6 +81,11 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     	m_shader_manager.useShader(ShaderType.TypeDefault);
     }
     
+    //handle back button (called from another thread!)
+    public boolean onBackPressed() {
+    	return m_ui_handler.onBackPressed();
+    }
+    
 
     public void onDrawFrame(GL10 unused) {
 

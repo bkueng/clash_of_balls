@@ -16,6 +16,7 @@ import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynError;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
+import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
 import com.android.game.clash_of_the_balls.network.Networking.NetworkData;
 
 /**
@@ -44,6 +45,10 @@ public class NetworkClient {
 		m_networking = networking;
 	}
 	
+	public ConnectedClient getConnectedClient(int idx) 
+		{ return m_networking.connectedClient(idx); }
+	public int getConnectedClientCount() { return m_networking.connectedClientCount(); }
+	
 	public String getOwnUniqueName() {
 		return m_networking.getUniqueName();
 	}
@@ -61,8 +66,13 @@ public class NetworkClient {
 	}
 	public void stopDiscovery() {
 		m_networking.stopDiscovery();
+		//clear the server list
+		m_available_servers=new ArrayList<String>();
 	}
 	
+	public void setOwnName(String name) {
+		m_networking.setServerName(name);
+	}
 	//join a game
 	public void connectToServer(String server_id) {
 		m_networking.joinSession(server_id);
@@ -71,6 +81,8 @@ public class NetworkClient {
 	
 	public boolean hasEvents() { return !m_available_events.isEmpty(); }
 	public Event getNextEvent() { return m_available_events.poll(); }
+		//does not remove the element from the queue
+	public Event peekNextEvent() { return m_available_events.peek(); }
 	
 	
 	//call this every frame, or in a regular time period

@@ -1,5 +1,6 @@
 package com.android.game.clash_of_the_balls.menu;
 
+import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
@@ -21,60 +22,79 @@ public class MenuItemButton extends MenuItem {
 	private Texture m_texture_unpressed;
 	private Texture m_texture_pressed;
 	private boolean m_pressed=false;
+	
+	private boolean m_is_disabled=false;
+	private VertexBufferFloat m_color_data_disabled;
 
 	public MenuItemButton(Vector position, Vector size
 			, Font2DSettings font_settings, String font_string
-			, TextureManager m_tex_manager) {
+			, TextureManager tex_manager) {
 		super(position, size);
 		
-		m_item_font = new Font2D(m_tex_manager, size, font_settings, (int)Math.round(size.y * 0.7));
+		m_item_font = new Font2D(tex_manager, size, font_settings, (int)Math.round(size.y * 0.7));
 		m_item_font.setString(font_string);
 		
-		m_texture_pressed=m_tex_manager
+		m_texture_pressed=tex_manager
 				.get(R.raw.texture_main_menu_pressed_button);
-		m_texture_unpressed=m_tex_manager
+		m_texture_unpressed=tex_manager
 				.get(R.raw.texture_main_menu_unpressed_button);
+		
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_color_data_white, 4);
+		
+		
+		//disabled button color
+		final int color = 0xff888888;
+		float color_data[] = new float[4*4];
+		for(int i=0; i<4; ++i) {
+			color_data[i*4 + 0] = (float)Color.red(color) / 255.f;
+			color_data[i*4 + 1] = (float)Color.green(color) / 255.f;
+			color_data[i*4 + 2] = (float)Color.blue(color) / 255.f;
+			color_data[i*4 + 3] = (float)Color.alpha(color) / 255.f;
+		}
+		m_color_data_disabled = new VertexBufferFloat(color_data, 4);
+	}
+	
+	public void setString(String str) {
+		m_item_font.setString(str);
 	}
 
+	public boolean isDisabled() { return m_is_disabled; }
+	public void disable() { m_is_disabled=true; }
+	public void enable() { m_is_disabled=false; }
+	public void enable(boolean enabled) { m_is_disabled=!enabled; }
+	
 	public boolean isPressed(){return m_pressed;}
 
 	public void draw(RenderHelper renderer) {		
-		Texture m_texture;
-		if(m_pressed){
-			m_texture=m_texture_pressed;
+		Texture texture;
+		if(m_pressed && !m_is_disabled){
+			texture=m_texture_pressed;
 		}else{
-			m_texture=m_texture_unpressed;
+			texture=m_texture_unpressed;
 		}
 		
-		renderer.shaderManager().activateTexture(0);
-		m_texture.useTexture(renderer);
+		VertexBufferFloat color_data_tmp = m_color_data;
+		VertexBufferFloat color_data_tmp_font = m_item_font.colorData();
+		if(m_is_disabled) {
+			m_color_data = m_color_data_disabled;
+			m_item_font.setColorData(m_color_data_disabled);
+		}
+		
 		int model_mat_pos = renderer.pushModelMat();
 		float model_mat[] = renderer.modelMat();
-		Matrix.setIdentityM(model_mat, model_mat_pos);
 		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
 		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
 		
-		// position
-		int position_handle = renderer.shaderManager().a_Position_handle;
-		if(position_handle != -1)
-			m_position_data.apply(position_handle);
-		
-        // color
-		int color_handle = renderer.shaderManager().a_Color_handle;
-		if(color_handle != -1)
-			m_color_data.apply(color_handle);      
-
-		renderer.apply();
-		
-        // Draw
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);                               
+		drawTexture(renderer, texture);
         
         // Render font
         m_item_font.draw(renderer);
+        
+        m_color_data = color_data_tmp;
+        m_item_font.setColorData(color_data_tmp_font);
         
         renderer.popModelMat();
 	}

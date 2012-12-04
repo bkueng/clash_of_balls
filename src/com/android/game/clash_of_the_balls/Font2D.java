@@ -77,6 +77,9 @@ public class Font2D implements IDrawable {
 		
 		Log.d(LOG_TAG, "Font succesfully created");
 	}
+	
+	public VertexBufferFloat colorData() { return m_color_data; }
+	public void setColorData(VertexBufferFloat color_data) { m_color_data = color_data; }
 
 	private void doInit(String string) {
 		
@@ -142,8 +145,8 @@ public class Font2D implements IDrawable {
 		bitmap.eraseColor(0);
 		
 		// Draw the text centered
-		//canvas.drawRGB(255, 0, 127); // TODO: Delete when finished
-		canvas.drawText(m_string, m_x_offset, m_y_offset, textPaint);
+		if(m_string!=null)
+			canvas.drawText(m_string, m_x_offset, m_y_offset, textPaint);
 				
 		return bitmap;
 	}
@@ -151,6 +154,7 @@ public class Font2D implements IDrawable {
 	public void setString(String string) {
 		doInit(string);
 	}
+	public String getString() { return m_string; }
 	
 	public static void reloadFonts() {
 		Font2D tmpFont2D;
@@ -166,6 +170,8 @@ public class Font2D implements IDrawable {
 	}
 
 	public void draw(RenderHelper renderer) {
+		
+		if(m_texture == null) return; //this happens if string is not set
 		
 		renderer.shaderManager().activateTexture(0);
 		m_texture.useTexture(renderer);
@@ -193,6 +199,12 @@ public class Font2D implements IDrawable {
 				m_weakFont2D.remove(i);
 				return;
 			}
+		}
+		if(m_texture != null) {
+			int[] textureHandle = new int[1];
+			textureHandle[0] = m_texture.textureHandle();
+
+			GLES20.glDeleteTextures(1, textureHandle, 0);
 		}
 	}
 	

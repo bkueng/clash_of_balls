@@ -13,8 +13,16 @@ import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
  */
 public class DynamicGameObject extends StaticGameObject {
 	
+	/* death of an object:
+	 * m_bIs_dead==true: means that this object cannot interact with others anymore
+	 * m_bIs_dying==true: implies m_bIs_dead==true. means the object is still in the
+	 * 					object list, but cannot move anymore. used for dying effect
+	 * m_bIs_dead && !m_bIs_dying: means the object is not used anymore
+	 */
 	protected boolean m_bIs_dead = false;
 	public boolean isDead() { return m_bIs_dead; }
+	protected boolean m_bIs_dying = false;
+	public boolean isReallyDead() { return m_bIs_dead && !m_bIs_dying; }
 	
 	protected Vector m_new_pos=new Vector();
 	protected boolean m_has_moved = false;
@@ -37,15 +45,14 @@ public class DynamicGameObject extends StaticGameObject {
 
 	@Override
 	public void draw(RenderHelper renderer) {
-		if(!m_bIs_dead) {
+		if(!isReallyDead()) {
 			super.draw(renderer);
 		}
 	}
 
 	@Override
 	public void move(float dsec) {
-		// TODO Auto-generated method stub
-			//-> set m_has_moved & m_new_pos
+		//-> set m_has_moved & m_new_pos
 	}
 	
 	public void handleImpact(DynamicGameObject other) {
@@ -55,11 +62,11 @@ public class DynamicGameObject extends StaticGameObject {
 	
 	
 	public void die() {
-		//TODO: dying effect ?
-		
-		m_bIs_dead = true;
-		
-		//generate event ?
+		if(!m_bIs_dead) {
+			m_bIs_dead = true;
+			m_bIs_dying = false;
+			m_owner.handleObjectDied(this);
+		}
 	}
 	
 	

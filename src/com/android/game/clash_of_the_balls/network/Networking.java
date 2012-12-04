@@ -101,7 +101,7 @@ public class Networking {
 				//	mHostChatInterface.sensorUpdate(ack_seq_num, pos);
 				receivedSensorUpdate(mBus.getUniqueName(), ack_seq_num, pos.x, pos.y); //send to ourself
 			} else {
-				mChatInterface.sensorUpdate(ack_seq_num, pos.x, pos.y);
+				if(mChatInterface!=null) mChatInterface.sensorUpdate(ack_seq_num, pos.x, pos.y);
 			}
 		} catch (BusException ex) {
     		alljoynError(Module.USE, AllJoynError.SEND_ERROR, 
@@ -116,7 +116,7 @@ public class Networking {
 				//	mHostChatInterface.ack(ack_seq_num);
 				receivedAck(mBus.getUniqueName(), ack_seq_num); //send to ourself
 			} else {
-				mChatInterface.ack(ack_seq_num);
+				if(mChatInterface!=null) mChatInterface.ack(ack_seq_num);
 			}
 		} catch (BusException ex) {
     		alljoynError(Module.USE, AllJoynError.SEND_ERROR, 
@@ -131,7 +131,7 @@ public class Networking {
 					mHostChatInterface.gameCommand(data);
 				receivedGameCommand(mBus.getUniqueName(), data); //send to ourself
 			} else {
-				mChatInterface.gameCommand(data);
+				if(mChatInterface!=null) mChatInterface.gameCommand(data);
 			}
 		} catch (BusException ex) {
     		alljoynError(Module.USE, AllJoynError.SEND_ERROR, 
@@ -188,9 +188,13 @@ public class Networking {
     public void setMaxClientCount(int max_count) {
     	m_max_client_count = max_count;
     }
+    public int maxClientCount() {
+    	return m_max_client_count;
+    }
     
     
     private volatile int m_max_client_count = -1;
+    private volatile boolean m_clients_can_join = false; //clients can only join when advertising
     
 	public synchronized void registerEventListener(Handler h) {
 		m_event_listeners.add(h);
@@ -216,6 +220,9 @@ public class Networking {
     public AllJoynErrorData getError() {
     	return m_error;
     }
+    public void resetErrors() {
+    	m_error = null;
+    }
 	
     //Note: server_name must NOT contain '.'
     //it can only consist of: [A-Z][a-z][0-9]_-
@@ -227,14 +234,19 @@ public class Networking {
 	//call this to let the others discover me
     //first call setServerName
 	public void startAdvertise() {
+		m_clients_can_join = true;
 		m_background_handler.requestName();
 		m_background_handler.bindSession();
 		m_background_handler.advertise();
 	}
 	public void stopAdvertise() {
+		m_clients_can_join = false;
 		m_background_handler.cancelAdvertise();
 		m_background_handler.unbindSession();
 		m_background_handler.releaseName();
+	}
+	public void setClientsCanJoin(boolean can_join) {
+		m_clients_can_join = can_join;
 	}
 	
 	//listen for other servers
@@ -258,17 +270,25 @@ public class Networking {
 	}
 	public void leaveSession() {
 		m_background_handler.leaveSession();
+		//clear the connected client list
+		m_connected_clients = new ArrayList<ConnectedClient>();
 	}
 	
 	public static String getNameFromServerId(String server_id) {
 		//server id is: NAME_PREFIX.<guid>.server_name
     	int lastDot = server_id.lastIndexOf('.');
-    	if (lastDot < 0) {
+    	if (lastDot < 0 || lastDot+2 > server_id.length()) {
     		//this is a format error. we could throw an exception.
     		//but we do our best here to avoid errors
     		return server_id;
     	}
-        return server_id.substring(lastDot + 1);
+        return server_id.substring(lastDot + 2);
+	}
+	public static String toDisplayableName(String server_name) {
+		return server_name.replaceAll("_", " ");
+	}
+	public static String fromDisplayableName(String server_name_displ) {
+		return server_name_displ.replaceAll(" ", "_");
 	}
 	
 	//incoming data
@@ -622,7 +642,7 @@ public class Networking {
     private volatile String m_server_id_to_join; //this is the well-known name
     
     private String getWellKnownName() {
-    	return NAME_PREFIX + ".g" + mBus.getGlobalGUIDString() + "."
+    	return NAME_PREFIX + ".g" + mBus.getGlobalGUIDString() + ".n"
     			+ m_host_server_name;
     }
     private String getWellKnownNameToJoin() {
@@ -751,10 +771,11 @@ public class Networking {
      */
     private boolean doDisconnect() {
         Log.i(TAG, "doDisonnect()");
-    	assert(mBusAttachmentState == BusAttachmentState.CONNECTED);
-    	mBus.unregisterBusListener(mBusListener);
-    	mBus.disconnect();
-		mBusAttachmentState = BusAttachmentState.DISCONNECTED;
+    	if(mBusAttachmentState == BusAttachmentState.CONNECTED) {
+    		mBus.unregisterBusListener(mBusListener);
+    		mBus.disconnect();
+    		mBusAttachmentState = BusAttachmentState.DISCONNECTED;
+    	}
     	return true;
     }
     
@@ -801,22 +822,23 @@ public class Networking {
          */
         int stateRelation = mBusAttachmentState.compareTo(BusAttachmentState.DISCONNECTED);
     	assert (stateRelation >= 0);
-    	
-    	/*
-    	 * We depend on the user interface and model to work together to not
-    	 * get this process started until a valid name is set in the channel name.
-    	 */
-    	String wellKnownName = getWellKnownName();
-    	Log.i(TAG, "Well-known name: "+wellKnownName);
-        Status status = mBus.requestName(wellKnownName, BusAttachment.ALLJOYN_REQUESTNAME_FLAG_DO_NOT_QUEUE
-        		| BusAttachment.ALLJOYN_NAME_FLAG_ALLOW_REPLACEMENT
-        		| BusAttachment.ALLJOYN_REQUESTNAME_FLAG_REPLACE_EXISTING);
-        if (status == Status.OK) {
-          	mHostChannelState = HostChannelState.NAMED;
-        } else {
-    		alljoynError(Module.USE, AllJoynError.CONNECT_ERROR, 
-    				"Unable to acquire well-known name: (" + status + ")");
-        }
+    	if(mHostChannelState == HostChannelState.IDLE) {
+	    	/*
+	    	 * We depend on the user interface and model to work together to not
+	    	 * get this process started until a valid name is set in the channel name.
+	    	 */
+	    	String wellKnownName = getWellKnownName();
+	    	Log.i(TAG, "Well-known name: "+wellKnownName);
+	        Status status = mBus.requestName(wellKnownName, BusAttachment.ALLJOYN_REQUESTNAME_FLAG_DO_NOT_QUEUE
+	        		| BusAttachment.ALLJOYN_NAME_FLAG_ALLOW_REPLACEMENT
+	        		| BusAttachment.ALLJOYN_REQUESTNAME_FLAG_REPLACE_EXISTING);
+	        if (status == Status.OK) {
+	          	mHostChannelState = HostChannelState.NAMED;
+	        } else {
+	    		alljoynError(Module.USE, AllJoynError.CONNECT_ERROR, 
+	    				"Unable to acquire well-known name: (" + status + ")");
+	        }
+    	}
     }
     
     /**
@@ -830,27 +852,30 @@ public class Networking {
          * In order to release a name, the bus attachment must at least be
          * connected.
          */
-    	assert(mBusAttachmentState == BusAttachmentState.CONNECTED || mBusAttachmentState == BusAttachmentState.DISCOVERING);
+    	if(mBusAttachmentState == BusAttachmentState.CONNECTED 
+    			|| mBusAttachmentState == BusAttachmentState.DISCOVERING) {
     	
-    	/*
-    	 * We need to progress monotonically down the hosted channel states
-    	 * for sanity.
-    	 */
-    	assert(mHostChannelState == HostChannelState.NAMED);
-    	
-    	/*
-    	 * We depend on the user interface and model to work together to not
-    	 * change the name out from under us while we are running.
-    	 */
-    	String wellKnownName = getWellKnownName();
-
-    	/*
-    	 * There's not a lot we can do if the bus attachment refuses to release
-    	 * the name.  It is not a fatal error, though, if it doesn't.  This is
-    	 * because bus attachments can have multiple names.
-    	 */
-    	mBus.releaseName(wellKnownName);
-    	mHostChannelState = HostChannelState.IDLE;
+	    	/*
+	    	 * We need to progress monotonically down the hosted channel states
+	    	 * for sanity.
+	    	 */
+	    	if(mHostChannelState == HostChannelState.NAMED) {
+		    	
+		    	/*
+		    	 * We depend on the user interface and model to work together to not
+		    	 * change the name out from under us while we are running.
+		    	 */
+		    	String wellKnownName = getWellKnownName();
+		
+		    	/*
+		    	 * There's not a lot we can do if the bus attachment refuses to release
+		    	 * the name.  It is not a fatal error, though, if it doesn't.  This is
+		    	 * because bus attachments can have multiple names.
+		    	 */
+		    	mBus.releaseName(wellKnownName);
+		    	mHostChannelState = HostChannelState.IDLE;
+	    	}
+	    }
     }
     
     /**
@@ -860,70 +885,74 @@ public class Networking {
     private void doBindSession() {
         Log.i(TAG, "doBindSession()");
         
-        Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
-        SessionOpts sessionOpts = new SessionOpts(SessionOpts.TRAFFIC_MESSAGES
-        		, true, SessionOpts.PROXIMITY_ANY, SessionOpts.TRANSPORT_ANY);
-        
-        Status status = mBus.bindSessionPort(contactPort, sessionOpts, new SessionPortListener() {
-            /**
-             * This method is called when a client tries to join the session
-             * we have bound.  It asks us if we want to accept the client into
-             * our session.
-             *
-             * In the class documentation for the SessionPortListener note that
-             * it is a requirement for this method to be multithread safe.
-             * Since we never access any shared state, this requirement is met.
-             */
-        	public boolean acceptSessionJoiner(short sessionPort, String joiner, SessionOpts sessionOpts) {
-                Log.i(TAG, "SessionPortListener.acceptSessionJoiner(" + sessionPort + ", " + joiner + ", " + sessionOpts.toString() + ")");
+        if(mHostChannelState == HostChannelState.IDLE 
+        		|| mHostChannelState == HostChannelState.NAMED) {
         	
-                /*
-        		 * Accept anyone who can get our contact port correct.
-        		 */
-        		if (sessionPort == CONTACT_PORT) {
-        			
-        			
-        			int connected_clients = connectedClientCount();
-        			
-        			if(m_max_client_count==-1 || connected_clients < m_max_client_count) {
-        				
-        				return true;
-        				
-        			}
-        		}
-        		return false;
-            }
-            
-            /**
-             * If we return true in acceptSessionJoiner, we admit a new client
-             * into our session.  The session does not really exist until a 
-             * client joins, at which time the session is created and a session
-             * ID is assigned.  This method communicates to us that this event
-             * has happened, and provides the new session ID for us to use.
-             *
-             * In the class documentation for the SessionPortListener note that
-             * it is a requirement for this method to be multithread safe.
-             * Since we never access any shared state, this requirement is met.
-             * 
-             * See comments in joinSession for why the hosted chat interface is
-             * created here. 
-             */
-            public void sessionJoined(short sessionPort, int id, String joiner) {
-                Log.i(TAG, "SessionPortListener.sessionJoined(" + sessionPort + ", " + id + ", " + joiner + ")");
-                mHostSessionId = id;
-                SignalEmitter emitter = new SignalEmitter(m_network_service, id
-                		, SignalEmitter.GlobalBroadcast.Off);
-                mHostChatInterface = emitter.getInterface(AlljoynInterface.class);
-            }             
-        });
-        
-        if (status == Status.OK) {
-        	mHostChannelState = HostChannelState.BOUND;
-        } else {
-    		alljoynError(Module.HOST, AllJoynError.CONNECT_ERROR,
-    				"Unable to bind session contact port: (" + status + ")");
-        	return;
-        }
+	        Mutable.ShortValue contactPort = new Mutable.ShortValue(CONTACT_PORT);
+	        SessionOpts sessionOpts = new SessionOpts(SessionOpts.TRAFFIC_MESSAGES
+	        		, true, SessionOpts.PROXIMITY_ANY, SessionOpts.TRANSPORT_ANY);
+	        
+	        Status status = mBus.bindSessionPort(contactPort, sessionOpts, new SessionPortListener() {
+	            /**
+	             * This method is called when a client tries to join the session
+	             * we have bound.  It asks us if we want to accept the client into
+	             * our session.
+	             *
+	             * In the class documentation for the SessionPortListener note that
+	             * it is a requirement for this method to be multithread safe.
+	             * Since we never access any shared state, this requirement is met.
+	             */
+	        	public boolean acceptSessionJoiner(short sessionPort, String joiner, SessionOpts sessionOpts) {
+	                Log.i(TAG, "SessionPortListener.acceptSessionJoiner(" + sessionPort + ", " + joiner + ", " + sessionOpts.toString() + ")");
+	        	
+	                /*
+	        		 * Accept anyone who can get our contact port correct.
+	        		 */
+	        		if (sessionPort == CONTACT_PORT && m_clients_can_join) {
+	        			
+	        			
+	        			int connected_clients = connectedClientCount();
+	        			
+	        			if(m_max_client_count==-1 || connected_clients < m_max_client_count) {
+	        				
+	        				return true;
+	        				
+	        			}
+	        		}
+	        		return false;
+	            }
+	            
+	            /**
+	             * If we return true in acceptSessionJoiner, we admit a new client
+	             * into our session.  The session does not really exist until a 
+	             * client joins, at which time the session is created and a session
+	             * ID is assigned.  This method communicates to us that this event
+	             * has happened, and provides the new session ID for us to use.
+	             *
+	             * In the class documentation for the SessionPortListener note that
+	             * it is a requirement for this method to be multithread safe.
+	             * Since we never access any shared state, this requirement is met.
+	             * 
+	             * See comments in joinSession for why the hosted chat interface is
+	             * created here. 
+	             */
+	            public void sessionJoined(short sessionPort, int id, String joiner) {
+	                Log.i(TAG, "SessionPortListener.sessionJoined(" + sessionPort + ", " + id + ", " + joiner + ")");
+	                mHostSessionId = id;
+	                SignalEmitter emitter = new SignalEmitter(m_network_service, id
+	                		, SignalEmitter.GlobalBroadcast.Off);
+	                mHostChatInterface = emitter.getInterface(AlljoynInterface.class);
+	            }             
+	        });
+	        
+	        if (status == Status.OK) {
+	        	mHostChannelState = HostChannelState.BOUND;
+	        } else {
+	    		alljoynError(Module.HOST, AllJoynError.CONNECT_ERROR,
+	    				"Unable to bind session contact port: (" + status + ")");
+	        	return;
+	        }
+	    }
     }
     
     /**
@@ -1289,22 +1318,12 @@ public class Networking {
      	 */
     	String uniqueName = mBus.getUniqueName();
     	MessageContext ctx = mBus.getMessageContext();
-    	
         
          // Always drop our own signals which may be echoed back from the system.
         if (ctx.sender.equals(uniqueName)) {
             Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
     		return;
     	}
-
-         // Drop signals on the hosted session unless we are joined-to-self.
-        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
-            Log.i(TAG, "Chat(): dropped signal received on hosted session " 
-            		+ ctx.sessionId + " when not joined-to-self");
-    		return;
-    	}
-        
-        //TODO: what to filter exactly?
         
         receivedSensorUpdate(ctx.sender, ack_seq_num, pos_x, pos_y);
     }
@@ -1333,14 +1352,6 @@ public class Networking {
             Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
     		return;
     	}
-
-         // Drop signals on the hosted session unless we are joined-to-self.
-        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
-            Log.i(TAG, "Chat(): dropped signal received on hosted session " + ctx.sessionId + " when not joined-to-self");
-    		return;
-    	}
-        
-        //TODO: what to filter exactly?
         
         receivedAck(ctx.sender, ack_seq_num);
     }
@@ -1375,8 +1386,6 @@ public class Networking {
     		return;
     	}
         
-        //TODO: what to filter exactly?
-        
         receivedGameCommand(ctx.sender, data);
     }
     private void receivedGameCommand(String sender, byte[] game_data) {
@@ -1396,11 +1405,6 @@ public class Networking {
          // Always drop our own signals which may be echoed back from the system.
         if (ctx.sender.equals(uniqueName)) {
             Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
-    		return;
-    	}
-         // Drop signals on the hosted session unless we are joined-to-self.
-        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
-            Log.i(TAG, "Chat(): dropped signal received on hosted session " + ctx.sessionId + " when not joined-to-self");
     		return;
     	}
         
@@ -1438,6 +1442,9 @@ public class Networking {
     		return;
     	}
         
+        Log.i(TAG, "got info from server: unique name="+unique_name
+        		+", well-known name="+well_known_name);
+        
         handleClientJoined(unique_name, well_known_name);
     }   
     
@@ -1460,7 +1467,29 @@ public class Networking {
 		ADVERTISE_CANCEL_ERROR,
 		JOIN_SESSION_ERROR,
 		SEND_ERROR,
-		BUS_EXCEPTION
+		BUS_EXCEPTION,
+		RECEIVE_TIMEOUT
+	}
+	public static String getErrorMsgMultiline(AllJoynError error) {
+		switch(error) {
+		case ADVERTISE_CANCEL_ERROR: return "Failed to stop\n"+
+				"advertisement of \n"+
+				"server name";
+		case ADVERTISE_ERROR: return "Failed to start\n"+
+				"advertisement of \n"+
+				"server name";
+		case BUS_EXCEPTION: return "Networking bus exception.\n"+
+				"cannot send or receive data";
+		case CONNECT_ERROR: return "Network: failed to connect";
+		case JOIN_SESSION_ERROR: return "Networking session error";
+		case SEND_ERROR: return "Failed to send data\n"+
+				"over the network";
+		case START_DISCOVERY_ERROR: return "Network error happened\n"+
+				"when trying to look\n"+
+				"for other servers";
+		case RECEIVE_TIMEOUT: return "Network receive timeout";
+		}
+		return "Unknown network error";
 	}
 	public static class AllJoynErrorData {
 		public Module module;

@@ -39,13 +39,13 @@ public class MainMenu extends GameMenuBase {
 		m_menu_items.add(m_host_button = new MenuItemButton(
 				new Vector(pos.x+size.x/2.f, pos.y+size.y*3.f/5.f),
 				new Vector(button_width, button_height), 
-				font_settings, "Host", m_tex_manager));
+				font_settings, "New Game", m_tex_manager));
 		
 		m_menu_items.add(m_join_button = new MenuItemButton(
 				new Vector(pos.x+size.x/2.f,
 						pos.y+size.y*3.f/5.f-(button_height+distanceButtons)),
 				new Vector(button_width, button_height), 
-				font_settings, "Join", m_tex_manager));
+				font_settings, "Join Game", m_tex_manager));
 		
 		m_menu_items.add(m_help_button = new MenuItemButton(
 				new Vector(pos.x+size.x/2.f, 

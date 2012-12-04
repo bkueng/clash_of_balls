@@ -24,6 +24,8 @@ public class EventGameInfo extends Event {
 	private int m_player_count;
 	private PlayerInfo[] m_players;
 	private GameLevel m_level;
+	private short m_round_count;
+	private short m_current_round;
 
 	public EventGameInfo(DataInputStream s, int seq_num) throws IOException {
 		super(type_game_info, seq_num);
@@ -41,6 +43,9 @@ public class EventGameInfo extends Event {
 			if(s.read(buffer) < name_len) throw new IOException();
 			m_players[i].unique_name = new String(buffer);
 		}
+		//round info
+		m_round_count = s.readShort();
+		m_current_round = s.readShort();
 		//game level
 		m_level = new GameLevel(null);
 		m_level.loadLevel(s);
@@ -48,7 +53,7 @@ public class EventGameInfo extends Event {
 	public EventGameInfo(GameBase game, int seq_num) {
 		super(type_game_info, seq_num);
 		//players
-		m_player_count = game.playerCount();
+		m_player_count = game.currentPlayerCount();
 		m_players = new PlayerInfo[m_player_count];
 		int i=0;
 		for (Map.Entry<Short, DynamicGameObject> entry : game.m_game_objects.entrySet()) {
@@ -66,6 +71,9 @@ public class EventGameInfo extends Event {
 			}
 		}
 		assert(i == m_player_count);
+		//round info
+		m_round_count = (short)game.settings().game_rounds;
+		m_current_round = (short)game.settings().game_current_round;
 		//level
 		m_level = game.level();
 	}
@@ -84,6 +92,9 @@ public class EventGameInfo extends Event {
 			s.writeShort((short)unique_name.length);
 			s.write(unique_name);
 		}
+		//round info
+		s.writeShort(m_round_count);
+		s.writeShort(m_current_round);
 		//level
 		m_level.write(s);
 	}
@@ -91,5 +102,7 @@ public class EventGameInfo extends Event {
 	public void apply(GameBase game) {
 		game.initGame(m_level);
 		game.initPlayers(m_players);
+		game.settings().game_rounds = m_round_count;
+		game.settings().game_current_round = m_current_round;
 	}
 }

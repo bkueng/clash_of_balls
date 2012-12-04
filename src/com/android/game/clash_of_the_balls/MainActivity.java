@@ -33,7 +33,8 @@ public class MainActivity extends Activity {
         // making it full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
         LoadViewTask progress_view = new LoadViewTask();
         progress_view.execute();
@@ -72,7 +73,21 @@ public class MainActivity extends Activity {
     	super.onDestroy();
     	stopService(new Intent(this, NetworkService.class));
     	m_gl_view.onDestroy();
+    	dismissDialog();
     }
+    
+    @Override
+    public void onBackPressed() {
+    	if(m_gl_view != null && !m_gl_view.onBackPressed())
+    		super.onBackPressed();
+    }
+    
+	public void dismissDialog() {
+		//close the progress dialog
+    	ProgressDialog dialog = progressDialog;
+    	if(dialog != null) dialog.dismiss();
+    	progressDialog = null;
+	}
 
     
     public class LoadViewTask extends AsyncTask<Void, Integer, Void>
@@ -141,17 +156,16 @@ public class MainActivity extends Activity {
 		protected void onProgressUpdate(Integer... values) 
 		{
 			//set the current progress of the progress dialog
-			progressDialog.setProgress(values[0]);
+			if(progressDialog!=null) progressDialog.setProgress(values[0]);
 		}
 
 		//after executing the code in the thread
 		@Override
 		protected void onPostExecute(Void result) 
 		{
-			//close the progress dialog
-			progressDialog.dismiss();
-			progressDialog = null;
+			dismissDialog();
 		} 	
+		
     }
 
 }
@@ -175,6 +189,11 @@ class MyGLSurfaceView extends GLSurfaceView {
 
         
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+    }
+    
+    //returns true if back button is handled, false if system should handle it
+    public boolean onBackPressed() {
+    	return m_renderer.onBackPressed();
     }
     
     public void onDestroy() {

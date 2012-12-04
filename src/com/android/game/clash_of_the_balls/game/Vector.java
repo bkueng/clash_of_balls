@@ -53,6 +53,10 @@ public class Vector {
 		}
 	}
 
+	public float angle() {
+		return (float) Math.atan2(y, x);
+	}
+	
 	public void add(Vector vector) {
 		x += vector.x;
 		y += vector.y;

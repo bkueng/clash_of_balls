@@ -76,7 +76,9 @@ public abstract class GameMenuBase implements UIBase {
 	protected abstract void onTouchUp(MenuItem item);
 
 	public UIHandler.UIChange UIChange() {
-		return m_ui_change;
+		UIHandler.UIChange ret = m_ui_change;
+		m_ui_change = UIChange.NO_CHANGE;
+		return ret;
 	}
 	
 	public void onActivate() {
@@ -85,6 +87,11 @@ public abstract class GameMenuBase implements UIBase {
 
 	public void onDeactivate() {
 		m_ui_change = UIChange.NO_CHANGE;
+	}
+	
+	public void onBackButtonPressed() {
+		//default behaviour is go back to main menu
+		m_ui_change = UIChange.MAIN_MENU;
 	}
 
 }

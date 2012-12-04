@@ -4,6 +4,7 @@ package com.android.game.clash_of_the_balls.game;
 import java.util.Map;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.GameLevel;
@@ -11,10 +12,18 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
+import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
+import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
+import com.android.game.clash_of_the_balls.menu.PopupBase;
+import com.android.game.clash_of_the_balls.menu.PopupGameStart;
+import com.android.game.clash_of_the_balls.menu.PopupMsg;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
+import com.android.game.clash_of_the_balls.network.Networking;
+import com.android.game.clash_of_the_balls.network.Networking.AllJoynError;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
+import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
 
 
 public class Game extends GameBase implements UIBase {
@@ -23,31 +32,48 @@ public class Game extends GameBase implements UIBase {
 	private SensorThread m_sensor_thread;
 	private GameView m_view;
 	
+	private UIHandler.UIChange m_ui_change;
+	private PopupBase m_error_popup = null;
+	private Context m_activity_context;
+	private Font2DSettings m_font_settings;
+	
 	private NetworkClient m_network_client;
 	
 	private GamePlayer m_own_player;
 	
+	private float m_calibration_timeout=0.f; //[sec]
+	
 	
 	public Game(Context c, GameSettings s, TextureManager texture_manager, 
-			NetworkClient network_client) {
+			NetworkClient network_client, Font2DSettings font_settings) {
 		super(false, s, texture_manager);
 		
 		m_sensor_thread=new SensorThread(c);
+		m_activity_context = c;
+		m_font_settings = font_settings;
 		m_sensor_thread.startThread();
 		m_network_client = network_client;
+		m_ui_change = UIHandler.UIChange.NO_CHANGE;
 	}
 	
 	public void initGame(GameLevel level) {
 		super.initGame(level);
 		
+		//after this call (and initPlayers) we should have wait_to_start_game 
+		//seconds until the game starts
+		
 		//view: save & restore scaling if it exists
 		float scaling = -1.f;
-		if(m_view != null) scaling = m_view.getZoomToTileSize();
+		float old_width=0.f, old_height=0.f;
+		if(m_view != null) {
+			scaling = m_view.getZoomToTileSize();
+			old_width = m_view.levelWidth();
+			old_height = m_view.levelHeight();
+		}
 		m_view = new GameView(m_settings.m_screen_width, m_settings.m_screen_height, 
 				null, (float)level.width, (float)level.height);
-		if(scaling > 0.f) m_view.setZoomToTileSize(scaling);
-		
-		//TODO: start calibration
+		if(scaling > 0.f && old_width==m_view.levelWidth() && old_height==m_view.levelHeight())
+			m_view.setZoomToTileSize(scaling);
 		
 	}
 	
@@ -63,6 +89,13 @@ public class Game extends GameBase implements UIBase {
 					Log.d(TAG_GAME, "we got our player at x="+m_own_player.pos().x
 							+", y="+m_own_player.pos().y);
 				}
+				//set network client id
+				for(int k=0; k<m_network_client.getConnectedClientCount(); ++k) {
+					ConnectedClient client=m_network_client.getConnectedClient(k);
+					if(client!=null && client.unique_id.equals(players[i].unique_name)) {
+						client.id = players[i].id;
+					}
+				}
 			}
 		}
 		
@@ -71,6 +104,18 @@ public class Game extends GameBase implements UIBase {
 		}
 		
 		m_view.setObjectToTrack(m_own_player);
+		
+		//start calibration
+		m_calibration_timeout = (float)wait_to_start_game - 1.f;
+		
+		//show game start popup
+		if(m_error_popup == null) {
+			m_settings.popup_menu = new PopupGameStart(m_activity_context
+					, m_texture_manager, m_settings.m_screen_width, m_settings.m_screen_height
+					, (float)wait_to_start_game, m_own_player.color()
+					, m_font_settings.m_typeface);
+			m_ui_change = UIChange.POPUP_SHOW;
+		}
 	}
 	
 	public void onDestroy() {
@@ -83,40 +128,77 @@ public class Game extends GameBase implements UIBase {
 	}
 	
 	private boolean m_bReceived_events = false; //send new sensor data if true
+	private float m_time_since_last_data_receive=0.f; //[sec]
+	private static final float network_receive_timeout = 4.f; //[sec]
 
 	public void move(float dsec) {
-		if(m_bIs_game_running) {
+		if(m_error_popup != null) {
+			//check for button pressed
+			if(m_error_popup.UIChange() == UIChange.POPUP_RESULT_BUTTON1) {
+				gameAbort();
+				m_error_popup = null;
+			}
+		} else {
+			//calibration
+			if(m_calibration_timeout > 0.f) {
+				m_calibration_timeout -= dsec;
+				if(m_calibration_timeout <= 0.f) {
+					m_sensor_thread.calibrate();
+				}
+			}
 
-			//get sensor values & send to server
-			Vector sensor_vec = m_sensor_thread.getCurrentVector();
-			if(m_bReceived_events) 
-				m_network_client.sensorUpdate(sensor_vec);
-			//TODO: apply sensor values to own player
+			if(m_bIs_game_running) {
 
-			handleNetworkError(m_network_client.getNetworkError());
+				//get sensor values & send to server
+				Vector sensor_vec = m_sensor_thread.getCurrentVector();
+				if(m_bReceived_events) 
+					m_network_client.sensorUpdate(sensor_vec);
+				//TODO: apply sensor values to own player
 
-			m_network_client.handleReceive();
-			if(m_network_client.hasEvents()) {
-				//TODO: undo prediction...
+				handleNetworkError(m_network_client.getNetworkError());
+
+				m_network_client.handleReceive();
+				if(m_network_client.hasEvents()) {
+					//TODO: undo prediction...
+
+					generate_events = false;
+					//apply the updates from the server
+					applyIncomingEvents();
+					
+					removeDeadObjects();
+					
+					m_bReceived_events = true;
+					m_time_since_last_data_receive = 0.f;
+				} else {
+					
+					m_bReceived_events = false;
+				}
 				
-				//apply the updates from the server
-				applyIncomingEvents();
-				
-				m_bReceived_events = true;
-			} else {
+				generate_events = true;
 				//TODO: do predicted move
 				
-				m_bReceived_events = false;
+				super.move(dsec);
+				//do not apply moves for now...
+				
+				
+				m_game_field.move(dsec);
+
+
+				m_view.move(dsec);
+				m_game_field.move(dsec);
+				
+				//check for receive timeout
+				if((m_time_since_last_data_receive+=dsec) > network_receive_timeout) {
+					AllJoynErrorData error = new AllJoynErrorData();
+					error.error_string = "";
+					error.error = AllJoynError.RECEIVE_TIMEOUT;
+					handleNetworkError(error);
+				}
+
+			} else {
+				m_network_client.handleReceive();
+				applyIncomingEvents();
 			}
-			m_game_field.move(dsec);
-
-
-			m_view.move(dsec);
-			m_game_field.move(dsec);
-			
-		} else {
-			m_network_client.handleReceive();
-			applyIncomingEvents();
 		}
 	}
 	
@@ -129,8 +211,23 @@ public class Game extends GameBase implements UIBase {
 	
 	private void handleNetworkError(AllJoynErrorData data) {
 		if(data != null) {
-			//TODO
-
+			//this is bad: here it's very difficult to recover, so we 
+			//show a message to the user and abort the game
+			
+			switch(data.error) {
+			case CONNECT_ERROR:
+			case JOIN_SESSION_ERROR:
+			case SEND_ERROR:
+			case BUS_EXCEPTION:
+			case RECEIVE_TIMEOUT:
+				m_settings.popup_menu = m_error_popup = new PopupMsg(m_activity_context 
+						, m_texture_manager, m_settings.m_screen_width
+						, m_settings.m_screen_height 
+						, m_font_settings.m_typeface, m_font_settings.m_color
+						, "Error", Networking.getErrorMsgMultiline(data.error), "Ok");
+				m_ui_change = UIChange.POPUP_SHOW;
+			}
+			
 		}
 	}
 
@@ -151,12 +248,13 @@ public class Game extends GameBase implements UIBase {
 	public void gameStartNow() {
 		super.gameStartNow();
 		m_bReceived_events = true;
-		//TODO
+		m_time_since_last_data_receive = 0.f;
+		m_sensor_thread.stopCalibrate();
+		m_ui_change = UIChange.POPUP_HIDE;
 	}
 	public void gameEnd() {
 		super.gameEnd();
-		//TODO
-		
+		m_ui_change = UIHandler.UIChange.GAME_ROUND_END;
 	}
 	
 	public int getNextSequenceNum() {
@@ -164,9 +262,9 @@ public class Game extends GameBase implements UIBase {
 	}
 
 	public UIHandler.UIChange UIChange() {
-		// TODO Auto-generated method stub
-		
-		return UIHandler.UIChange.NO_CHANGE;
+		UIHandler.UIChange ret = m_ui_change;
+		m_ui_change = UIChange.NO_CHANGE;
+		return ret;
 	}
 
 	public void onActivate() {
@@ -174,10 +272,21 @@ public class Game extends GameBase implements UIBase {
 	}
 
 	public void onDeactivate() {
-		// ignore
+		gameEnd();
+		m_ui_change = UIHandler.UIChange.NO_CHANGE;
 	}
 	
 	public String getUniqueNameFromPlayerId(short player_id) {
 		throw new RuntimeException("getUniqueNameFromPlayerId should not be called inside Game object");
+	}
+	
+	private void gameAbort() {
+		m_bIs_game_running = false;
+		m_ui_change = UIChange.GAME_ABORT;
+	}
+	
+	public void onBackButtonPressed() {
+		//ok the user wants it this way: abort the game
+		gameAbort();
 	}
 }

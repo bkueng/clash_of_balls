@@ -19,7 +19,7 @@ public class VertexBufferFloat {
 	
 	public static final float[] sprite_color_data_white = new float[] 
 			{
-			1.0f, 1.0f, 1.0f, 1.0f,
+			1.0f, 1.0f, 1.0f, 1.0f, //RGBA (!)
 			1.0f, 1.0f, 1.0f, 1.0f,
 			1.0f, 1.0f, 1.0f, 1.0f,
 			1.0f, 1.0f, 1.0f, 1.0f

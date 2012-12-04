@@ -48,7 +48,7 @@ public abstract class Event {
 			}
 			switch(b) {
 			case type_game_start: return new EventGameStartNow(seq_num);
-			case type_game_end: return new EventGameEnd(seq_num);
+			case type_game_end: return new EventGameEnd(s, seq_num);
 			case type_game_info: return new EventGameInfo(s, seq_num);
 			case type_item_removed: return new EventItemRemoved(s, seq_num);
 			case type_item_added: return new EventItemAdded(s, seq_num);
