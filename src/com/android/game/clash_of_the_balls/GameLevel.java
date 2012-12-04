@@ -70,8 +70,14 @@ public class GameLevel {
 	public static final int TYPE_HOLE_CORNER_DOWN_LEFT = 13;
 	public static final int TYPE_HOLE_CORNER_UP_LEFT = 14;
 	
+	public static final int TYPE_HOLE_HEAD_UP = 15;
+	public static final int TYPE_HOLE_HEAD_DOWN = 16;
+	public static final int TYPE_HOLE_HEAD_LEFT = 17;
+	public static final int TYPE_HOLE_HEAD_RIGHT = 18;
+	
+	
 	//TODO: add more: hole, obstacles, ...
-	public static final int TYPE_FG_MAX = 14; // max field int value foreground
+	public static final int TYPE_FG_MAX = 18; // max field int value foreground
 	
 	public static int rawResTexIdFromForeground(int fg_field) {
 		switch(fg_field) {
@@ -93,6 +99,11 @@ public class GameLevel {
 		case TYPE_HOLE_CORNER_DOWN_RIGHT:;
 		case TYPE_HOLE_CORNER_UP_LEFT:;
 		case TYPE_HOLE_CORNER_UP_RIGHT:return R.raw.texture_hole_corner;
+		
+		case TYPE_HOLE_HEAD_LEFT:;
+		case TYPE_HOLE_HEAD_RIGHT:;
+		case TYPE_HOLE_HEAD_UP:;
+		case TYPE_HOLE_HEAD_DOWN:return R.raw.texture_hole_head;
 		
 		
 		}

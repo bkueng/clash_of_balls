@@ -110,6 +110,18 @@ public class GameField extends GameObject {
 					case GameLevel.TYPE_HOLE_CORNER_DOWN_LEFT:
 						obj=new GameHole(pos,Type.Hole_Corner_down_left,m_texture_manager.get(raw_res_id));
 						break;
+					case GameLevel.TYPE_HOLE_HEAD_DOWN:
+						obj=new GameHole(pos,Type.Hole_Head_Down,m_texture_manager.get(raw_res_id));
+						break;
+					case GameLevel.TYPE_HOLE_HEAD_UP:
+						obj=new GameHole(pos,Type.Hole_Head_Up,m_texture_manager.get(raw_res_id));
+						break;
+					case GameLevel.TYPE_HOLE_HEAD_LEFT:
+						obj=new GameHole(pos,Type.Hole_Head_Left,m_texture_manager.get(raw_res_id));
+						break;
+					case GameLevel.TYPE_HOLE_HEAD_RIGHT:
+						obj=new GameHole(pos,Type.Hole_Head_Right,m_texture_manager.get(raw_res_id));
+						break;
 					} 
 					m_fg_objects[y*m_width+x] = obj;
 				}
