@@ -14,6 +14,7 @@ import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
 import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
 import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
+import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 
 public class WaitMenu extends GameMenuInGame {
@@ -25,22 +26,29 @@ public class WaitMenu extends GameMenuInGame {
 	private MenuItemButton m_start_button;
 	private MenuItemButton m_cancel_button;
 	
+	private MenuItemStringMultiline m_client_label;
 	private MenuItemList m_client_list;
 	private float m_item_height;
+	
+	private int m_max_player_count;
 
 
 	public WaitMenu(MenuBackground background,
 			float screen_width, float screen_height
 			, TextureManager tex_manager, GameSettings settings
 			, Context context, Font2D.Font2DSettings font_settings
-			, Networking networking
-			, NetworkClient network_client) {
+			, int label_font_color
+			, Networking networking, NetworkClient network_client) {
 		
 		super(background, context, settings, networking
 				, network_client, tex_manager, font_settings);
 
 		Vector pos = new Vector(0.f, 0.f);
 		Vector size = new Vector(screen_width, screen_height);
+		
+		Font2D.Font2DSettings label_font_settings 
+			= new Font2D.Font2DSettings(font_settings.m_typeface,
+				TextAlign.LEFT, label_font_color);
 
 		if (m_background != null)
 			m_background.getViewport(screen_width, screen_height, pos, size);
@@ -48,6 +56,7 @@ public class WaitMenu extends GameMenuInGame {
 		// add menu items
 		float button_width = size.x * 0.35f;
 		float button_height=0.25f*button_width;
+		float label_height = 0.75f*button_height;
 
 		float offset_y = size.y * 0.025f;
 		float offset_x = offset_y;
@@ -56,9 +65,15 @@ public class WaitMenu extends GameMenuInGame {
 		m_item_height = button_height * 0.8f;
 		m_list_item_font_settings = new Font2DSettings(font_settings.m_typeface
 				, font_settings.m_align, font_settings.m_color);
+		m_menu_items.add(m_client_label = new MenuItemStringMultiline(
+				new Vector(pos.x + offset_x
+						, pos.y + size.y - label_height),
+				new Vector(size.x, label_height),
+				label_font_settings, "", m_tex_manager));
 		m_menu_items.add(m_client_list = new MenuItemList(
 				new Vector(pos.x + offset_x, pos.y + offset_y), 
-				new Vector(size.x - offset_x*3.f - button_width, size.y - 2.f*offset_y), 
+				new Vector(size.x - offset_x*3.f - button_width, size.y 
+						- offset_y - label_height), 
 				new Vector(m_item_height*1.5f, m_item_height), 
 				tex_manager));
 		
@@ -81,6 +96,7 @@ public class WaitMenu extends GameMenuInGame {
 		super.move(dsec);
 		
 		if(m_error_popup == null) {
+			int old_list_size = m_client_list.itemCount();
 			//update the connected clients
 			boolean is_self_connected=false; //is our own name on the list?
 			//remove old ones
@@ -117,11 +133,24 @@ public class WaitMenu extends GameMenuInGame {
 							is_self_connected = true;
 				}
 			}
+			if(old_list_size != m_client_list.itemCount())
+				updateLabel();
 			
 			m_start_button.enable(m_settings.is_host
 					&& (m_client_list.itemCount() > 1 || GameSettings.debug)
 					&& is_self_connected);
 			
+		}
+	}
+	
+	private void updateLabel() {
+		if(m_settings.is_host && m_max_player_count > 0) {
+			m_client_label.setString(" Connected Players: "
+					+m_client_list.itemCount() + " of max "
+					+m_max_player_count);
+		} else {
+			m_client_label.setString(" Connected Players: "
+					+m_client_list.itemCount());
 		}
 	}
 	
@@ -174,6 +203,10 @@ public class WaitMenu extends GameMenuInGame {
 	public void onActivate() {
 		super.onActivate();
 		m_start_button.enable(m_settings.is_host);
+		if(m_settings.selected_level!=null) 
+			m_max_player_count = m_settings.selected_level.player_count;
+		else m_max_player_count = 0;
+		updateLabel();
 	}
 	public void onDeactivate() {
 		super.onDeactivate();

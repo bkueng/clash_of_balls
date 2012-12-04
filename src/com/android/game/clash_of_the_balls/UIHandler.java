@@ -142,6 +142,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		m_wait_menu_ui = new WaitMenu(m_normal_menu_background
 				, screen_width, screen_height,m_tex_manager
 				, m_settings,m_activity_context, m_font_settings
+				, label_font_color
 				, Networking.getInstance(), m_network_client);
 		
 		progress_view.setProgress(50);
