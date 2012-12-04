@@ -1,5 +1,7 @@
 package com.android.game.clash_of_the_balls.game;
 
+import android.util.Log;
+
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
@@ -58,7 +60,9 @@ public class GameField extends GameObject {
 		
 		//foreground
 		short object_id=next_object_id;
+		
 		m_fg_objects = new StaticGameObject[m_width*m_height];
+		if(m_texture_manager != null) {
 		for(int y=0; y<m_height; ++y) {
 			for(int x=0; x<m_width; ++x) {
 				int type = level.foreground(x, y);
@@ -66,15 +70,24 @@ public class GameField extends GameObject {
 				if(raw_res_id != -1) {
 					Vector pos = new Vector((float)x+0.5f, (float)y+0.5f);
 					StaticGameObject obj=null;
-					/* TODO
 					switch(type) {
-					case GameLevel.TYPE_HOLE: 
-						obj=new GameHole(object_id++, pos, texture_manager.get(raw_res_id));
+					case GameLevel.TYPE_BOARDER_DOWN: 
+						obj=new GameBoarder(pos,Type.Boarder_down,m_texture_manager.get(raw_res_id));
 						break;
-					} */
+					case GameLevel.TYPE_BOARDER_UP: 
+						obj=new GameBoarder(pos,Type.Boarder_up,m_texture_manager.get(raw_res_id));
+						break;
+					case GameLevel.TYPE_BOARDER_LEFT: 
+						obj=new GameBoarder(pos,Type.Boarder_left,m_texture_manager.get(raw_res_id));
+						break;
+					case GameLevel.TYPE_BOARDER_RIGHT:
+						obj=new GameBoarder(pos,Type.Boarder_right,m_texture_manager.get(raw_res_id));
+						break;
+					} 
 					m_fg_objects[y*m_width+x] = obj;
 				}
 			}
+		}
 		}
 		return object_id;
 	}

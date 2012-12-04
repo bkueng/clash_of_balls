@@ -53,12 +53,21 @@ public class GameLevel {
 	//when objects are added change GameField to load correct object
 	public static final int TYPE_EMPTY = 0;
 	public static final int TYPE_PLAYER = 1;
+	//Boarder of field
+	public static final int TYPE_BOARDER_LEFT = 2;
+	public static final int TYPE_BOARDER_RIGHT = 3;
+	public static final int TYPE_BOARDER_UP = 4;
+	public static final int TYPE_BOARDER_DOWN = 5;
 	//TODO: add more: hole, obstacles, ...
-	public static final int TYPE_FG_MAX = 1; // max field int value foreground
+	public static final int TYPE_FG_MAX = 5; // max field int value foreground
 	
 	public static int rawResTexIdFromForeground(int fg_field) {
 		switch(fg_field) {
 		case TYPE_PLAYER: return -1;
+		case TYPE_BOARDER_LEFT:;
+		case TYPE_BOARDER_RIGHT:;
+		case TYPE_BOARDER_DOWN:;
+		case TYPE_BOARDER_UP: return R.raw.texture_border;
 		}
 		return -1;
 	}

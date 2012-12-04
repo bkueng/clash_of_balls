@@ -18,6 +18,10 @@ public class StaticGameObject extends GameObject {
 	public enum Type {
 		Background,
 		Hole,
+		Boarder_left,
+		Boarder_up,
+		Boarder_right,
+		Boarder_down,
 		Wall,
 		Player,
 		Item
