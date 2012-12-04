@@ -131,6 +131,19 @@ public class GameField extends GameObject {
 					case GameLevel.TYPE_WALL_VERT:
 						obj=new GameWall(pos,Type.Wall_vertical,m_texture_manager.get(raw_res_id));
 						break;
+					case GameLevel.TYPE_WALL_CORNER_UP_RIGHT:
+						obj=new GameWall(pos,Type.Wall_Corner_up_right,m_texture_manager.get(raw_res_id));
+						break;
+					case GameLevel.TYPE_WALL_CORNER_UP_LEFT:
+						obj=new GameWall(pos,Type.Wall_Corner_up_left,m_texture_manager.get(raw_res_id));
+						break;
+					case GameLevel.TYPE_WALL_CORNER_DOWN_RIGHT:
+						obj=new GameWall(pos,Type.Wall_Corner_down_right,m_texture_manager.get(raw_res_id));
+						break;
+					case GameLevel.TYPE_WALL_CORNER_DOWN_LEFT:
+						obj=new GameWall(pos,Type.Wall_Corner_down_left,m_texture_manager.get(raw_res_id));
+						break;
+						
 					} 
 					m_fg_objects[y*m_width+x] = obj;
 				}

@@ -27,6 +27,17 @@ public class GameWall extends StaticGameObject {
 		} else if (type ==Type.Wall_horizontal) {
 			setRotation(angle);
 			rects = new Rectangle[]{r2,r3,r4};
+		} else if (type ==Type.Wall_Corner_up_right) {
+			rects = new Rectangle[]{r1,r3,r4};
+		} else if (type ==Type.Wall_Corner_up_left) {
+			setRotation(angle);
+			rects = new Rectangle[]{r1,r3,r2};
+		} else if (type ==Type.Wall_Corner_down_left) {
+			setRotation(2*angle);
+			rects = new Rectangle[]{r2,r3,r5};
+		} else if (type ==Type.Wall_Corner_down_right) {
+			setRotation(3*angle);
+			rects = new Rectangle[]{r5,r3,r4};
 		}
 		
 		m_wall_items= rects;
