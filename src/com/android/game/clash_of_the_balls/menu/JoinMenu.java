@@ -9,6 +9,7 @@ import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
 import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
+import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 
 public class JoinMenu extends GameMenuBase {
@@ -17,8 +18,11 @@ public class JoinMenu extends GameMenuBase {
 	
 	private MenuItemButton m_join_button;
 	private MenuItemButton m_cancel_button;
-	private MenuItemKeyboard m_name_button;
 	
+	private MenuItemKeyboard m_name_button;
+	private MenuItemStringMultiline m_name_label;
+	
+	private MenuItemStringMultiline m_game_label;
 	private MenuItemList m_game_list;
 	private float m_item_height;
 	
@@ -41,6 +45,10 @@ public class JoinMenu extends GameMenuBase {
 		Vector pos=new Vector(0.f, 0.f);
 		Vector size=new Vector(screen_width, screen_height);
 		
+		Font2D.Font2DSettings label_font_settings 
+			= new Font2D.Font2DSettings(font_settings.m_typeface,
+				TextAlign.LEFT, font_settings.m_color);
+		
 		m_tex_manager = tex_manager;
 		m_network_client = network_client;
 		m_settings = settings;
@@ -51,6 +59,7 @@ public class JoinMenu extends GameMenuBase {
 		//add menu items
 		float button_width = size.x * 0.35f;
 		float button_height=0.25f*button_width;
+		float label_height = 0.75f*button_height;
 		
 		float offset_y = size.y*0.025f;
 		float offset_x = offset_y;
@@ -61,14 +70,25 @@ public class JoinMenu extends GameMenuBase {
 				, font_settings.m_align, font_settings.m_color);
 		m_menu_items.add(m_game_list = new MenuItemList(
 				new Vector(pos.x + offset_x, pos.y + offset_y), 
-				new Vector(size.x - offset_x*3.f - button_width, size.y - 2.f*offset_y), 
+				new Vector(size.x - offset_x*3.f - button_width
+						, size.y - offset_y - label_height), 
 				new Vector(m_item_height*1.5f, m_item_height), 
 				tex_manager));
+		m_menu_items.add(m_game_label = new MenuItemStringMultiline(
+				new Vector(m_game_list.pos().x
+						, m_game_list.pos().y + m_game_list.size().y),
+				new Vector(m_game_list.size().x, label_height),
+				label_font_settings, " Choose a Game:", m_tex_manager));
 		
 		// Name
+		m_menu_items.add(m_name_label = new MenuItemStringMultiline(
+				new Vector(pos.x+size.x - offset_x - button_width
+						, pos.y + size.y - label_height),
+				new Vector(button_width, label_height),
+				label_font_settings, " Your Name:", m_tex_manager));
 		m_menu_items.add(m_name_button = new MenuItemKeyboard(
 				new Vector(pos.x+size.x - offset_x - button_width
-						, pos.y + size.y * 3.f / 4.f + offset_y),
+						, pos.y + size.y - button_height - label_height),
 				new Vector(button_width, button_height),
 				font_settings, m_tex_manager, m_activity_context,
 				"Please Enter your Nickname:"));
