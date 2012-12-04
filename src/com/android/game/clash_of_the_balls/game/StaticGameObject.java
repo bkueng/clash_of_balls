@@ -26,6 +26,11 @@ public class StaticGameObject extends GameObject {
 		Corner_up_left,
 		Corner_down_right,
 		Corner_down_left,
+		Hole_Full,
+		Hole_Corner_up_right,
+		Hole_Corner_up_left,
+		Hole_Corner_down_right,
+		Hole_Corner_down_left,
 		Wall,
 		Player,
 		Item
@@ -40,7 +45,7 @@ public class StaticGameObject extends GameObject {
 	
 	protected float m_rotation_angle=0.f; //in rad, texture rotation
 	
-	public void setRotation(float angle_rad) {
+	public void setRotation(float angle_rad) {//CCW
 		m_rotation_angle = angle_rad;
 	}
 	
