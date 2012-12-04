@@ -8,11 +8,28 @@ public class GameWall extends StaticGameObject {
 							//the position of these is relative to the object position
 							// so within [-0.5, 0.5]
 							//use m_position + m_wall_items[i].pos to get game position
-	
-	
-	public GameWall(final short id, Vector position
-			, Texture texture, Rectangle[] wall_items) {
-		super(id, position, Type.Wall, texture);
-		m_wall_items = wall_items;
+
+	public GameWall(Vector pos, Type type, Texture texture) {
+		super((short)-1, pos, type, texture);		
+		float angle = (float) Math.PI / 2;
+
+		Rectangle r1 = new Rectangle(-0.11f,0.23f,0.22f,0.22f);
+		Rectangle r2 = new Rectangle(-0.45f,-0.11f,0.22f,0.22f);
+		Rectangle r3 = new Rectangle(-0.11f,-0.11f,0.22f,0.22f);
+		Rectangle r4 = new Rectangle(0.22f,-0.11f,0.22f,0.22f);
+		Rectangle r5 = new Rectangle(-0.11f,-0.44f,0.22f,0.22f);
+		
+		Rectangle[] rects = null;
+		
+		if (type == Type.Wall_vertical) {
+			// DO Nothing
+			rects = new Rectangle[]{r1,r3,r5};
+		} else if (type ==Type.Wall_horizontal) {
+			setRotation(angle);
+			rects = new Rectangle[]{r2,r3,r4};
+		}
+		
+		m_wall_items= rects;
+		
 	}
 }

@@ -26,7 +26,7 @@ public class StaticGameObject extends GameObject {
 		Corner_up_left,
 		Corner_down_right,
 		Corner_down_left,
-		Hole_Full,
+		Hole_Full, //Completely empty
 		Hole_Corner_up_right,
 		Hole_Corner_up_left,
 		Hole_Corner_down_right,
@@ -35,7 +35,8 @@ public class StaticGameObject extends GameObject {
 		Hole_Head_Up,
 		Hole_Head_Left,
 		Hole_Head_Right,
-		Wall,
+		Wall_horizontal,
+		Wall_vertical,
 		Player,
 		Item
 	}

@@ -190,7 +190,7 @@ public abstract class GameBase {
 								
 								switch(field_obj.type) {
 								case Hole:
-									
+									//TODO All other types of holes should be also implemented...
 									if ( eucDist(obj.newPosition(), field_obj.pos()) < ((GamePlayer) obj).m_radius ) {
 										// player falls down hole and dies
 										((GamePlayer) obj).die();
@@ -198,17 +198,18 @@ public abstract class GameBase {
 									
 									break;
 									
-								case Wall:
-									
+								case Wall_horizontal:
 									//!!! TODO: Adjust minimum distance, regarding the size of the obstacle!!!
-
-									
+									break;
+								case Wall_vertical:
+									//!!! TODO: Adjust minimum distance, regarding the size of the obstacle!!!
 									break;
 								default: throw new RuntimeException("collision detection for type "+
 										field_obj.type+" not implemented!");
 								}
 								
 								break;
+								
 							case Item:
 								
 								//an item does not move (or does it??)
