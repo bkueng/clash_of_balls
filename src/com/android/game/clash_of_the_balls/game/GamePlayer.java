@@ -26,8 +26,13 @@ public class GamePlayer extends DynamicGameObject {
 	public int color() { return m_color; }
 	
 	private Vector m_acceleration = new Vector();
+	private float m_sensor_scaling = 3.f; //influences the acceleration
 	public Vector acceleration() { return m_acceleration; }
 	
+	public void applySensorVector(Vector v) {
+		m_acceleration.set(v);
+		m_acceleration.mul(m_sensor_scaling);
+	}
 	
 	protected Texture m_overlay_texture;
 
@@ -154,7 +159,8 @@ public class GamePlayer extends DynamicGameObject {
 		float model_mat[] = renderer.modelMat();
 		Matrix.translateM(model_mat, model_mat_pos, 
 				m_position.x, m_position.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_scaling, m_scaling, 0.f);
+		Matrix.scaleM(model_mat, model_mat_pos, m_scaling*m_radius*2.f
+				, m_scaling*m_radius*2.f, 0.f);
 		Matrix.translateM(model_mat, model_mat_pos, 
 				-0.5f, -0.5f, 0.f);
 	}

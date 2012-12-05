@@ -235,7 +235,7 @@ public class GameServer extends GameBase implements Runnable {
 				if(obj != null && obj.type == Type.Player) {
 					if(!obj.isDead()) {
 						GamePlayer p = (GamePlayer)obj;
-						p.acceleration().set(m_sensor_vector);
+						p.applySensorVector(m_sensor_vector);
 					}
 					++m_sensor_update_count;
 				}
