@@ -124,7 +124,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 				m_tex_manager.get(R.raw.texture_main_menu_bg),1600.f/960.f);
 		m_main_menu = new MainMenu(m_main_menu_background
 				, screen_width, screen_height,m_tex_manager,m_activity_context
-				, m_font_settings);
+				, m_font_settings, m_settings);
 		
 		progress_view.setProgress(30);
 		
