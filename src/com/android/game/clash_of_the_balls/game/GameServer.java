@@ -241,7 +241,7 @@ public class GameServer extends GameBase implements Runnable {
 				}
 			}
 
-			if(m_sensor_update_count >= currentPlayerCount() || force_move) {
+			if(m_sensor_update_count >= initialPlayerCount() || force_move) {
 				m_sensor_update_count = 0;
 				moveGame();
 			}
