@@ -59,6 +59,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private UIBase m_wait_menu_ui;
 	private UIBase m_join_menu_ui;
 	private UIBase m_results_menu_ui;
+	private UIBase m_help_menu_ui;
 	private Game m_game_ui;
 	
 	private MenuBackground m_main_menu_background;
@@ -76,6 +77,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		CREATION_MENU,
 		WAIT_MENU,
 		JOIN_MENU,
+		HELP_MENU,
 		
 		GAME_START_CLIENT,
 		GAME_ROUND_END,
@@ -163,6 +165,13 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		progress_view.setProgress(70);
 		
+		//Help Menu
+		m_help_menu_ui = new HelpMenu(m_normal_menu_background
+				, screen_width, screen_height,m_tex_manager
+				, m_activity_context, m_font_settings, label_font_color
+				, m_settings, m_network_client);
+		
+		
 		//Game
 		m_game_ui = new Game(m_activity_context, m_settings, m_tex_manager
 				, m_network_client, m_font_settings);
@@ -218,6 +227,8 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 			case WAIT_MENU: uiChange(m_active_ui,m_wait_menu_ui);
 			break;
 			case JOIN_MENU: uiChange(m_active_ui,m_join_menu_ui);
+			break;
+			case HELP_MENU: uiChange(m_active_ui,m_help_menu_ui);
 			break;
 			case MAIN_MENU: uiChange(m_active_ui, m_main_menu);
 			break;

@@ -81,7 +81,7 @@ public class MainMenu extends GameMenuBase {
 		} else if (item == m_join_button) {
 			m_ui_change = UIChange.JOIN_MENU;
 		} else if (item == m_help_button) {
-
+			m_ui_change = UIChange.HELP_MENU;
 		} else if (item == m_credits_button) {
 			m_settings.popup_menu = m_credits;
 			m_ui_change = UIChange.POPUP_SHOW;
