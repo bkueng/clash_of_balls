@@ -96,8 +96,8 @@ public abstract class GameBase {
 			Texture texture=null;
 			Texture texture_overlay=null;
 			if(m_texture_manager != null) {
-				texture = m_texture_manager.get(R.raw.texture_grey_unpressed_button);
-				texture_overlay = m_texture_manager.get(R.raw.texture_grey_pressed_button);
+				texture = m_texture_manager.get(R.raw.texture_ball_base);
+				texture_overlay = m_texture_manager.get(R.raw.texture_ball_up);
 			}
 			GamePlayer p = new GamePlayer(players[i], this, texture, texture_overlay);
 			m_game_objects.put(players[i].id, p);

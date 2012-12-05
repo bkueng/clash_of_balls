@@ -47,8 +47,8 @@ public class PopupGameStart extends PopupBase {
 		final int font_color = 0xff888888;
 		
 		//player preview
-		Texture texture = tex_manager.get(R.raw.texture_grey_unpressed_button);
-		Texture texture_overlay = tex_manager.get(R.raw.texture_grey_pressed_button);
+		Texture texture = tex_manager.get(R.raw.texture_ball_base);
+		Texture texture_overlay = tex_manager.get(R.raw.texture_ball_up);
 		m_player = new GamePlayer(null, (short)0
 				, new Vector(), player_color, texture, texture_overlay);
 		m_player_size = new Vector(m_size.x * 0.3f, m_size.x * 0.3f);
