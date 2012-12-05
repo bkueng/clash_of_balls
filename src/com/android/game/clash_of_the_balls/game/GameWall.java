@@ -9,8 +9,8 @@ public class GameWall extends StaticGameObject {
 							// so within [-0.5, 0.5]
 							//use m_position + m_wall_items[i].pos to get game position
 
-	public GameWall(Vector pos, Type type, Texture texture) {
-		super((short)-1, pos, type, texture);		
+	public GameWall(short id, Vector pos, Type type, Texture texture) {
+		super(id, pos, type, texture);		
 		float angle = (float) Math.PI / 2;
 
 		Rectangle r1 = new Rectangle(-0.11f,0.23f,0.22f,0.22f);

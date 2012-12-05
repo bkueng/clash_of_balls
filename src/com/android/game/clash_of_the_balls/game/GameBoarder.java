@@ -4,8 +4,8 @@ import com.android.game.clash_of_the_balls.Texture;
 
 public class GameBoarder extends StaticGameObject {
 
-	public GameBoarder(Vector pos,Type type, Texture texture) {
-		super((short)-1,pos,type, texture);
+	public GameBoarder(short id, Vector pos,Type type, Texture texture) {
+		super(id,pos,type, texture);
 		
 		float angle = (float)Math.PI/2;
 		

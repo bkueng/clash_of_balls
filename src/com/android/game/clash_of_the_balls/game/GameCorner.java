@@ -4,8 +4,8 @@ import com.android.game.clash_of_the_balls.Texture;
 
 public class GameCorner extends StaticGameObject {
 
-	GameCorner(Vector position, Type type, Texture texture) {
-		super((short)-1, position, type, texture);
+	GameCorner(short id, Vector position, Type type, Texture texture) {
+		super(id, position, type, texture);
 		
 		float angle = (float)Math.PI/2;
 		

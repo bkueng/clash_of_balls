@@ -4,8 +4,8 @@ import com.android.game.clash_of_the_balls.Texture;
 
 public class GameHole extends StaticGameObject {
 
-	GameHole(Vector position, Type type, Texture texture) {
-		super((short) -1, position, type, texture);
+	GameHole(short id, Vector position, Type type, Texture texture) {
+		super(id, position, type, texture);
 		float angle = (float) Math.PI / 2;
 
 		if (type == Type.Hole_Corner_up_right || type == Type.Hole_Head_Up) {
