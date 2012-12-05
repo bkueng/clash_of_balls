@@ -101,6 +101,8 @@ public class GameServer extends GameBase implements Runnable {
 		
 		Looper looper = m_looper;
 		if(looper != null) {
+			if(m_msg_handler!=null)
+				m_networking.unregisterEventListener(m_msg_handler);
 			looper.quit();
 			try {
 				//wait for thread to exit
