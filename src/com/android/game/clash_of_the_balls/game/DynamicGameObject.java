@@ -55,11 +55,23 @@ public class DynamicGameObject extends StaticGameObject {
 		m_position.set(new_pos);
 	}
 
+	//handle everything in here updated by the server. like position & speed
+	//all these operations must be undoable or overwritable by a server update!
+	//Note that dsec can be negative to move back in time!
 	@Override
 	public void move(float dsec) {
 		m_new_pos.set(m_position);
 		
 		//-> set m_has_moved & m_new_pos
+	}
+	
+	//every change that does not need to be updated by the server can be handled
+	//in here
+	//this can also be called by the server & is used to move less important
+	//stuff like animation or item timeout's
+	//do NOT generate Events in here
+	public void moveClient(float dsec) {
+		
 	}
 	
 	public void handleImpact(StaticGameObject other) {

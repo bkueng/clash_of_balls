@@ -295,10 +295,9 @@ public class GameServer extends GameBase implements Runnable {
 		float elapsed_time = (float)(time - m_last_time) / 1000.f;
 		m_last_time = time;
 		
-		//first go back 1/2 RTT & simulate forward?
-		
 		generate_events = true;
 		move(elapsed_time);
+		moveClient(elapsed_time);
 		doCollisionHandling();
 		applyMove();
 		handleGenerateItems(elapsed_time);
@@ -365,6 +364,7 @@ public class GameServer extends GameBase implements Runnable {
 		Looper.loop();
 		
 		m_networking.unregisterEventListener(m_msg_handler);
+		
 		m_msg_handler = null;
 		m_looper = null;
 		m_bIs_game_running = false;
