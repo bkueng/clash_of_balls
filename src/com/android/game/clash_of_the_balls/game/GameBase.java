@@ -16,6 +16,7 @@ import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
+import com.android.game.clash_of_the_balls.game.event.EventImpact;
 import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
 import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
@@ -53,7 +54,20 @@ public abstract class GameBase {
 	
 	protected Queue<Event> m_events = new LinkedList<Event>();
 	
-	public DynamicGameObject getGameObject(short id) {
+	public StaticGameObject getGameObject(short id) {
+		StaticGameObject obj = m_game_objects.get(id);
+		if(obj == null) {
+			//check field
+			for(int x=0; x<m_game_field.width() && obj==null; ++x) {
+				for(int y=0; y<m_game_field.height() && obj==null; ++y) {
+					StaticGameObject field_obj=m_game_field.foreground(x, y);
+					if(field_obj!=null && field_obj.m_id == id) obj=field_obj;
+				}
+			}
+		}
+		return obj;
+	}
+	public DynamicGameObject getMoveableGameObject(short id) {
 		return m_game_objects.get(id); //can return null!
 	}
 	
@@ -319,6 +333,16 @@ public abstract class GameBase {
 					}
 				}
 			}
+		}
+	}
+	
+	private void handleImpact(StaticGameObject obja, Vector pos_a
+			, StaticGameObject objb, Vector pos_b) {
+		obja.handleImpact(objb);
+		objb.handleImpact(obja);
+		if(generate_events) {
+			addEvent(new EventImpact(getNextSequenceNum(), obja.m_id
+					, pos_a, objb.m_id, pos_b));
 		}
 	}
 	

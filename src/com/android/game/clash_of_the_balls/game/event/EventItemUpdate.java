@@ -47,7 +47,7 @@ public class EventItemUpdate extends Event {
 	}
 
 	public void apply(GameBase game) {
-		DynamicGameObject obj = game.getGameObject(m_id);
+		DynamicGameObject obj = game.getMoveableGameObject(m_id);
 		if(obj!=null) {
 			obj.pos().set(m_pos_x, m_pos_y);
 			obj.speed().set(m_speed_x, m_speed_y);

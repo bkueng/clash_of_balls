@@ -31,7 +31,7 @@ public class EventItemRemoved extends Event {
 	}
 
 	public void apply(GameBase game) {
-		DynamicGameObject obj = game.getGameObject(m_id);
+		DynamicGameObject obj = game.getMoveableGameObject(m_id);
 		if(obj!=null) {
 			obj.die();
 		} else {

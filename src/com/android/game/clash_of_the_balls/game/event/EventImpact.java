@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import android.util.Log;
 
-import com.android.game.clash_of_the_balls.game.DynamicGameObject;
 import com.android.game.clash_of_the_balls.game.GameBase;
+import com.android.game.clash_of_the_balls.game.StaticGameObject;
 import com.android.game.clash_of_the_balls.game.Vector;
 
 public class EventImpact extends Event {
@@ -42,6 +42,7 @@ public class EventImpact extends Event {
 		m_id_b = id_b;
 		m_b_x = pos_b.x;
 		m_b_y = pos_b.y;
+		
 	}
 
 	public void write(DataOutputStream s) throws IOException {
@@ -59,8 +60,8 @@ public class EventImpact extends Event {
 
 	public void apply(GameBase game) {
 		//we don't need to apply the position
-		DynamicGameObject obj_a = game.getGameObject(m_id_a);
-		DynamicGameObject obj_b = game.getGameObject(m_id_b);
+		StaticGameObject obj_a = game.getGameObject(m_id_a);
+		StaticGameObject obj_b = game.getGameObject(m_id_b);
 		if(obj_a!=null && obj_b!=null) {
 			obj_a.handleImpact(obj_b);
 			obj_b.handleImpact(obj_a);

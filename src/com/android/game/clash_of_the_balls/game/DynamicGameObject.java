@@ -55,7 +55,7 @@ public class DynamicGameObject extends StaticGameObject {
 		//-> set m_has_moved & m_new_pos
 	}
 	
-	public void handleImpact(DynamicGameObject other) {
+	public void handleImpact(StaticGameObject other) {
 		++m_impact_count;
 	}
 	public int impactCount() { return m_impact_count; }

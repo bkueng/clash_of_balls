@@ -56,6 +56,10 @@ public class StaticGameObject extends GameObject {
 		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
 	}
+	
+	public void handleImpact(StaticGameObject other) {
+		//do nothing
+	}
 
 	public void draw(RenderHelper renderer) {
 		

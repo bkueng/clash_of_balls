@@ -233,7 +233,7 @@ public class GameServer extends GameBase implements Runnable {
 		
 			short id;
 			while((id=m_network_server.getSensorUpdate(m_sensor_vector)) != -1) {
-				DynamicGameObject obj = getGameObject(id);
+				DynamicGameObject obj = getMoveableGameObject(id);
 				if(obj != null && obj.type == Type.Player) {
 					if(!obj.isDead()) {
 						GamePlayer p = (GamePlayer)obj;
