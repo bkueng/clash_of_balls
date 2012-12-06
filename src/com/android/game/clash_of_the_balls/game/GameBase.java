@@ -85,7 +85,7 @@ public abstract class GameBase {
 	
 	public void initGame(GameLevel level) {
 		if(m_bIs_game_running)
-			throw new RuntimeException("initGame called while game is running! this must NOT happend");
+			Log.e(TAG, "initGame called while game is running! this must NOT happend");
 		
 		m_game_objects = new TreeMap<Short, DynamicGameObject>();
 		m_game_field = new GameField(m_texture_manager);

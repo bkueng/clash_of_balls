@@ -287,11 +287,11 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 	private void handleGameAbort() {
 		Log.i(LOG_TAG, "Game abort call");
 		
+		m_game_server.stopThread();
+		
 		Networking networking = Networking.getInstance();
 		if(m_settings.is_host) networking.stopAdvertise();
 		networking.leaveSession();
-		
-		m_game_server.stopThread();
 		networking.resetErrors();
 		
 		uiChange(m_active_ui, m_main_menu);

@@ -103,10 +103,11 @@ public class GameServer extends GameBase implements Runnable {
 		if(looper != null) {
 			if(m_msg_handler!=null)
 				m_networking.unregisterEventListener(m_msg_handler);
+			m_looper = null;
 			looper.quit();
 			try {
 				//wait for thread to exit
-				looper.getThread().join(800);
+				looper.getThread().join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -265,11 +266,13 @@ public class GameServer extends GameBase implements Runnable {
 		addEvent(new EventGameInfo(this, getNextSequenceNum()));
 		sendAllEvents();
 		
-		//wait for start ...
-		try {
-			Thread.sleep(wait_to_start_game * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		//wait for start: wait_to_start_game seconds
+		for(int i=0; i< 2*wait_to_start_game && m_looper!=null; ++i) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		//ok let's do it...
@@ -341,7 +344,9 @@ public class GameServer extends GameBase implements Runnable {
 		addEvent(new EventGameStartNow(getNextSequenceNum()));
 		sendAllEvents();
 		m_is_game_ending=false;
-		m_msg_handler.postDelayed(m_timeout_check, network_receive_timeout);
+		IncomingHandler h = m_msg_handler;
+		if(h!=null)
+			h.postDelayed(m_timeout_check, network_receive_timeout);
 	}
 	
 	public void gameEnd() {
