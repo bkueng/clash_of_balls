@@ -205,27 +205,29 @@ public class CreationMenu extends GameMenuBase {
 	@Override
 	protected void onTouchUp(MenuItem item) {
 		if (item == m_create_button) {
-			m_settings.is_host = true;
-			//1->1 Round, 2->2 Round, 3-> 4 Rounds, 4-> 10 Rounds?? TODO
-			int idx= 0;
-			for(int i=0; i<m_round_buttons.length; ++i)
-				if(m_round_buttons[i].isPressed()) idx = i;
-			Log.d(LOG_TAG, "Game Creation: selected rounds: "+round_list[idx]);
-			m_settings.game_rounds=round_list[idx];
-			m_settings.game_current_round = 1;
-			
-			MenuItemLevel item_level = (MenuItemLevel)m_level_list.getSelectedItem();
-			m_settings.selected_level = item_level.level();
-			
-			String user_name = Networking.fromDisplayableName(m_name_button.getString());
-			m_settings.user_name = user_name;
-			m_network_server.setOwnName(user_name);
-			m_network_server.setMaxClientCount(m_settings.selected_level.player_count);
-			//create game
-			m_network_server.startAdvertise();
-			m_network_server.joinSessionToSelf();
-			
-			m_ui_change = UIChange.WAIT_MENU;
+			if(!m_create_button.isDisabled()) {
+				m_settings.is_host = true;
+				//1->1 Round, 2->2 Round, 3-> 4 Rounds, 4-> 10 Rounds?? TODO
+				int idx= 0;
+				for(int i=0; i<m_round_buttons.length; ++i)
+					if(m_round_buttons[i].isPressed()) idx = i;
+				Log.d(LOG_TAG, "Game Creation: selected rounds: "+round_list[idx]);
+				m_settings.game_rounds=round_list[idx];
+				m_settings.game_current_round = 1;
+
+				MenuItemLevel item_level = (MenuItemLevel)m_level_list.getSelectedItem();
+				m_settings.selected_level = item_level.level();
+
+				String user_name = Networking.fromDisplayableName(m_name_button.getString());
+				m_settings.user_name = user_name;
+				m_network_server.setOwnName(user_name);
+				m_network_server.setMaxClientCount(m_settings.selected_level.player_count);
+				//create game
+				m_network_server.startAdvertise();
+				m_network_server.joinSessionToSelf();
+
+				m_ui_change = UIChange.WAIT_MENU;
+			}
 		} else if (item == m_cancel_button) {
 			m_settings.is_host = false;
 			m_ui_change = UIChange.MAIN_MENU;
