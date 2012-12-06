@@ -43,22 +43,22 @@ public class GameHole extends StaticGameObject {
 		case Boarder_left:
 		case Corner_up_right:
 		break;
-		case Corner_down_right:
+		case Hole_Corner_down_right:
 		case Hole_Head_Right:
 		case Boarder_up:
 		case Corner_up_left:
-			setRotation(3 * angle);
+			setRotation(3.f * angle);
 			break;
 		case Hole_Corner_down_left:
 		case Hole_Head_Down:
 		case Boarder_right:
 		case Corner_down_left:
-			setRotation(2 * angle);
+			setRotation(2.f * angle);
 			break;
 		case Hole_Corner_up_left:
 		case Hole_Head_Left:
 		case Boarder_down:
-		case Hole_Corner_down_right:
+		case Corner_down_right:
 			setRotation(angle);
 			break;
 		}
