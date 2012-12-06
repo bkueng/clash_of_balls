@@ -30,8 +30,10 @@ public class GamePlayer extends DynamicGameObject {
 	public Vector acceleration() { return m_acceleration; }
 	
 	public void applySensorVector(Vector v) {
-		m_acceleration.set(v);
-		m_acceleration.mul(m_sensor_scaling);
+		if(!m_bIs_dead) {
+			m_acceleration.set(v);
+			m_acceleration.mul(m_sensor_scaling);
+		}
 	}
 	
 	protected Texture m_overlay_texture;
@@ -89,6 +91,7 @@ public class GamePlayer extends DynamicGameObject {
 	
 	public void die() {
 		if(!m_bIs_dead) {
+			m_acceleration.set(0.f, 0.f);
 			m_scaling = 1.f;
 			m_scaling_speed = 0.f;
 			m_bIs_dead = true;
