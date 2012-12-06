@@ -1,14 +1,15 @@
-package com.android.game.clash_of_the_balls;
+package com.android.game.clash_of_the_balls.menu;
 
 import android.content.Context;
 
+import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.GameSettings;
+import com.android.game.clash_of_the_balls.R;
+import com.android.game.clash_of_the_balls.TextureManager;
+import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
+import com.android.game.clash_of_the_balls.R.raw;
 import com.android.game.clash_of_the_balls.game.Vector;
-import com.android.game.clash_of_the_balls.menu.GameMenuBase;
-import com.android.game.clash_of_the_balls.menu.MenuBackground;
-import com.android.game.clash_of_the_balls.menu.MenuItem;
-import com.android.game.clash_of_the_balls.menu.MenuItemImg;
-import com.android.game.clash_of_the_balls.menu.MenuItemStringMultiline;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
 
 public class HelpMenu extends GameMenuBase {
@@ -58,7 +59,7 @@ public class HelpMenu extends GameMenuBase {
 				new Vector(pos.x + offset_x+label_width+3*offset_x
 						, pos.y + size.y - label_height-offset_y),
 				new Vector(label_width, label_height),
-				m_tex_manager, R.raw.texture_ball_up));
+				m_tex_manager, R.raw.img_first));
 		
 		m_menu_items.add(m_second_label = new MenuItemStringMultiline(
 				new Vector(pos.x + offset_x+label_width+offset_x
@@ -71,8 +72,7 @@ public class HelpMenu extends GameMenuBase {
 				new Vector(pos.x + offset_x
 						, pos.y + size.y - 2*(label_height)-offset_y),
 				new Vector(label_width, label_height),
-				m_tex_manager, R.raw.texture_ball_up));
-		
+				m_tex_manager, R.raw.img_second));
 		m_menu_items.add(m_third_label = new MenuItemStringMultiline(
 				new Vector(pos.x + 2*offset_x
 						, pos.y + size.y -3*(label_height)-offset_y),
@@ -83,7 +83,7 @@ public class HelpMenu extends GameMenuBase {
 				new Vector(pos.x + offset_x+label_width+3*offset_x
 						, pos.y + size.y - 3*(label_height)-offset_y),
 				new Vector(label_width, label_height),
-				m_tex_manager, R.raw.texture_ball_up));
+				m_tex_manager, R.raw.img_third));
 	}
 
 	@Override

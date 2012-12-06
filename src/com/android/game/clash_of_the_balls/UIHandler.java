@@ -17,6 +17,7 @@ import com.android.game.clash_of_the_balls.game.IMoveable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.menu.CreationMenu;
+import com.android.game.clash_of_the_balls.menu.HelpMenu;
 import com.android.game.clash_of_the_balls.menu.JoinMenu;
 import com.android.game.clash_of_the_balls.menu.MainMenu;
 import com.android.game.clash_of_the_balls.menu.MenuBackground;
