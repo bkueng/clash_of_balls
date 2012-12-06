@@ -302,7 +302,7 @@ public abstract class GameBase {
 									float b = 2.f * (alpha * beta + gamma * delta);
 									float c = (gamma * gamma + alpha * alpha) - (rads * rads);
 									float D = (b*b) - (4.f * a * c);
-									D = (float) Math.sqrt(D);
+									D = FloatMath.sqrt(D);
 									
 									float t1 = (-b + D) / (2.f * a);
 									float t2 = (-b - D) / (2.f * a);
@@ -343,10 +343,14 @@ public abstract class GameBase {
 									speed_b.mul(1/dir_b_a.lengthSquared());
 									dir_b_a.mul(dir_b_a.dot(speed_b));
 									
+									// Calculate epsilon (elasticity factor)
+									float epsilon = (player_a.elasticFactor() 
+											+ player_b.elasticFactor()) / 2.0f;
+									
 									Vector temp_a = new Vector(speed_a);
 									Vector temp_b = new Vector(speed_b);
-									temp_a.mul(player_a.m_mass - player_b.m_mass);
-									temp_b.mul(player_b.m_mass);
+									temp_a.mul(player_a.m_mass - epsilon * player_b.m_mass);
+									temp_b.mul(player_b.m_mass * (1.0f + epsilon));
 									temp_a.add(temp_b);
 									temp_a.mul(1/(player_a.m_mass + player_b.m_mass));
 									temp_a.sub(speed_a);
@@ -355,8 +359,8 @@ public abstract class GameBase {
 									
 									temp_a.set(speed_a);
 									temp_b.set(speed_b);
-									temp_b.mul(player_b.m_mass - player_a.m_mass);
-									temp_a.mul(player_a.m_mass);
+									temp_b.mul(player_b.m_mass - epsilon * player_a.m_mass);
+									temp_a.mul(player_a.m_mass * (1.0f + epsilon));
 									temp_b.add(temp_a);
 									temp_b.mul(1/(player_b.m_mass + player_a.m_mass));
 									temp_b.sub(speed_b);
