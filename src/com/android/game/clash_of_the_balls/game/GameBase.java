@@ -284,7 +284,7 @@ public abstract class GameBase {
 								GamePlayer player_a = ((GamePlayer) obja);
 								GamePlayer player_b = ((GamePlayer) objb);
 								
-								if ( eucDist(obja.newPosition(), objb.newPosition()) <= (player_a.m_radius + player_b.m_radius) ) {
+								if ( obja.newPosition().dist(objb.newPosition()) <= (player_a.m_radius + player_b.m_radius) ) {
 									
 									Log.d(TAG, "Players collide");
 									
@@ -410,10 +410,6 @@ public abstract class GameBase {
 			addEvent(new EventImpact(getNextSequenceNum(), obja.m_id
 					, pos_a, objb.m_id, pos_b));
 		}
-	}
-	
-	private float eucDist(Vector v1, Vector v2) {
-		return (float) FloatMath.sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y));
 	}
 	
 }
