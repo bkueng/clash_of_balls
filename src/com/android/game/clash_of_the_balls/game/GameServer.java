@@ -310,7 +310,8 @@ public class GameServer extends GameBase implements Runnable {
 	
 	private void checkGameEnd(float elapsed_time) {
 		//in debug mode we allow a single player -> don't end the game
-		if(GameSettings.debug && initialPlayerCount()==1) return;
+		if(GameSettings.debug && initialPlayerCount()==1
+				&& currentPlayerCount()!=0) return;
 		
 		//game ends if there is only 1 player left (or 0)
 		//a small timeout is used after only 1 or 0 player is left
