@@ -49,10 +49,35 @@ public class DynamicGameObject extends StaticGameObject {
 			super.draw(renderer);
 		}
 	}
+	
+	private Vector m_server_translation = new Vector(0.f, 0.f);
+	private static final float SERVER_POS_SMOOTHING = 1.f/5.f;
+						//this defines how smoothly the server position update
+						//is applied. a bigger value means less smoothly but 
+						//more accruate with the server (1 means apply in one step)
+						//it takes ln(0.01)/ln(1-SERVER_POS_SMOOTHING) frames (steps)
+						//to get the error (distance of positions) below 0.01
+						//for SERVER_POS_SMOOTHING = 1/5 it's about 20 frames
+	
+	
 	public void applyVectorData(Vector new_pos, Vector new_speed) {
 		m_speed.set(new_speed);
 		
-		m_position.set(new_pos);
+		//apply position smoothly
+		m_server_translation.set(new_pos.x - m_position.x, new_pos.y - m_position.y);
+		if(m_server_translation.length() < 0.02) {
+			m_position.set(new_pos);
+			m_server_translation.set(0.f, 0.f);
+		} else {
+			applySmoothing(m_position);
+		}
+	}
+	
+	private void applySmoothing(Vector dest_vector) {
+		float dx = m_server_translation.x * SERVER_POS_SMOOTHING;
+		float dy = m_server_translation.y * SERVER_POS_SMOOTHING;
+		dest_vector.add(dx, dx);
+		m_server_translation.sub(dx, dy);
 	}
 
 	//handle everything in here updated by the server. like position & speed
@@ -61,6 +86,15 @@ public class DynamicGameObject extends StaticGameObject {
 	@Override
 	public void move(float dsec) {
 		m_new_pos.set(m_position);
+		
+		if(m_owner.generate_events) {
+			//check for client-side smoothing of server position update
+			if(Math.abs(m_server_translation.x) > GameBase.EPS
+					|| Math.abs(m_server_translation.y) > GameBase.EPS) {
+				applySmoothing(m_new_pos);
+				m_has_moved = true;
+			}
+		}
 		
 		//-> set m_has_moved & m_new_pos
 	}

@@ -157,7 +157,6 @@ public class Game extends GameBase implements UIBase {
 					m_network_client.sensorUpdate(sensor_vec);
 					m_last_sensor_update = sensor_vec;
 				}
-				//TODO: apply sensor values to own player
 				
 				handleNetworkError(m_network_client.getNetworkError());
 

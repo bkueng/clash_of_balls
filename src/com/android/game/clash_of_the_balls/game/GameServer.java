@@ -296,8 +296,8 @@ public class GameServer extends GameBase implements Runnable {
 		m_last_time = time;
 		
 		generate_events = true;
-		move(elapsed_time);
 		moveClient(elapsed_time);
+		move(elapsed_time);
 		doCollisionHandling();
 		applyMove();
 		handleGenerateItems(elapsed_time);

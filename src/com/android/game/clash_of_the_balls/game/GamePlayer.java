@@ -109,6 +109,8 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	public void moveClient(float dsec) {
+		super.moveClient(dsec);
+		
 		if(m_bIs_dying) {
 			m_scaling -= (m_scaling_speed + 1.5f*dsec) * dsec;
 			m_scaling_speed += dsec * 2.f*1.5f;
