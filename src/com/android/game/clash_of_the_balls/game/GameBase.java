@@ -221,17 +221,67 @@ public abstract class GameBase {
 									}
 									
 									break;
-								case Wall_horizontal: //TODO: change to Wall
+
+								case Wall_vertical: // TODO: change to Wall
 								{
 									GamePlayer player = ((GamePlayer) obj);
 									GameWall wall = ((GameWall) field_obj);  
 									
 									for (Rectangle rect : wall.m_wall_items) {
-										if (rect.intersectCircle(player.newPosition(), player.m_radius)) {
-											// TODO: 
+
+										final float eps = 0.0f;
+										
+										Vector rect_center = new Vector(wall.m_position.x + rect.pos.x, wall.m_position.y + rect.pos.y);
+										Vector normal = new Vector();
+										
+										if (player.newPosition().x <= rect_center.x) {
+											if (player.newPosition().y <= rect_center.y) {
+												// player is in the lower left area
+												
+												// check for intersection with vertical edge
+												if (lineCircleIntersection(rect_center.x - rect.width()/2.0f, rect_center.y - rect.height()/2.0f, rect_center.x + rect.width()/2.0f, rect_center.y + rect.height()/2.0f, player.newPosition(), player.m_radius)) {
+													// calculate normal of this edge
+													normal.set(-(rect_center.y - rect.height()/2.0f), rect_center.x - rect.width()/2.0f);
+													normal.normalize();
+													Vector player_pos = new Vector(normal);
+													
+													// calculate new velocity
+													normal.mul(player.speed().dot(normal));
+													normal.mul(-2.0f);
+													normal.add(player.speed());
+													
+													// set new position of player
+													player_pos.mul(player.m_radius + eps);
+													player.newPosition().add(player_pos);
+													
+												}
+													
+												// check for intersection with horizontal edge
+												
+											} else {
+												// player is in the upper left area
+												
+											}
+										} else {
+											if (player.pos().y <= rect_center.y) {
+												// player is in the lower right area
+												
+
+											} else {
+												// player is in the upper right area
+												
+
+											}
+										}
+										
+										/*
+										if (rect.intersectCircle(
+												player.newPosition(),
+												player.m_radius)) {
+											// TODO:
 											Log.d(TAG, "Player - Wall collided");
 
-										}
+										} */
 									}
 									
 									break;
@@ -401,15 +451,50 @@ public abstract class GameBase {
 			}
 		}
 	}
-	
-	private void handleImpact(StaticGameObject obja, Vector pos_a
-			, StaticGameObject objb, Vector pos_b) {
+
+	private void handleImpact(StaticGameObject obja, Vector pos_a,
+			StaticGameObject objb, Vector pos_b) {
 		obja.handleImpact(objb);
 		objb.handleImpact(obja);
-		if(generate_events) {
-			addEvent(new EventImpact(getNextSequenceNum(), obja.m_id
-					, pos_a, objb.m_id, pos_b));
+		if (generate_events) {
+			addEvent(new EventImpact(getNextSequenceNum(), obja.m_id, pos_a,
+					objb.m_id, pos_b));
 		}
 	}
-	
+
+	private boolean lineCircleIntersection(float x1, float y1, float x2, float y2,
+			Vector circ_pos, float cr) {
+		float cx = circ_pos.x;
+		float cy = circ_pos.y;
+		float dx = x2 - x1;
+		float dy = y2 - y1;
+		float a = dx * dx + dy * dy;
+		float b = 2.0f * (dx * (x1 - cx) + dy * (y1 - cy));
+		float c = cx * cx + cy * cy;
+		c += x1 * x1 + y1 * y1;
+		c -= 2.0f * (cx * x1 + cy * y1);
+		c -= cr * cr;
+		float D = b * b - 4.0f * a * c;
+
+		if (D < 0) { // Not intersecting
+			return false;
+		} else {
+			float mu = (-b + (float) Math.sqrt(b * b - 4.0f * a * c))
+					/ (2.0f * a);
+			float ix1 = x1 + mu * (dx);
+			float iy1 = y1 + mu * (dy);
+			mu = (-b - (float) Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+			float ix2 = x1 + mu * (dx);
+			float iy2 = y1 + mu * (dy);
+
+			// set new position of player to impact point
+			circ_pos.set( (ix1 + ix2) / 2.0f, (iy1 + iy2) / 2.0f );
+			
+			Log.d(TAG, "Circle - Line intersection point, x: " + ix1 + "y: " + iy1);
+			Log.d(TAG, "Circle - Line intersection point, x: " + ix2 + "y: " + iy2);
+			
+			return true;
+		}
+
+	}
 }
