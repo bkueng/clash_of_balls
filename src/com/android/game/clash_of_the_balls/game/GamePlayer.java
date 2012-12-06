@@ -67,10 +67,11 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	public void move(float dsec) {
+		super.move(dsec);
 		
 		//update position
-		m_new_pos.x = m_position.x + (m_speed.x + dsec * m_acceleration.x / 2.f) * dsec;
-		m_new_pos.y = m_position.y + (m_speed.y + dsec * m_acceleration.y / 2.f) * dsec;
+		m_new_pos.x += (m_speed.x + dsec * m_acceleration.x / 2.f) * dsec;
+		m_new_pos.y += (m_speed.y + dsec * m_acceleration.y / 2.f) * dsec;
 		//update speed
 		m_speed.x += dsec * m_acceleration.x;
 		m_speed.y += dsec * m_acceleration.y;

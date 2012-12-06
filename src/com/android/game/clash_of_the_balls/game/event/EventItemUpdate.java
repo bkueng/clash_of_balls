@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.android.game.clash_of_the_balls.game.DynamicGameObject;
 import com.android.game.clash_of_the_balls.game.GameBase;
+import com.android.game.clash_of_the_balls.game.Vector;
 
 public class EventItemUpdate extends Event {
 	private static final String TAG = "EventItemUpdate";
@@ -49,8 +50,8 @@ public class EventItemUpdate extends Event {
 	public void apply(GameBase game) {
 		DynamicGameObject obj = game.getMoveableGameObject(m_id);
 		if(obj!=null) {
-			obj.pos().set(m_pos_x, m_pos_y);
-			obj.speed().set(m_speed_x, m_speed_y);
+			obj.applyVectorData(new Vector(m_pos_x, m_pos_y)
+				, new Vector(m_speed_x, m_speed_y));
 		} else {
 			Log.e(TAG, "cannot apply: obj is null!");
 		}
