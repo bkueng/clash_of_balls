@@ -221,13 +221,21 @@ public abstract class GameBase {
 									}
 									
 									break;
+								case Wall_horizontal: //TODO: change to Wall
+								{
+									GamePlayer player = ((GamePlayer) obj);
+									GameWall wall = ((GameWall) field_obj);  
 									
-								case Wall_horizontal:
-									//!!! TODO: Adjust minimum distance, regarding the size of the obstacle!!!
+									for (Rectangle rect : wall.m_wall_items) {
+										if (rect.intersectCircle(player.newPosition(), player.m_radius)) {
+											// TODO: 
+											Log.d(TAG, "Player - Wall collided");
+
+										}
+									}
+									
 									break;
-								case Wall_vertical:
-									//!!! TODO: Adjust minimum distance, regarding the size of the obstacle!!!
-									break;
+								}
 								default: throw new RuntimeException("collision detection for type "+
 										field_obj.type+" not implemented!");
 								}
@@ -272,52 +280,96 @@ public abstract class GameBase {
 							
 							switch(objb.type) {
 							case Player:
-								//TODO
+							{								
 								GamePlayer player_a = ((GamePlayer) obja);
 								GamePlayer player_b = ((GamePlayer) objb);
 								
-								if ( eucDist(obja.newPosition(), objb.newPosition()) < player_a.m_radius + player_b.m_radius ) {
+								if ( eucDist(obja.newPosition(), objb.newPosition()) <= (player_a.m_radius + player_b.m_radius) ) {
 									
-									// Calculate collision angle phi
-									float phi = (float) Math.atan2(obja.newPosition().y - objb.newPosition().y, obja.newPosition().x - objb.newPosition().x);
+									Log.d(TAG, "Players collide");
 									
-									// Derive x/y velocity in rotated coordinate system
-									float u1 = obja.speed().length();
-									float u2 = objb.speed().length();
+									// Players collide
+									float eps = 0.0f; // eps distance between players
 									
-									// object a
-									float v1x = u1 * (float) Math.cos(obja.speed().angle() - phi);
-									float v1y = u1 * (float) Math.cos(obja.speed().angle() - phi);
+									float alpha = player_a.pos().x - player_b.pos().x;
+									float gamma = player_a.pos().y - player_b.pos().y;
+									float beta = player_a.newPosition().x - player_a.pos().x + player_b.newPosition().x - player_b.pos().x;
+									float delta = player_a.newPosition().y - player_a.pos().y + player_b.newPosition().y - player_b.pos().y;
 									
-									// object b
-									float v2x = u2 * (float) Math.cos(objb.speed().angle() - phi);
-									float v2y = u2 * (float) Math.cos(objb.speed().angle() - phi);
+									float rads = ((player_a.m_radius + player_b.m_radius + eps) * (player_a.m_radius + player_b.m_radius + eps));
+
+									float a = (beta * beta + delta * delta);
+									float b = 2.f * (alpha * beta + gamma * delta);
+									float c = (gamma * gamma + alpha * alpha) - (rads * rads);
+									float D = (b*b) - (4.f * a * c);
+									D = (float) Math.sqrt(D);
 									
-									// 1D collision detection
-									float m1 = player_a.m_mass;
-									float m2 = player_b.m_mass;
+									float t1 = (-b + D) / (2.f * a);
+									float t2 = (-b - D) / (2.f * a);
+									float t = t1;
 									
-									float f1x = v1x * (m1 - m2) + 2 * m2 * v2x;
-									float f2x = v2x * (m1 - m2) + 2 * m2 * v1x;
+									if (Math.abs(t2) < Math.abs(t1))
+										t = t2;
 									
-									// rotate everything back to normal coordinate system
-									// final velocity v1, v2
-									float v1 = (float) Math.sqrt(f1x * f1x * f1x * f1x + v1y * v1y * v1y);
-									float v2 = (float) Math.sqrt(f2x * f2x * f2x * f2x + v2y * v2y * v2y);
-									// final direction d1, d2
-									float d1 = (float) Math.atan2(v1y, f1x) + phi;
-									float d2 = (float) Math.atan2(v2y, f2x) + phi;
+									// Set the new position of player a
+									Vector new_position_a = new Vector(player_a.newPosition());
+									new_position_a.sub(player_a.pos());
+									new_position_a.mul(t);
+									player_a.pos().add(new_position_a);
+									player_a.newPosition().set(player_a.pos());
 									
-									// calculate and set new velocity to each player
-									player_a.speed().x = (float) Math.cos(d1) * v1;
-									player_a.speed().y = (float) Math.sin(d1) * v1;
+									// Set the new position of player b
+									Vector new_position_b = new Vector(player_b.newPosition());
+									new_position_b.sub(player_b.pos());
+									new_position_b.mul(t);
+									player_b.pos().add(new_position_b);
+									player_b.newPosition().set(player_b.pos());
+																		
+									Log.d(TAG, "Player a new position, x: " + player_a.newPosition().x + "y: " + player_a.newPosition().y);
+									Log.d(TAG, "Player b new position, x: " + player_b.newPosition().y + "y: " + player_b.newPosition().y);
 									
-									player_b.speed().x = (float) Math.cos(d2) * v2;
-									player_b.speed().y = (float) Math.sin(d2) * v2;
+									// Get new direction for player a
+									// Get new direction for player b
+									Vector dir_a_b = new Vector(player_b.newPosition());
+									dir_a_b.sub(player_a.newPosition());
+									dir_a_b.normalize();
+									Vector dir_b_a = new Vector(dir_a_b);
+									
+									Vector speed_a = new Vector(player_a.speed());
+									speed_a.mul(1/dir_a_b.lengthSquared());
+									dir_a_b.mul(dir_a_b.dot(speed_a));
+									
+									Vector speed_b = new Vector(player_b.speed());
+									speed_b.mul(1/dir_b_a.lengthSquared());
+									dir_b_a.mul(dir_b_a.dot(speed_b));
+									
+									Vector temp_a = new Vector(speed_a);
+									Vector temp_b = new Vector(speed_b);
+									temp_a.mul(player_a.m_mass - player_b.m_mass);
+									temp_b.mul(player_b.m_mass);
+									temp_a.add(temp_b);
+									temp_a.mul(1/(player_a.m_mass + player_b.m_mass));
+									temp_a.sub(speed_a);
+									Log.d(TAG, "new speed direction of a, x: " + temp_a.x + "y: " + temp_a.y);
+									player_a.speed().add(temp_a);
+									
+									temp_a.set(speed_a);
+									temp_b.set(speed_b);
+									temp_b.mul(player_b.m_mass - player_a.m_mass);
+									temp_a.mul(player_a.m_mass);
+									temp_b.add(temp_a);
+									temp_b.mul(1/(player_b.m_mass + player_a.m_mass));
+									temp_b.sub(speed_b);
+									Log.d(TAG, "new speed direction of b, x: " + temp_b.x + "y: " + temp_b.y);
+									player_b.speed().add(temp_b);
+									
 								}
 								
 								break;
+							}
 							case Item:
+								Log.d(TAG, "Player - Item collision");
+
 								//TODO: take the item
 								
 								break;
