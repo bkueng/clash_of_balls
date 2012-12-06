@@ -291,14 +291,13 @@ public abstract class GameBase {
 									Log.d(TAG, "Players collide");
 									
 									// Players collide
-									float eps = 0.0f; // eps distance between players
 									
 									float alpha = player_a.pos().x - player_b.pos().x;
 									float gamma = player_a.pos().y - player_b.pos().y;
 									float beta = player_a.newPosition().x - player_a.pos().x + player_b.newPosition().x - player_b.pos().x;
 									float delta = player_a.newPosition().y - player_a.pos().y + player_b.newPosition().y - player_b.pos().y;
 									
-									float rads = ((player_a.m_radius + player_b.m_radius + eps) * (player_a.m_radius + player_b.m_radius + eps));
+									float rads = ((player_a.m_radius + player_b.m_radius + EPS) * (player_a.m_radius + player_b.m_radius + eps));
 
 									float a = (beta * beta + delta * delta);
 									float b = 2.f * (alpha * beta + gamma * delta);
