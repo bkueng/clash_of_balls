@@ -1,5 +1,8 @@
 package com.android.game.clash_of_the_balls.game;
 
+import android.util.FloatMath;
+import android.util.Log;
+
 
 public class Vector {
 	
@@ -52,6 +55,13 @@ public class Vector {
 			y = 0.0f;
 		}
 	}
+	
+	public float distSquared(Vector p) {
+		return (x-p.x) * (x-p.x) + (y-p.y) * (y-p.y);
+	}
+	public float dist(Vector p) {
+		return FloatMath.sqrt((x-p.x) * (x-p.x) + (y-p.y) * (y-p.y));
+	}
 
 	public float angle() {
 		return (float) Math.atan2(y, x);
@@ -61,10 +71,18 @@ public class Vector {
 		x += vector.x;
 		y += vector.y;
 	}
+	public void add(float fx, float fy) {
+		x+=fx;
+		y+=fy;
+	}
 
 	public void sub(Vector vector) {
 		x -= vector.x;
 		y -= vector.y;
+	}
+	public void sub(float fx, float fy) {
+		x-=fx;
+		y-=fy;
 	}
 
 
@@ -85,12 +103,12 @@ public class Vector {
 	public void rotate(float dAlfa_rad) {
 		float nCos = (float) Math.cos(dAlfa_rad);
 		float nSin = (float) Math.sin(dAlfa_rad);
-
+		
 		float iX = x * nCos - y * nSin;
 		float iY = y * nCos + x * nSin;
 
 		x = iX;
-		x = iY;
+		y = iY;
 	}
 
 }
