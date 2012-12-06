@@ -166,9 +166,14 @@ public class Game extends GameBase implements UIBase {
 				m_bReceived_events = has_network_events;
 				if(has_network_events) {
 					
+					m_last_rtt = m_time_since_last_data_receive;
+					m_time_since_last_data_receive = 0.f;
+					
 					//we have a synchronization update from the server
 					//we assume that all predicted events (game moves) 
 					//can simply be overwritten by the server update
+
+					Log.v(TAG_GAME, "Network incoming: RTT="+m_last_rtt);
 
 					generate_events = false;
 					//go back 1/2 RTT
@@ -186,9 +191,6 @@ public class Game extends GameBase implements UIBase {
 					applyMove();
 					
 					removeDeadObjects();
-					
-					m_last_rtt = m_time_since_last_data_receive;
-					m_time_since_last_data_receive = 0.f;
 				}
 				
 				//do a predicted move
