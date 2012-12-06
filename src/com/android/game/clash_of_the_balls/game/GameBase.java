@@ -183,7 +183,7 @@ public abstract class GameBase {
 			
 			//assume that the game objects are not larger than 1.0 (one sprite)
 			
-			if(obj.hasMoved()) {
+			if(obj.hasMoved() && !obj.isDead()) {
 				int x_start = (int)(obj.newPosition().x) - 1;
 				if(x_start < 0) x_start = 0;
 				int x_end = x_start + 2;
@@ -204,10 +204,20 @@ public abstract class GameBase {
 								
 								switch(field_obj.type) {
 								case Hole:
-									//TODO All other types of holes should be also implemented...
-									if ( eucDist(obj.newPosition(), field_obj.pos()) < ((GamePlayer) obj).m_radius ) {
-										// player falls down hole and dies
-										((GamePlayer) obj).die();
+									GameHole hole = (GameHole) field_obj;
+									Vector n=new Vector();
+									if(hole.isInside(obj.pos(), obj.newPosition(), n)) {
+										//obj falls down
+										if(is_server) { 
+											//the client will receive the update from server
+											handleImpact(obj, obj.newPosition()
+													, field_obj, field_obj.pos());
+											//apply speed
+											obj.speed().set(n);
+											
+											obj.die();
+											
+										}
 									}
 									
 									break;

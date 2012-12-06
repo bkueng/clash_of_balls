@@ -66,7 +66,6 @@ public class GamePlayer extends DynamicGameObject {
 		m_color_data_colored = new VertexBufferFloat(color_data, 4);
 	}
 	
-	
 	public void move(float dsec) {
 		
 		//update position
@@ -78,10 +77,9 @@ public class GamePlayer extends DynamicGameObject {
 		
 		m_has_moved = true;
 		
-		
 		if(m_bIs_dying) {
-			m_scaling -= (m_scaling_speed + dsec) * dsec;
-			m_scaling_speed += dsec * 2.f;
+			m_scaling -= (m_scaling_speed + 1.5f*dsec) * dsec;
+			m_scaling_speed += dsec * 2.f*1.5f;
 			if(m_scaling < 0.01f) {
 				m_bIs_dying = false;
 				m_scaling = 0.01f;
