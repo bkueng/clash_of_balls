@@ -58,13 +58,13 @@ public class GameLevel {
 	public static final int TYPE_BOARDER_RIGHT = 3;
 	public static final int TYPE_BOARDER_UP = 4;
 	public static final int TYPE_BOARDER_DOWN = 5;
-	//Corners of field
+	//Corners of field: these are also holes
 	public static final int TYPE_CORNER_UP_RIGHT = 6;
 	public static final int TYPE_CORNER_DOWN_RIGHT = 7;
 	public static final int TYPE_CORNER_DOWN_LEFT = 8;
 	public static final int TYPE_CORNER_UP_LEFT = 9;
 	//Holes 
-	public static final int TYPE_HOLE = 10;
+	public static final int TYPE_HOLE = 10; //single round hole, only 1 tile
 	public static final int TYPE_HOLE_FULL = 11;
 	public static final int TYPE_HOLE_CORNER_UP_RIGHT = 12;
 	public static final int TYPE_HOLE_CORNER_DOWN_RIGHT = 13;
@@ -84,7 +84,6 @@ public class GameLevel {
 	public static final int TYPE_WALL_CORNER_DOWN_LEFT = 24;
 	public static final int TYPE_WALL_CORNER_UP_LEFT = 25;
 	
-	//TODO: add more: hole, obstacles, ...
 	public static final int TYPE_FG_MAX = 25; // max field int value foreground
 	
 	public static int rawResTexIdFromForeground(int fg_field) {

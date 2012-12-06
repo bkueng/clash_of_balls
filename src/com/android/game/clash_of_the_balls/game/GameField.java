@@ -5,6 +5,7 @@ import android.util.Log;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
+import com.android.game.clash_of_the_balls.game.GameHole.HoleType;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 
 /**
@@ -75,58 +76,58 @@ public class GameField extends GameObject {
 						texture = m_texture_manager.get(raw_res_id);
 					switch(type) {
 					case GameLevel.TYPE_BOARDER_DOWN:
-						obj=new GameBoarder(object_id++, pos,Type.Boarder_down, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Boarder_down, texture);
 						break;
 					case GameLevel.TYPE_BOARDER_UP: 
-						obj=new GameBoarder(object_id++, pos,Type.Boarder_up, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Boarder_up, texture);
 						break;
 					case GameLevel.TYPE_BOARDER_LEFT: 
-						obj=new GameBoarder(object_id++, pos,Type.Boarder_left, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Boarder_left, texture);
 						break;
 					case GameLevel.TYPE_BOARDER_RIGHT:
-						obj=new GameBoarder(object_id++, pos,Type.Boarder_right, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Boarder_right, texture);
 						break;
 					case GameLevel.TYPE_CORNER_DOWN_LEFT:
-						obj=new GameCorner(object_id++, pos,Type.Corner_down_left, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Corner_down_left, texture);
 						break;
 					case GameLevel.TYPE_CORNER_DOWN_RIGHT:
-						obj=new GameCorner(object_id++, pos,Type.Corner_down_right, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Corner_down_right, texture);
 						break;
 					case GameLevel.TYPE_CORNER_UP_LEFT:
-						obj=new GameCorner(object_id++, pos,Type.Corner_up_left, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Corner_up_left, texture);
 						break;
 					case GameLevel.TYPE_CORNER_UP_RIGHT:
-						obj=new GameCorner(object_id++, pos,Type.Corner_up_right, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Corner_up_right, texture);
 						break;
 					case GameLevel.TYPE_HOLE:
-						obj=new GameHole(object_id++, pos,Type.Hole, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_single, texture);
 						break;
 					case GameLevel.TYPE_HOLE_FULL:
-						obj=new GameHole(object_id++, pos,Type.Hole_Full, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Full, texture);
 						break;
 					case GameLevel.TYPE_HOLE_CORNER_UP_RIGHT:
-						obj=new GameHole(object_id++, pos,Type.Hole_Corner_up_right, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Corner_up_right, texture);
 						break;
 					case GameLevel.TYPE_HOLE_CORNER_UP_LEFT:
-						obj=new GameHole(object_id++, pos,Type.Hole_Corner_up_left, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Corner_up_left, texture);
 						break;
 					case GameLevel.TYPE_HOLE_CORNER_DOWN_RIGHT:
-						obj=new GameHole(object_id++, pos,Type.Hole_Corner_down_right, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Corner_down_right, texture);
 						break;
 					case GameLevel.TYPE_HOLE_CORNER_DOWN_LEFT:
-						obj=new GameHole(object_id++, pos,Type.Hole_Corner_down_left, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Corner_down_left, texture);
 						break;
 					case GameLevel.TYPE_HOLE_HEAD_DOWN:
-						obj=new GameHole(object_id++, pos,Type.Hole_Head_Down, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Down, texture);
 						break;
 					case GameLevel.TYPE_HOLE_HEAD_UP:
-						obj=new GameHole(object_id++, pos,Type.Hole_Head_Up, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Up, texture);
 						break;
 					case GameLevel.TYPE_HOLE_HEAD_LEFT:
-						obj=new GameHole(object_id++, pos,Type.Hole_Head_Left, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Left, texture);
 						break;
 					case GameLevel.TYPE_HOLE_HEAD_RIGHT:
-						obj=new GameHole(object_id++, pos,Type.Hole_Head_Right, texture);
+						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Right, texture);
 						break;
 					case GameLevel.TYPE_WALL_HOR:
 						obj=new GameWall(object_id++, pos,Type.Wall_horizontal, texture);
