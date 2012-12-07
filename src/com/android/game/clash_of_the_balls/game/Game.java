@@ -164,6 +164,8 @@ public class Game extends GameBase implements UIBase {
 				boolean has_network_events = m_network_client.hasEvents();
 				m_bReceived_events = has_network_events;
 				if(has_network_events) {
+					//undo events: simply discard them
+					while(m_events.poll() != null) { }
 					
 					m_last_rtt = m_time_since_last_data_receive;
 					m_time_since_last_data_receive = 0.f;
@@ -193,7 +195,7 @@ public class Game extends GameBase implements UIBase {
 				}
 				
 				//do a predicted move
-				generate_events = false;
+				generate_events = true;
 				
 				/* 
 				 * Undo Predicted Events
@@ -213,11 +215,11 @@ public class Game extends GameBase implements UIBase {
 				//strictly synchronized with the server
 				moveClient(dsec);
 				
-				if(!has_network_events) {
-					super.move(dsec);
-					doCollisionHandling();
-					super.applyMove();
-				}
+				//even if we had network updates, we should move one step
+				//to apply the new positions smoothly
+				super.move(dsec);
+				doCollisionHandling();
+				super.applyMove();
 				
 				
 				m_game_field.move(dsec);
