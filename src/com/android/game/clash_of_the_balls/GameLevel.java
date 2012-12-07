@@ -201,14 +201,13 @@ public class GameLevel {
 				assertFormat(line.length >= 2*width);
 				
 				String log_line = "";
-				
 				for(int x=0; x<width; ++x) {
 					//background
-					int bg = Integer.parseInt(line[x*2]);
+					int bg = Integer.parseInt(line[x*2].trim());
 					assertFormat(bg >= 0 && bg <= TYPE_BG_MAX);
 					m_background[(height-y-1)*width+x] = bg;
 					//foreground
-					int fg = Integer.parseInt(line[x*2+1]);
+					int fg = Integer.parseInt(line[x*2+1].trim());
 					assertFormat(fg >= 0 && fg <= TYPE_FG_MAX);
 					if(fg==TYPE_PLAYER) ++player_count;
 					m_foreground[(height-y-1)*width+x] = fg;

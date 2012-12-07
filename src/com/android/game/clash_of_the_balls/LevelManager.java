@@ -35,7 +35,9 @@ public class LevelManager {
 			l.loadLevel(raw_res_id);
 			m_levels.add(l);
 		} catch (Exception e) {
-			Log.w(LOG_TAG, "Failed to load level with raw res id="+raw_res_id);
+			Log.w(LOG_TAG, "Failed to load level with raw res id="+raw_res_id
+					+" ("+e.getMessage()+")");
+			
 		}
 		
 	}
