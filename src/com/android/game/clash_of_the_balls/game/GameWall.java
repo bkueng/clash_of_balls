@@ -8,9 +8,21 @@ public class GameWall extends StaticGameObject {
 							//the position of these is relative to the object position
 							// so within [-0.5, 0.5]
 							//use m_position + m_wall_items[i].pos to get game position
+	
+	public enum WallType {
+		Wall_horizontal,
+		Wall_vertical,
+		Wall_Corner_up_right,
+		Wall_Corner_up_left,
+		Wall_Corner_down_right,
+		Wall_Corner_down_left
+	}
+	private final WallType m_wall_type;
 
-	public GameWall(short id, Vector pos, Type type, Texture texture) {
-		super(id, pos, type, texture);		
+	public GameWall(short id, Vector pos, WallType wall_type, Texture texture) {
+		super(id, pos, Type.Wall, texture);		
+		m_wall_type = wall_type;
+		
 		float angle = (float) Math.PI / 2;
 
 		Rectangle r1 = new Rectangle(-0.11f,0.23f,0.22f,0.22f);
@@ -21,21 +33,21 @@ public class GameWall extends StaticGameObject {
 		
 		Rectangle[] rects = null;
 		
-		if (type == Type.Wall_vertical) {
+		if (m_wall_type == WallType.Wall_vertical) {
 			// DO Nothing
 			rects = new Rectangle[]{r1,r3,r5};
-		} else if (type ==Type.Wall_horizontal) {
+		} else if (m_wall_type ==WallType.Wall_horizontal) {
 			setRotation(angle);
 			rects = new Rectangle[]{r2,r3,r4};
-		} else if (type ==Type.Wall_Corner_up_right) {
+		} else if (m_wall_type ==WallType.Wall_Corner_up_right) {
 			rects = new Rectangle[]{r1,r3,r4};
-		} else if (type ==Type.Wall_Corner_up_left) {
+		} else if (m_wall_type ==WallType.Wall_Corner_up_left) {
 			setRotation(angle);
 			rects = new Rectangle[]{r1,r3,r2};
-		} else if (type ==Type.Wall_Corner_down_left) {
+		} else if (m_wall_type ==WallType.Wall_Corner_down_left) {
 			setRotation(2*angle);
 			rects = new Rectangle[]{r2,r3,r5};
-		} else if (type ==Type.Wall_Corner_down_right) {
+		} else if (m_wall_type ==WallType.Wall_Corner_down_right) {
 			setRotation(3*angle);
 			rects = new Rectangle[]{r5,r3,r4};
 		}

@@ -223,7 +223,7 @@ public abstract class GameBase {
 									}
 									
 									break;
-								case Wall_horizontal: //TODO: change to Wall
+								case Wall:
 								{
 									GamePlayer player = ((GamePlayer) obj);
 									GameWall wall = ((GameWall) field_obj);  

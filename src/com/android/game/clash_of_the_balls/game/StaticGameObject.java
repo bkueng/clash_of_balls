@@ -18,12 +18,7 @@ public class StaticGameObject extends GameObject {
 	public enum Type {
 		Background,
 		Hole,
-		Wall_horizontal,
-		Wall_vertical,
-		Wall_Corner_up_right,
-		Wall_Corner_up_left,
-		Wall_Corner_down_right,
-		Wall_Corner_down_left,
+		Wall,
 		Player,
 		Item
 	}
