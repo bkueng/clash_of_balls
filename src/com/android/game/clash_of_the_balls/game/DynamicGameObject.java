@@ -64,20 +64,10 @@ public class DynamicGameObject extends StaticGameObject {
 		m_speed.set(new_speed);
 		
 		//apply position smoothly
-		m_server_translation.set(new_pos.x - m_position.x, new_pos.y - m_position.y);
-		if(m_server_translation.length() < 0.02) {
-			m_position.set(new_pos);
-			m_server_translation.set(0.f, 0.f);
-		} else {
-			applySmoothing(m_position);
-		}
-	}
-	
-	private void applySmoothing(Vector dest_vector) {
-		float dx = m_server_translation.x * SERVER_POS_SMOOTHING;
-		float dy = m_server_translation.y * SERVER_POS_SMOOTHING;
-		dest_vector.add(dx, dx);
-		m_server_translation.sub(dx, dy);
+		//we cannot simply change m_position or m_new_pos because we would need
+		//to do collision handling
+		m_server_translation.set(new_pos.x - m_new_pos.x, new_pos.y - m_new_pos.y);
+		
 	}
 
 	//handle everything in here updated by the server. like position & speed
@@ -91,7 +81,15 @@ public class DynamicGameObject extends StaticGameObject {
 			//check for client-side smoothing of server position update
 			if(Math.abs(m_server_translation.x) > GameBase.EPS
 					|| Math.abs(m_server_translation.y) > GameBase.EPS) {
-				applySmoothing(m_new_pos);
+				if(m_server_translation.length() < 0.02f) {
+					m_new_pos.add(m_server_translation);
+					m_server_translation.set(0.f, 0.f);
+				} else {
+					float dx = m_server_translation.x * SERVER_POS_SMOOTHING;
+					float dy = m_server_translation.y * SERVER_POS_SMOOTHING;
+					m_new_pos.add(dx, dy);
+					m_server_translation.sub(dx, dy);
+				}
 				m_has_moved = true;
 			}
 		}
