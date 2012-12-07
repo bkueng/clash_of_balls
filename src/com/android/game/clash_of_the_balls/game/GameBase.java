@@ -358,6 +358,12 @@ public abstract class GameBase {
 									Log.d(TAG, "new speed direction of b, x: " + temp_b.x + "y: " + temp_b.y);
 									player_b.speed().add(temp_b);
 									
+									if(is_server) {
+										//the client will receive the update from server
+										handleImpact(player_a, player_a.newPosition()
+												, player_b, player_b.newPosition());
+									}
+									
 								}
 								
 								break;
