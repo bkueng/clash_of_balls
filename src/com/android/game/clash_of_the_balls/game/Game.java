@@ -177,19 +177,12 @@ public class Game extends GameBase implements UIBase {
 					Log.v(TAG_GAME, "Network incoming: RTT="+m_last_rtt);
 
 					generate_events = false;
-					//go back 1/2 RTT
-					super.move(-m_last_rtt/2.f);
 					
 					//apply the updates from the server
 					applyIncomingEvents();
-					
-					//move forward 1/2 RTT
-					//the incoming events happend about 1/2 RTT in the past
-					//so we move the game foreward by 1/2 RTT to be at the 
-					//correct time again
-					super.move(m_last_rtt/2.f);
-					doCollisionHandling();
-					applyMove();
+					//position updates are not applied in here
+					//so no object changes position and we do not have
+					//to do collision detection
 					
 					removeDeadObjects();
 				}
