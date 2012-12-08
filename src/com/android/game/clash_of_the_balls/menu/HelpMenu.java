@@ -3,7 +3,6 @@ package com.android.game.clash_of_the_balls.menu;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.text.method.ArrowKeyMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -11,9 +10,8 @@ import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.TextureManager;
-import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
-import com.android.game.clash_of_the_balls.R.raw;
+import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.menu.MenuItemArrow.ArrowType;
@@ -32,9 +30,11 @@ public class HelpMenu extends GameMenuBase {
 
 	private MenuItemArrow m_button_next;
 	private MenuItemArrow m_button_prev;
+	private MenuItemGreyButton m_button_back;
 
 	private boolean m_left_visible = false;
 	private boolean m_right_visible = false;
+	private boolean m_back_visible = false;
 
 	private Vector pos;
 	private Vector size;
@@ -58,13 +58,17 @@ public class HelpMenu extends GameMenuBase {
 
 		m_screen_height = screen_height;
 		m_screen_width = screen_width;
+		
 		pos = new Vector(0.f, 0.f);
 		size = new Vector(m_screen_width, m_screen_height);
-		img_width = size.x * 0.65f;
-		img_height = .5f * img_width;
-		text_height = 0.4f * img_width;
-		text_width = 1.5f * img_width;
-		offset_x = size.y * 0.1f;
+		
+		img_width = size.x * 0.6f;
+		img_height = .5f * size.y;
+		
+		text_height = 0.4f * size.y;
+		text_width = 0.8f * size.x;
+		
+		offset_x = size.x * 0.025f;
 		offset_y = offset_x * 0.5f;
 
 		m_tex_manager = tex_manager;
@@ -72,24 +76,37 @@ public class HelpMenu extends GameMenuBase {
 		m_label_font_settings = new Font2D.Font2DSettings(
 				font_settings.m_typeface, TextAlign.CENTER, label_font_color);
 
+		// Add Pages
 		addPage("Push the others into\n the holes", R.raw.img_first);
 
 		addPage("Control your ball\n balancing your phone!", R.raw.img_second);
 
-		addPage(" Watch out\nfor Walls", R.raw.img_third);
+		addPage("Watch out\nfor Walls", R.raw.img_third);
+
+		addPage("At the beginning, keep your\n phone still to choose\n your equilibrium state",
+				R.raw.img_four);
 
 		m_button_next = new MenuItemArrow(new Vector(pos.x + size.x / 2
-				+ img_width / 2, pos.y + offset_y), new Vector(text_height / 2,
-				text_height / 2), m_tex_manager, ArrowType.RIGHT);
+				+ img_width / 2+offset_x, 
+				pos.y + offset_y),
+				new Vector(img_height / 2,
+				img_height / 2), m_tex_manager, ArrowType.RIGHT);
 
-		m_button_prev = new MenuItemArrow(new Vector(pos.x + offset_x, pos.y
-				+ offset_y), new Vector(text_height / 2, text_height / 2),
+		m_button_prev = new MenuItemArrow(new Vector(pos.x +size.x/2 -img_width/2-offset_x-img_height/2, pos.y
+				+ offset_y), new Vector(img_height / 2, img_height / 2),
 				m_tex_manager, ArrowType.LEFT);
+		
+		m_button_back = new MenuItemGreyButton(new Vector(pos.x + size.x / 2
+				+ img_width / 2-offset_x/2, 
+				pos.y + size.y - text_height - offset_y-img_height/3),
+				new Vector(img_height / 1.4f,
+				img_height / 2), m_tex_manager,"Menu",font_settings);
 
 		handlePageChanged();
 	}
 
 	private void handlePageChanged() {
+		
 		if (m_curr_page > 0) {
 			m_left_visible = true;
 		} else {
@@ -97,8 +114,10 @@ public class HelpMenu extends GameMenuBase {
 		}
 		if (m_curr_page < m_num_pages - 1) {
 			m_right_visible = true;
+			m_back_visible=false;
 		} else {
 			m_right_visible = false;
+			m_back_visible=true;
 		}
 		m_menu_items = m_pages.get(m_curr_page);
 
@@ -125,13 +144,12 @@ public class HelpMenu extends GameMenuBase {
 	public void draw(RenderHelper renderer) {
 		if (m_background != null)
 			m_background.draw(renderer);
-		if (m_left_visible) {
-			m_button_prev.draw(renderer);
-		}
-		if (m_right_visible)
-			m_button_next.draw(renderer);
 		for (int i = 0; i < m_menu_items.size(); ++i)
 			m_menu_items.get(i).draw(renderer);
+		if (m_left_visible) m_button_prev.draw(renderer);
+		if (m_right_visible) m_button_next.draw(renderer);
+		if (m_back_visible) m_button_back.draw(renderer);
+		
 	}
 
 	@Override
@@ -146,6 +164,10 @@ public class HelpMenu extends GameMenuBase {
 				m_button_next.onTouchDown(x, y);
 				onTouchDown(m_button_next);
 			}
+			if (m_button_back.isInside(x, y) && m_back_visible) {
+				m_button_back.onTouchDown(x, y);
+				onTouchDown(m_button_back);
+			}
 		} else if (event == MotionEvent.ACTION_UP) {
 			if (m_button_prev.isInside(x, y) && m_left_visible) {
 				m_button_prev.onTouchUp(x, y);
@@ -154,6 +176,10 @@ public class HelpMenu extends GameMenuBase {
 			if (m_button_next.isInside(x, y) && m_right_visible) {
 				m_button_next.onTouchUp(x, y);
 				onTouchUp(m_button_next);
+			}
+			if (m_button_back.isInside(x, y) && m_back_visible) {
+				m_button_back.onTouchUp(x, y);
+				onTouchUp(m_button_back);
 			}
 		}
 	}
@@ -168,6 +194,11 @@ public class HelpMenu extends GameMenuBase {
 			nextPage();
 		} else if (item == m_button_prev) {
 			previousPage();
+		} else if (item == m_button_back){
+			m_curr_page=0;
+			m_button_back.remain_unpressed();
+			m_ui_change = UIChange.MAIN_MENU;
+			handlePageChanged();
 		}
 
 	}

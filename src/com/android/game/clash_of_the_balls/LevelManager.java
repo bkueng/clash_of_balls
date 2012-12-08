@@ -22,6 +22,7 @@ public class LevelManager {
 	}
 	
 	public void loadLevels() {
+		loadLevel(R.raw.level_1);
 		loadLevel(R.raw.level_test);
 		loadLevel(R.raw.level_test_holes);
 		loadLevel(R.raw.level_test_wall);
