@@ -97,10 +97,10 @@ public class HelpMenu extends GameMenuBase {
 				m_tex_manager, ArrowType.LEFT);
 		
 		m_button_back = new MenuItemGreyButton(new Vector(pos.x + size.x / 2
-				+ img_width / 2-offset_x/2, 
-				pos.y + size.y - text_height - offset_y-img_height/3),
-				new Vector(img_height / 1.4f,
-				img_height / 2), m_tex_manager,"Menu",font_settings);
+				                + img_width / 2+offset_x/2, 
+				                pos.y +  offset_y),
+				                new Vector(img_height / 1.5f,
+				                img_height / 2.2f), m_tex_manager,"Menu",font_settings);
 
 		handlePageChanged();
 	}
@@ -159,12 +159,10 @@ public class HelpMenu extends GameMenuBase {
 			if (m_button_prev.isInside(x, y) && m_left_visible) {
 				m_button_prev.onTouchDown(x, y);
 				onTouchDown(m_button_prev);
-			}
-			if (m_button_next.isInside(x, y) && m_right_visible) {
+			}else if (m_button_next.isInside(x, y) && m_right_visible) {
 				m_button_next.onTouchDown(x, y);
 				onTouchDown(m_button_next);
-			}
-			if (m_button_back.isInside(x, y) && m_back_visible) {
+			}else if (m_button_back.isInside(x, y) && m_back_visible) {
 				m_button_back.onTouchDown(x, y);
 				onTouchDown(m_button_back);
 			}
@@ -172,12 +170,10 @@ public class HelpMenu extends GameMenuBase {
 			if (m_button_prev.isInside(x, y) && m_left_visible) {
 				m_button_prev.onTouchUp(x, y);
 				onTouchUp(m_button_prev);
-			}
-			if (m_button_next.isInside(x, y) && m_right_visible) {
+			}else if (m_button_next.isInside(x, y) && m_right_visible) {
 				m_button_next.onTouchUp(x, y);
 				onTouchUp(m_button_next);
-			}
-			if (m_button_back.isInside(x, y) && m_back_visible) {
+			}else if (m_button_back.isInside(x, y) && m_back_visible) {
 				m_button_back.onTouchUp(x, y);
 				onTouchUp(m_button_back);
 			}
