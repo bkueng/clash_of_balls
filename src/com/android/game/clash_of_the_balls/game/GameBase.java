@@ -146,6 +146,30 @@ public abstract class GameBase {
 		return item;
 	}
 	
+	//get the middle of a random game field (tile) where no foreground object is
+	//and no moveable object is closer than min_object_dist (normally 1)
+	//to this position
+	//returns false if none is found
+	protected boolean getFreeRandomField(Vector pos_out, float min_object_dist) {
+		final int max_tries = 15;
+		boolean ret = false;
+		int empty_x[] = m_game_field.fgEmptyFieldIdxX();
+		int empty_y[] = m_game_field.fgEmptyFieldIdxY();
+		for(int i=0; i<max_tries && !ret; ++i) {
+			int idx = (int)(Math.random() * empty_x.length);
+			pos_out.x = (float)empty_x[idx] + 0.5f;
+			pos_out.y = (float)empty_y[idx] + 0.5f;
+			ret = true;
+			//check if no moveable object is too close
+			for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
+				if(entry.getValue().pos().distSquared(pos_out) < min_object_dist*min_object_dist) {
+					ret=false;
+				}
+			}
+		}
+		return ret;
+	}
+	
 	//this is the initial player count
 	public int initialPlayerCount() {
 		return m_initial_player_count;
