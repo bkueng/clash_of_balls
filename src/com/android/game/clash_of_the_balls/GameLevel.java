@@ -127,11 +127,15 @@ public class GameLevel {
 	
 	//bg
 	public static final int TYPE_NORMAL = 0;
-	public static final int TYPE_BG_MAX = 0; // max field int value background
+	public static final int TYPE_BG_BRICK = 1;
+	public static final int TYPE_BG_STONE = 2;
+	public static final int TYPE_BG_MAX = 2; // max field int value background
 	
 	public static int rawResTexIdFromBackground(int bg_field) {
 		switch(bg_field) {
 		case TYPE_NORMAL: return R.raw.texture_game_bg;
+		case TYPE_BG_BRICK: return R.raw.texture_game_bg_brick;
+		case TYPE_BG_STONE: return R.raw.texture_game_bg_stone;
 		}
 		return -1;
 	}
