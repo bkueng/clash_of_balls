@@ -3,7 +3,6 @@ package com.android.game.clash_of_the_balls.menu;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.text.method.ArrowKeyMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -11,9 +10,7 @@ import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.TextureManager;
-import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
-import com.android.game.clash_of_the_balls.R.raw;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.menu.MenuItemArrow.ArrowType;
@@ -58,13 +55,17 @@ public class HelpMenu extends GameMenuBase {
 
 		m_screen_height = screen_height;
 		m_screen_width = screen_width;
+		
 		pos = new Vector(0.f, 0.f);
 		size = new Vector(m_screen_width, m_screen_height);
-		img_width = size.x * 0.65f;
-		img_height = .5f * img_width;
-		text_height = 0.4f * img_width;
-		text_width = 1.5f * img_width;
-		offset_x = size.y * 0.1f;
+		
+		img_width = size.x * 0.6f;
+		img_height = .5f * size.y;
+		
+		text_height = 0.4f * size.y;
+		text_width = 0.8f * size.x;
+		
+		offset_x = size.x * 0.025f;
 		offset_y = offset_x * 0.5f;
 
 		m_tex_manager = tex_manager;
@@ -72,18 +73,24 @@ public class HelpMenu extends GameMenuBase {
 		m_label_font_settings = new Font2D.Font2DSettings(
 				font_settings.m_typeface, TextAlign.CENTER, label_font_color);
 
+		// Add Pages
 		addPage("Push the others into\n the holes", R.raw.img_first);
 
 		addPage("Control your ball\n balancing your phone!", R.raw.img_second);
 
-		addPage(" Watch out\nfor Walls", R.raw.img_third);
+		addPage("Watch out\nfor Walls", R.raw.img_third);
+
+		addPage("At the beginning, keep your\n phone still to choose\n your equilibrium state",
+				R.raw.img_four);
 
 		m_button_next = new MenuItemArrow(new Vector(pos.x + size.x / 2
-				+ img_width / 2, pos.y + offset_y), new Vector(text_height / 2,
-				text_height / 2), m_tex_manager, ArrowType.RIGHT);
+				+ img_width / 2+offset_x, 
+				pos.y + offset_y),
+				new Vector(img_height / 2,
+				img_height / 2), m_tex_manager, ArrowType.RIGHT);
 
-		m_button_prev = new MenuItemArrow(new Vector(pos.x + offset_x, pos.y
-				+ offset_y), new Vector(text_height / 2, text_height / 2),
+		m_button_prev = new MenuItemArrow(new Vector(pos.x +size.x/2 -img_width/2-offset_x-img_height/2, pos.y
+				+ offset_y), new Vector(img_height / 2, img_height / 2),
 				m_tex_manager, ArrowType.LEFT);
 
 		handlePageChanged();
