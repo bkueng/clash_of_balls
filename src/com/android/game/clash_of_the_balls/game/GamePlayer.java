@@ -17,6 +17,8 @@ public class GamePlayer extends DynamicGameObject {
 	public final float m_radius = 0.5f;
 	public final float m_mass = 10;
 	
+	private float m_max_speed = 3.f;
+	
 	private int m_color; //ARGB
 	private VertexBufferFloat m_color_data_colored;
 	
@@ -26,7 +28,7 @@ public class GamePlayer extends DynamicGameObject {
 	public int color() { return m_color; }
 	
 	private Vector m_acceleration = new Vector();
-	private float m_sensor_scaling = 3.f; //influences the acceleration
+	private float m_sensor_scaling = 5.f; //influences the acceleration
 	public Vector acceleration() { return m_acceleration; }
 	
 	public void applySensorVector(Vector v) {
@@ -67,13 +69,18 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	public void move(float dsec) {
+		super.move(dsec);
 		
 		//update position
-		m_new_pos.x = m_position.x + (m_speed.x + dsec * m_acceleration.x / 2.f) * dsec;
-		m_new_pos.y = m_position.y + (m_speed.y + dsec * m_acceleration.y / 2.f) * dsec;
+		m_new_pos.x += m_speed.x * dsec;
+		m_new_pos.y += m_speed.y * dsec;
 		//update speed
-		m_speed.x += dsec * m_acceleration.x;
-		m_speed.y += dsec * m_acceleration.y;
+		if(m_owner.generate_events) {
+			m_speed.x += dsec * m_acceleration.x;
+			m_speed.y += dsec * m_acceleration.y;
+			float speed = m_speed.length();
+			if(speed > m_max_speed) m_speed.mul(m_max_speed / speed);
+		}
 		
 		m_has_moved = true;
 		
@@ -87,6 +94,14 @@ public class GamePlayer extends DynamicGameObject {
 		}
 	}
 	
+	public void handleImpact(StaticGameObject other) {
+		super.handleImpact(other);
+		switch(other.type) {
+		case Hole: die();
+			break;
+		default:
+		}
+	}
 	public void die() {
 		if(!m_bIs_dead) {
 			m_acceleration.set(0.f, 0.f);
@@ -156,14 +171,11 @@ public class GamePlayer extends DynamicGameObject {
 	
 	protected void doModelTransformation(RenderHelper renderer) {
 		//scale & translate
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, 
-				m_position.x, m_position.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_scaling*m_radius*2.f
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+		renderer.modelMatScale(m_scaling*m_radius*2.f
 				, m_scaling*m_radius*2.f, 0.f);
-		Matrix.translateM(model_mat, model_mat_pos, 
-				-0.5f, -0.5f, 0.f);
+		renderer.modelMatTranslate(-0.5f, -0.5f, 0.f);
 	}
 	protected void undoModelTransformation(RenderHelper renderer) {
 		renderer.popModelMat();

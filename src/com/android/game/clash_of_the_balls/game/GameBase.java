@@ -29,6 +29,8 @@ import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 public abstract class GameBase {
 	private static final String TAG = "GameBase";
 	
+	public static final float EPS = 0.00001f;
+	
 	protected final static int wait_to_start_game = 5; //[sec]
 					//time between press of play and actual game start
 					//in the last second of this, the sensor calibration will be done
@@ -83,7 +85,7 @@ public abstract class GameBase {
 	
 	public void initGame(GameLevel level) {
 		if(m_bIs_game_running)
-			throw new RuntimeException("initGame called while game is running! this must NOT happend");
+			Log.e(TAG, "initGame called while game is running! this must NOT happend");
 		
 		m_game_objects = new TreeMap<Short, DynamicGameObject>();
 		m_game_field = new GameField(m_texture_manager);
@@ -222,7 +224,7 @@ public abstract class GameBase {
 									
 									break;
 
-								case Wall_vertical: // TODO: change to Wall
+								case Wall_vertical:
 								{
 									GamePlayer player = ((GamePlayer) obj);
 									GameWall wall = ((GameWall) field_obj);  
@@ -538,41 +540,35 @@ public abstract class GameBase {
 									Log.d(TAG, "Players collide");
 									
 									// Players collide
-									float eps = 0.0f; // eps distance between players
 									
 									float alpha = player_a.pos().x - player_b.pos().x;
 									float gamma = player_a.pos().y - player_b.pos().y;
-									float beta = player_a.newPosition().x - player_a.pos().x + player_b.newPosition().x - player_b.pos().x;
-									float delta = player_a.newPosition().y - player_a.pos().y + player_b.newPosition().y - player_b.pos().y;
+									float beta = player_a.newPosition().x - player_a.pos().x - player_b.newPosition().x + player_b.pos().x;
+									float delta = player_a.newPosition().y - player_a.pos().y - player_b.newPosition().y + player_b.pos().y;
 									
-									float rads = ((player_a.m_radius + player_b.m_radius + eps) * (player_a.m_radius + player_b.m_radius + eps));
+									float rads = ((player_a.m_radius + player_b.m_radius + EPS) * (player_a.m_radius + player_b.m_radius + EPS));
 
 									float a = (beta * beta + delta * delta);
 									float b = 2.f * (alpha * beta + gamma * delta);
 									float c = (gamma * gamma + alpha * alpha) - (rads * rads);
-									float D = (b*b) - (4.f * a * c);
-									D = FloatMath.sqrt(D);
+									float D = FloatMath.sqrt((b*b) - (4.f * a * c));
 									
 									float t1 = (-b + D) / (2.f * a);
 									float t2 = (-b - D) / (2.f * a);
 									float t = t1;
-									
-									if (Math.abs(t2) < Math.abs(t1))
-										t = t2;
+									if (t2 < t1) t = t2;
 									
 									// Set the new position of player a
-									Vector new_position_a = new Vector(player_a.newPosition());
+									Vector new_position_a = player_a.newPosition();
 									new_position_a.sub(player_a.pos());
 									new_position_a.mul(t);
-									player_a.pos().add(new_position_a);
-									player_a.newPosition().set(player_a.pos());
+									new_position_a.add(player_a.pos());
 									
 									// Set the new position of player b
-									Vector new_position_b = new Vector(player_b.newPosition());
+									Vector new_position_b = player_b.newPosition();
 									new_position_b.sub(player_b.pos());
 									new_position_b.mul(t);
-									player_b.pos().add(new_position_b);
-									player_b.newPosition().set(player_b.pos());
+									new_position_b.add(player_b.pos());
 																		
 									Log.d(TAG, "Player a new position, x: " + player_a.newPosition().x + "y: " + player_a.newPosition().y);
 									Log.d(TAG, "Player b new position, x: " + player_b.newPosition().y + "y: " + player_b.newPosition().y);
@@ -584,37 +580,38 @@ public abstract class GameBase {
 									dir_a_b.normalize();
 									Vector dir_b_a = new Vector(dir_a_b);
 									
-									Vector speed_a = new Vector(player_a.speed());
-									speed_a.mul(1/dir_a_b.lengthSquared());
-									dir_a_b.mul(dir_a_b.dot(speed_a));
-									
-									Vector speed_b = new Vector(player_b.speed());
-									speed_b.mul(1/dir_b_a.lengthSquared());
-									dir_b_a.mul(dir_b_a.dot(speed_b));
+									dir_a_b.mul(dir_a_b.dot(player_a.speed()));
+									dir_b_a.mul(dir_b_a.dot(player_b.speed()));
 									
 									// Calculate epsilon (elasticity factor)
 									float epsilon = (player_a.elasticFactor() 
 											+ player_b.elasticFactor()) / 2.0f;
 									
-									Vector temp_a = new Vector(speed_a);
-									Vector temp_b = new Vector(speed_b);
+									Vector temp_a = new Vector(dir_a_b);
+									Vector temp_b = new Vector(dir_b_a);
 									temp_a.mul(player_a.m_mass - epsilon * player_b.m_mass);
 									temp_b.mul(player_b.m_mass * (1.0f + epsilon));
 									temp_a.add(temp_b);
-									temp_a.mul(1/(player_a.m_mass + player_b.m_mass));
-									temp_a.sub(speed_a);
+									temp_a.mul(1.f/(player_a.m_mass + player_b.m_mass));
+									temp_a.sub(dir_a_b);
 									Log.d(TAG, "new speed direction of a, x: " + temp_a.x + "y: " + temp_a.y);
 									player_a.speed().add(temp_a);
 									
-									temp_a.set(speed_a);
-									temp_b.set(speed_b);
+									temp_a.set(dir_a_b);
+									temp_b.set(dir_b_a);
 									temp_b.mul(player_b.m_mass - epsilon * player_a.m_mass);
 									temp_a.mul(player_a.m_mass * (1.0f + epsilon));
 									temp_b.add(temp_a);
-									temp_b.mul(1/(player_b.m_mass + player_a.m_mass));
-									temp_b.sub(speed_b);
+									temp_b.mul(1.f/(player_b.m_mass + player_a.m_mass));
+									temp_b.sub(dir_b_a);
 									Log.d(TAG, "new speed direction of b, x: " + temp_b.x + "y: " + temp_b.y);
 									player_b.speed().add(temp_b);
+									
+									if(is_server) {
+										//the client will receive the update from server
+										handleImpact(player_a, player_a.newPosition()
+												, player_b, player_b.newPosition());
+									}
 									
 								}
 								

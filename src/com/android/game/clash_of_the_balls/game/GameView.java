@@ -87,10 +87,9 @@ public class GameView extends GameObject {
 	//call this before rendering
 	public void applyView(RenderHelper renderer) {
 		//translate & scale
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_scaling, m_scaling, 0.f);
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+		renderer.modelMatScale(m_scaling, m_scaling, 0.f);
 	}
 	//call this after rendering
 	public void resetView(RenderHelper renderer) {

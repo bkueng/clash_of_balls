@@ -49,9 +49,16 @@ public class DynamicGameObject extends StaticGameObject {
 			super.draw(renderer);
 		}
 	}
+	public void applyVectorData(Vector new_pos, Vector new_speed) {
+		m_speed.set(new_speed);
+		
+		m_position.set(new_pos);
+	}
 
 	@Override
 	public void move(float dsec) {
+		m_new_pos.set(m_position);
+		
 		//-> set m_has_moved & m_new_pos
 	}
 	

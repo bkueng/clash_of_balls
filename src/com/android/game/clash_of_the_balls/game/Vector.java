@@ -37,7 +37,7 @@ public class Vector {
 
 	
 	public float length() { 
-		return (float) Math.sqrt((x * x) + (y * y));
+		return FloatMath.sqrt((x * x) + (y * y));
 	}
 	
 	public float lengthSquared() { 
@@ -101,8 +101,8 @@ public class Vector {
 	}
 
 	public void rotate(float dAlfa_rad) {
-		float nCos = (float) Math.cos(dAlfa_rad);
-		float nSin = (float) Math.sin(dAlfa_rad);
+		float nCos = FloatMath.cos(dAlfa_rad);
+		float nSin = FloatMath.sin(dAlfa_rad);
 		
 		float iX = x * nCos - y * nSin;
 		float iY = y * nCos + x * nSin;

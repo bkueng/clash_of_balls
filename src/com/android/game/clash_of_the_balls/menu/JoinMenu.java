@@ -173,6 +173,7 @@ public class JoinMenu extends GameMenuBase {
 						String user_name = Networking.fromDisplayableName(
 								m_name_button.getString());
 						m_settings.user_name = user_name;
+						m_settings.is_host = false;
 						m_network_client.setOwnName(user_name);
 						m_network_client.connectToServer(server_id);
 						m_ui_change = UIChange.WAIT_MENU;

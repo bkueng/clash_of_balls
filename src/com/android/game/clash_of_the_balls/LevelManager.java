@@ -22,9 +22,14 @@ public class LevelManager {
 	}
 	
 	public void loadLevels() {
+		loadLevel(R.raw.level_1);
+		loadLevel(R.raw.level_2);
+		loadLevel(R.raw.level_3);
+		loadLevel(R.raw.level_test1);
 		loadLevel(R.raw.level_test);
 		loadLevel(R.raw.level_test_holes);
 		loadLevel(R.raw.level_test_wall);
+		loadLevel(R.raw.level_test2);
 		//TODO: other levels, also from file system?
 		
 	}
@@ -35,7 +40,9 @@ public class LevelManager {
 			l.loadLevel(raw_res_id);
 			m_levels.add(l);
 		} catch (Exception e) {
-			Log.w(LOG_TAG, "Failed to load level with raw res id="+raw_res_id);
+			Log.w(LOG_TAG, "Failed to load level with raw res id="+raw_res_id
+					+" ("+e.getMessage()+")");
+			
 		}
 		
 	}

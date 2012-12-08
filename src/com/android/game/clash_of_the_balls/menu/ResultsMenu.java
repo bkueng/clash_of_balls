@@ -157,7 +157,7 @@ public class ResultsMenu extends GameMenuInGame {
 		}
 		
 		if(m_settings.isGameFinished()) {
-			m_start_button.setString("main menu");
+			m_start_button.setString("Main Menu");
 			if(winner.length() > 0)
 				m_title.setString("Results: "+winner+" wins");
 			else

@@ -6,6 +6,7 @@ import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.GameHole.HoleType;
+import com.android.game.clash_of_the_balls.game.GameWall.WallType;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 
 /**
@@ -130,22 +131,22 @@ public class GameField extends GameObject {
 						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Right, texture);
 						break;
 					case GameLevel.TYPE_WALL_HOR:
-						obj=new GameWall(object_id++, pos,Type.Wall_horizontal, texture);
+						obj=new GameWall(object_id++, pos,WallType.Wall_horizontal, texture);
 						break;
 					case GameLevel.TYPE_WALL_VERT:
-						obj=new GameWall(object_id++, pos,Type.Wall_vertical, texture);
+						obj=new GameWall(object_id++, pos,WallType.Wall_vertical, texture);
 						break;
 					case GameLevel.TYPE_WALL_CORNER_UP_RIGHT:
-						obj=new GameWall(object_id++, pos,Type.Wall_Corner_up_right, texture);
+						obj=new GameWall(object_id++, pos,WallType.Wall_Corner_up_right, texture);
 						break;
 					case GameLevel.TYPE_WALL_CORNER_UP_LEFT:
-						obj=new GameWall(object_id++, pos,Type.Wall_Corner_up_left, texture);
+						obj=new GameWall(object_id++, pos,WallType.Wall_Corner_up_left, texture);
 						break;
 					case GameLevel.TYPE_WALL_CORNER_DOWN_RIGHT:
-						obj=new GameWall(object_id++, pos,Type.Wall_Corner_down_right, texture);
+						obj=new GameWall(object_id++, pos,WallType.Wall_Corner_down_right, texture);
 						break;
 					case GameLevel.TYPE_WALL_CORNER_DOWN_LEFT:
-						obj=new GameWall(object_id++, pos,Type.Wall_Corner_down_left, texture);
+						obj=new GameWall(object_id++, pos,WallType.Wall_Corner_down_left, texture);
 						break;
 						
 					} 

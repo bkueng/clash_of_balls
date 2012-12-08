@@ -103,10 +103,11 @@ public class GameServer extends GameBase implements Runnable {
 		if(looper != null) {
 			if(m_msg_handler!=null)
 				m_networking.unregisterEventListener(m_msg_handler);
+			m_looper = null;
 			looper.quit();
 			try {
 				//wait for thread to exit
-				looper.getThread().join(800);
+				looper.getThread().join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -265,11 +266,13 @@ public class GameServer extends GameBase implements Runnable {
 		addEvent(new EventGameInfo(this, getNextSequenceNum()));
 		sendAllEvents();
 		
-		//wait for start ...
-		try {
-			Thread.sleep(wait_to_start_game * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		//wait for start: wait_to_start_game seconds
+		for(int i=0; i< 2*wait_to_start_game && m_looper!=null; ++i) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		//ok let's do it...
@@ -307,7 +310,8 @@ public class GameServer extends GameBase implements Runnable {
 	
 	private void checkGameEnd(float elapsed_time) {
 		//in debug mode we allow a single player -> don't end the game
-		if(GameSettings.debug && currentPlayerCount()==1) return;
+		if(GameSettings.debug && initialPlayerCount()==1
+				&& currentPlayerCount()!=0) return;
 		
 		//game ends if there is only 1 player left (or 0)
 		//a small timeout is used after only 1 or 0 player is left
@@ -341,7 +345,9 @@ public class GameServer extends GameBase implements Runnable {
 		addEvent(new EventGameStartNow(getNextSequenceNum()));
 		sendAllEvents();
 		m_is_game_ending=false;
-		m_msg_handler.postDelayed(m_timeout_check, network_receive_timeout);
+		IncomingHandler h = m_msg_handler;
+		if(h!=null)
+			h.postDelayed(m_timeout_check, network_receive_timeout);
 	}
 	
 	public void gameEnd() {
@@ -350,7 +356,7 @@ public class GameServer extends GameBase implements Runnable {
 		Statistic stat = m_settings.game_statistics.currentRoundStatistics();
 		for(DynamicGameObject item : m_game_objects.values()) {
 			if(item.type == Type.Player && !item.isDead()) {
-				stat.setPlayerPoints(item.m_id, initialPlayerCount() - currentPlayerCount()-1);
+				stat.setPlayerPoints(item.m_id, initialPlayerCount() - currentPlayerCount());
 			}
 		}
 		m_settings.game_statistics.applyCurrentRoundStatistics();

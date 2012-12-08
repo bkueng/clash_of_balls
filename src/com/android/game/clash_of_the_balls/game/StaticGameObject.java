@@ -18,12 +18,7 @@ public class StaticGameObject extends GameObject {
 	public enum Type {
 		Background,
 		Hole,
-		Wall_horizontal,
-		Wall_vertical,
-		Wall_Corner_up_right,
-		Wall_Corner_up_left,
-		Wall_Corner_down_right,
-		Wall_Corner_down_left,
+		Wall,
 		Player,
 		Item
 	}
@@ -100,18 +95,15 @@ public class StaticGameObject extends GameObject {
 	//these can be overridden by subclasses to customize model transformation
 	protected void doModelTransformation(RenderHelper renderer) {
 		//translate
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
+		renderer.pushModelMat();
+		
 		if(m_rotation_angle == 0.f) {
-			Matrix.translateM(model_mat, model_mat_pos, 
-					m_position.x-0.5f, m_position.y-0.5f, 0.f);
+			renderer.modelMatTranslate(m_position.x-0.5f, m_position.y-0.5f, 0.f);
 		} else {
-			Matrix.translateM(model_mat, model_mat_pos, 
-					m_position.x, m_position.y, 0.f);
-			Matrix.rotateM(model_mat, model_mat_pos, m_rotation_angle*180.f/(float)Math.PI
+			renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+			renderer.modelMatRotate(m_rotation_angle*180.f/(float)Math.PI
 					, 0.f, 0.f, 1.f);
-			Matrix.translateM(model_mat, model_mat_pos, 
-					-0.5f, -0.5f, 0.f);
+			renderer.modelMatTranslate(-0.5f, -0.5f, 0.f);
 		}
 	}
 	

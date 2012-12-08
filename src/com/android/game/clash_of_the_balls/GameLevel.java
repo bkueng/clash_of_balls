@@ -127,11 +127,15 @@ public class GameLevel {
 	
 	//bg
 	public static final int TYPE_NORMAL = 0;
-	public static final int TYPE_BG_MAX = 0; // max field int value background
+	public static final int TYPE_BG_BRICK = 1;
+	public static final int TYPE_BG_STONE = 2;
+	public static final int TYPE_BG_MAX = 2; // max field int value background
 	
 	public static int rawResTexIdFromBackground(int bg_field) {
 		switch(bg_field) {
 		case TYPE_NORMAL: return R.raw.texture_game_bg;
+		case TYPE_BG_BRICK: return R.raw.texture_game_bg_brick;
+		case TYPE_BG_STONE: return R.raw.texture_game_bg_stone;
 		}
 		return -1;
 	}
@@ -201,14 +205,13 @@ public class GameLevel {
 				assertFormat(line.length >= 2*width);
 				
 				String log_line = "";
-				
 				for(int x=0; x<width; ++x) {
 					//background
-					int bg = Integer.parseInt(line[x*2]);
+					int bg = Integer.parseInt(line[x*2].trim());
 					assertFormat(bg >= 0 && bg <= TYPE_BG_MAX);
 					m_background[(height-y-1)*width+x] = bg;
 					//foreground
-					int fg = Integer.parseInt(line[x*2+1]);
+					int fg = Integer.parseInt(line[x*2+1].trim());
 					assertFormat(fg >= 0 && fg <= TYPE_FG_MAX);
 					if(fg==TYPE_PLAYER) ++player_count;
 					m_foreground[(height-y-1)*width+x] = fg;

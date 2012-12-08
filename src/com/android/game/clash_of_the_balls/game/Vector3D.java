@@ -1,5 +1,7 @@
 package com.android.game.clash_of_the_balls.game;
 
+import android.util.FloatMath;
+
 public class Vector3D {
 
 	public float x,y,z;
@@ -36,7 +38,7 @@ public class Vector3D {
 	
 
 	public float length() { 
-		return (float) Math.sqrt((x * x) + (y * y) + (z * z));
+		return FloatMath.sqrt((x * x) + (y * y) + (z * z));
 	}
 	
 	public float lengthSquared() { 
@@ -112,8 +114,8 @@ public class Vector3D {
 	//rotate this vector around vector n, by angle radians
 	//n will be normalized
 	public void rotate(Vector3D n, float angle) {
-		float ca=(float)Math.cos(angle);
-		float sa=(float)Math.sin(angle);
+		float ca=FloatMath.cos(angle);
+		float sa=FloatMath.sin(angle);
 		
 		float len=n.length();
 		if(len==0.0f || angle==0.f) return;

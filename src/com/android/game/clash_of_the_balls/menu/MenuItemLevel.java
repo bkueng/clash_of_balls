@@ -49,16 +49,13 @@ public class MenuItemLevel extends MenuItem {
 	
 	public void draw(RenderHelper renderer) {
 		
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
 		
 		m_game_view.applyView(renderer);
 		m_game_field.draw(renderer);
 		if(m_is_selected) {
-			model_mat = renderer.modelMat();
-			model_mat_pos = renderer.modelMatPos();
-			Matrix.scaleM(model_mat, model_mat_pos, (float)m_level.width, 
+			renderer.modelMatScale((float)m_level.width, 
 					(float)m_level.height, 0.f);
 			drawTexture(renderer, m_sel_texture);
 		}

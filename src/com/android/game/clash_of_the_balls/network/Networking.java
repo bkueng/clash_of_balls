@@ -1204,6 +1204,7 @@ public class Networking {
         }
         mUseSessionId = -1;
         mJoinedToSelf = false;
+        mChatInterface = null;
      	mUseChannelState = UseChannelState.IDLE;
     }
     
