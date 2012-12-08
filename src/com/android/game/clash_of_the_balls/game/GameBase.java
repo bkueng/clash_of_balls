@@ -283,20 +283,10 @@ public abstract class GameBase {
 													// check if intersection point lies on the line
 													if (intersect_point.x > ax && intersect_point.x < bx) {
 														
-														// normal of this edge
+														// normal vector for lower edge (horizontal)
 														normal.set(0.0f, -1.0f);
-														Vector player_pos = new Vector(normal);
-														
-														// calculate new velocity
-														normal.mul(player.speed().dot(normal));
-														normal.mul(-2.0f);
-														normal.add(player.speed());
-														// set new velocity
-														player.speed().set(normal);
-														
-														// set new position of player
-														player_pos.mul(player.m_radius + eps);
-														player.newPosition().add(player_pos);
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, eps);
 													
 													} else {
 														// check corner
@@ -313,20 +303,10 @@ public abstract class GameBase {
 													// check if intersection point lies on the line
 													if (intersect_point.y > ay && intersect_point.y < dy) {
 														
-														// normal of this edge
+														// normal vector for left edge (vertical)
 														normal.set(-1.0f, 0.0f);
-														Vector player_pos = new Vector(normal);
-														
-														// calculate new velocity
-														normal.mul(player.speed().dot(normal));
-														normal.mul(-2.0f);
-														normal.add(player.speed());
-														// set new velocity
-														player.speed().set(normal);
-														
-														// set new position of player
-														player_pos.mul(player.m_radius + eps);
-														player.newPosition().add(player_pos);
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, eps);
 													
 													} else {
 														// check corner
@@ -341,21 +321,11 @@ public abstract class GameBase {
 													// check if intersection point lies on the line
 													if (intersect_point.x > dx && intersect_point.x < cx) {
 														
-														// normal of this edge
+														// normal vector for upper edge (horizontal)
 														normal.set(0.0f, 1.0f);
-														Vector player_pos = new Vector(normal);
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, eps);
 														
-														// calculate new velocity
-														normal.mul(player.speed().dot(normal));
-														normal.mul(-2.0f);
-														normal.add(player.speed());
-														// set new velocity
-														player.speed().set(normal);
-														
-														// set new position of player
-														player_pos.mul(player.m_radius + eps);
-														player.newPosition().add(player_pos);
-													
 													} else {
 														// check corner
 														// TODO
@@ -373,21 +343,11 @@ public abstract class GameBase {
 													// check if intersection point lies on the line
 													if (intersect_point.y > by && intersect_point.y < cy) {
 														
-														// normal of this edge
+														// normal vector for right edge (vertical)
 														normal.set(1.0f, 0.0f);
-														Vector player_pos = new Vector(normal);
-														
-														// calculate new velocity
-														normal.mul(player.speed().dot(normal));
-														normal.mul(-2.0f);
-														normal.add(player.speed());
-														// set new velocity
-														player.speed().set(normal);
-														
-														// set new position of player
-														player_pos.mul(player.m_radius + eps);
-														player.newPosition().add(player_pos);
-													
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, eps);
+
 													} else {
 														// check corner
 														// TODO
@@ -401,21 +361,11 @@ public abstract class GameBase {
 													// check if intersection point lies on the line
 													if (intersect_point.x > ax && intersect_point.x < bx) {
 														
-														// normal of this edge
+														// normal vector for lower edge (horizontal)
 														normal.set(0.0f, -1.0f);
-														Vector player_pos = new Vector(normal);
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, eps);
 														
-														// calculate new velocity
-														normal.mul(player.speed().dot(normal));
-														normal.mul(-2.0f);
-														normal.add(player.speed());
-														// set new velocity
-														player.speed().set(normal);
-														
-														// set new position of player
-														player_pos.mul(player.m_radius + eps);
-														player.newPosition().add(player_pos);
-													
 													} else {
 														// check corner
 														// TODO
@@ -431,21 +381,11 @@ public abstract class GameBase {
 													// check if intersection point lies on the line
 													if (intersect_point.y > by && intersect_point.y < cy) {
 														
-														// normal of this edge
+														// normal vector for right edge (vertical)
 														normal.set(1.0f, 0.0f);
-														Vector player_pos = new Vector(normal);
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, eps);
 														
-														// calculate new velocity
-														normal.mul(player.speed().dot(normal));
-														normal.mul(-2.0f);
-														normal.add(player.speed());
-														// set new velocity
-														player.speed().set(normal);
-														
-														// set new position of player
-														player_pos.mul(player.m_radius + eps);
-														player.newPosition().add(player_pos);
-													
 													} else {
 														// check corner
 														// TODO
@@ -459,21 +399,11 @@ public abstract class GameBase {
 													// check if intersection point lies on the line
 													if (intersect_point.x > dx && intersect_point.y < cx) {
 														
-														// normal of this edge
+														// normal vector for upper edge (horizontal)
 														normal.set(0.0f, 1.0f);
-														Vector player_pos = new Vector(normal);
-														
-														// calculate new velocity
-														normal.mul(player.speed().dot(normal));
-														normal.mul(-2.0f);
-														normal.add(player.speed());
-														// set new velocity
-														player.speed().set(normal);
-														
-														// set new position of player
-														player_pos.mul(player.m_radius + eps);
-														player.newPosition().add(player_pos);
-													
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, eps);
+
 													} else {
 														// check corner
 														// TODO
