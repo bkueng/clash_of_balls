@@ -14,6 +14,7 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
+import com.android.game.clash_of_the_balls.game.GameItem.ItemType;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventImpact;
@@ -45,6 +46,9 @@ public abstract class GameBase {
 	
 	protected boolean m_bIs_game_running = false;
 	public boolean isRunning() { return m_bIs_game_running; }
+	
+	protected GamePlayer m_own_player = null;
+	public GamePlayer ownPlayer() { return m_own_player; }
 	
 	public final boolean is_server;
 	
@@ -120,6 +124,26 @@ public abstract class GameBase {
 			if(players[i].id >= m_next_object_id)
 				m_next_object_id = (short) (players[i].id + 1);
 		}
+	}
+	
+	//add item to the game. does not generate an Event
+	public GameItem addItem(short id, ItemType type, Vector position) {
+		Texture texture=null;
+		if(m_texture_manager!=null) {
+			switch(type) {
+			case IncreaseMaxSpeed: texture=m_texture_manager.get(R.raw.texture_item_speed);
+				break;
+			case InvertControls: texture=m_texture_manager.get(R.raw.texture_item_control_change);
+				break;
+			case InvisibleToOthers: texture=m_texture_manager.get(R.raw.texture_item_invisible);
+				break;
+			case MassAndSize: texture=m_texture_manager.get(R.raw.texture_item_mass);
+				break;
+			}
+		}
+		GameItem item = new GameItem(this, id, position, texture, type);
+		m_game_objects.put(id, item);
+		return item;
 	}
 	
 	//this is the initial player count

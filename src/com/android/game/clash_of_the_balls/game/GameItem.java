@@ -10,7 +10,7 @@ import com.android.game.clash_of_the_balls.Texture;
 
 public class GameItem extends DynamicGameObject {
 
-	public static final float item_effect_duration = 10.f; //[sec]
+	public static final float item_effect_duration = 20.f; //[sec]
 
 	private float m_scaling=1.f; //for drawing, used for dying effect
 	
@@ -24,7 +24,13 @@ public class GameItem extends DynamicGameObject {
 		InvertControls, //invert input controls
 		
 		//the logic of applying an item is in GamePlayer.applyItem
+		
+		None
 	}
+	
+    public static ItemType getRandomType() {
+        return ItemType.values()[(int) (Math.random() * (ItemType.values().length-1))];
+    }
 	
 	private final ItemType m_item_type;
 	public ItemType itemType() { return m_item_type; }

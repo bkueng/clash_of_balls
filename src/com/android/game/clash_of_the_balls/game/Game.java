@@ -39,8 +39,6 @@ public class Game extends GameBase implements UIBase {
 	
 	private NetworkClient m_network_client;
 	
-	private GamePlayer m_own_player;
-	
 	private float m_calibration_timeout=0.f; //[sec]
 	
 	
