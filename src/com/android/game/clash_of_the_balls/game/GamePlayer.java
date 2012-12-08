@@ -94,6 +94,14 @@ public class GamePlayer extends DynamicGameObject {
 		}
 	}
 	
+	public void handleImpact(StaticGameObject other) {
+		super.handleImpact(other);
+		switch(other.type) {
+		case Hole: die();
+			break;
+		default:
+		}
+	}
 	public void die() {
 		if(!m_bIs_dead) {
 			m_acceleration.set(0.f, 0.f);

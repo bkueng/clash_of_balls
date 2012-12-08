@@ -217,8 +217,6 @@ public abstract class GameBase {
 											//apply speed
 											obj.speed().set(n);
 											
-											obj.die();
-											
 										}
 									}
 									
