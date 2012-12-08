@@ -43,7 +43,7 @@ public class RenderHelper {
 			float screen_height) {
 		m_shader_manager = shader_manager;
 		
-		final int init_model_mat_count = 4;
+		final int init_model_mat_count = 6;
 		m_model_mat = new float[init_model_mat_count*mat_size];
 		m_cur_model_mat_pos=0;
 		m_max_model_mat_pos = mat_size*(init_model_mat_count - 1);
@@ -85,10 +85,6 @@ public class RenderHelper {
 	public int popModelMat() {
 		
 		m_cur_model_mat_pos-=mat_size;
-		if(m_cur_model_mat_pos*3 < m_max_model_mat_pos
-				&& m_max_model_mat_pos > 3*mat_size) {
-			resizeModelMat(m_model_mat.length/2);
-		}
 		
 		return m_cur_model_mat_pos;
 	}
