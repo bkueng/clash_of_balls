@@ -99,9 +99,30 @@ public class GamePlayer extends DynamicGameObject {
 		switch(other.type) {
 		case Hole: die();
 			break;
+		case Item: applyItem((GameItem) other);
+			break;
 		default:
 		}
 	}
+	
+	public void applyItem(GameItem item) {
+		//disable old item if any
+		
+		
+		switch(item.itemType()) {
+		case IncreaseMaxSpeed:
+			break;
+		case InvertControls:
+			break;
+		case InvisibleToOthers:
+			break;
+		case MassAndSize:
+			break;
+		default:
+			break;
+		}
+	}
+	
 	public void die() {
 		if(!m_bIs_dead) {
 			m_acceleration.set(0.f, 0.f);
