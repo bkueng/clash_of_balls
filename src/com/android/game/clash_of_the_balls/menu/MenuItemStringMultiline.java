@@ -65,10 +65,9 @@ public class MenuItemStringMultiline extends MenuItem {
 		if(m_item_font != null) {
 			float y = m_position.y;
 			for(int i=0; i<m_item_font.length; ++i) {
-				int model_mat_pos = renderer.pushModelMat();
-				float model_mat[] = renderer.modelMat();
-				Matrix.translateM(model_mat, model_mat_pos, m_position.x, y, 0.f);
-				Matrix.scaleM(model_mat, model_mat_pos, m_font_size.x, m_font_size.y, 0.f);
+				renderer.pushModelMat();
+				renderer.modelMatTranslate(m_position.x, y, 0.f);
+				renderer.modelMatScale(m_font_size.x, m_font_size.y, 0.f);
 
 				m_item_font[m_item_font.length-i-1].draw(renderer);
 

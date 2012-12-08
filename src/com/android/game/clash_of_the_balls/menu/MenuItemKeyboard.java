@@ -4,18 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.opengl.GLES20;
-import android.opengl.Matrix;
-import android.support.v4.content.Loader.ForceLoadContentObserver;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.game.clash_of_the_balls.Font2D;
-import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
@@ -171,11 +166,9 @@ public class MenuItemKeyboard extends MenuItem {
 	}
 
 	public void draw(RenderHelper renderer) {			
-		
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+		renderer.modelMatScale(m_size.x, m_size.y, 0.f);
 		
 		drawTexture(renderer, m_texture);
 		

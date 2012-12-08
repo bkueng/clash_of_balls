@@ -74,7 +74,6 @@ public class RenderHelper {
 	public int pushModelMat() {
 		if(m_cur_model_mat_pos >= m_max_model_mat_pos)
 			resizeModelMat(m_model_mat.length*2);
-		
 		for(int i=0; i<mat_size; ++i) {
 			m_model_mat[m_cur_model_mat_pos+i+mat_size] = 
 					m_model_mat[m_cur_model_mat_pos+i];
@@ -92,6 +91,26 @@ public class RenderHelper {
 		}
 		
 		return m_cur_model_mat_pos;
+	}
+	
+	//model matrix operations
+	public void modelMatScale(float scale_x, float scale_y, float scale_z) {
+		Matrix.scaleM(m_model_mat, m_cur_model_mat_pos, scale_x, scale_y, scale_z);
+	}
+	public void modelMatTranslate(float x, float y, float z) {
+		Matrix.translateM(m_model_mat, m_cur_model_mat_pos, x, y, z);
+	}
+	private float[] m_tmp_rot_mat = new float[mat_size];
+	
+	public void modelMatRotate(float alpha_degree, float x, float y, float z) {
+        Matrix.setRotateM(m_tmp_rot_mat, 0, alpha_degree, x, y, z);
+        pushModelMat();
+        Matrix.multiplyMM(m_model_mat, m_cur_model_mat_pos-mat_size
+        		, m_model_mat, m_cur_model_mat_pos, m_tmp_rot_mat, 0);
+        popModelMat();
+	}
+	public void modelMatSetIdentity() {
+		Matrix.setIdentityM(m_model_mat, m_cur_model_mat_pos);
 	}
 	
 	

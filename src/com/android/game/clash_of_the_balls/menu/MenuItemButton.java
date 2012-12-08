@@ -83,10 +83,9 @@ public class MenuItemButton extends MenuItem {
 			m_item_font.setColorData(m_color_data_disabled);
 		}
 		
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, this.size().x, this.size().y, 0.f);
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+		renderer.modelMatScale(m_size.x, m_size.y, 0.f);
 		
 		drawTexture(renderer, texture);
         

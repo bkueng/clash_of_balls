@@ -45,12 +45,10 @@ public class MenuBackground extends GameObject {
 				, m_position, m_size);
 		
 		//translate & scale to fit screen
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.setIdentityM(model_mat, model_mat_pos);
-		Matrix.translateM(model_mat, model_mat_pos, m_position.x, m_position.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_size.x, m_size.y, 0.f);
-		
+		renderer.pushModelMat();
+		renderer.modelMatSetIdentity();
+		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+		renderer.modelMatScale(m_size.x, m_size.y, 0.f);
 		
 		int position_handle = renderer.shaderManager().a_Position_handle;
 		if(position_handle != -1)

@@ -102,22 +102,20 @@ public class PopupGameStart extends PopupBase {
 		super.draw(renderer);
 		
 		//the player
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, 
-				m_player_pos.x+m_player_size.x/2.f, m_player_pos.y+m_player_size.y/2.f, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_player_size.x, m_player_size.y, 0.f);
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_player_pos.x+m_player_size.x/2.f
+				, m_player_pos.y+m_player_size.y/2.f, 0.f);
+		renderer.modelMatScale(m_player_size.x, m_player_size.y, 0.f);
 		
 		m_player.draw(renderer);
 		
         renderer.popModelMat();
         
         //countdown font
-		model_mat_pos = renderer.pushModelMat();
-		model_mat = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, m_timeout_font_pos.x
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_timeout_font_pos.x
 				, m_timeout_font_pos.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_timeout_font_size.x
+		renderer.modelMatScale(m_timeout_font_size.x
 				, m_timeout_font_size.y, 0.f);
 		
 		m_timeout_font.draw(renderer);
@@ -125,11 +123,10 @@ public class PopupGameStart extends PopupBase {
         renderer.popModelMat();
         
         //game start font
-		model_mat_pos = renderer.pushModelMat();
-		model_mat = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, m_game_start_font_pos.x
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_game_start_font_pos.x
 				, m_game_start_font_pos.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_game_start_font_size.x
+		renderer.modelMatScale(m_game_start_font_size.x
 				, m_game_start_font_size.y, 0.f);
 		
 		m_game_start_font.draw(renderer);

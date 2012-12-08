@@ -163,14 +163,11 @@ public class GamePlayer extends DynamicGameObject {
 	
 	protected void doModelTransformation(RenderHelper renderer) {
 		//scale & translate
-		int model_mat_pos = renderer.pushModelMat();
-		float model_mat[] = renderer.modelMat();
-		Matrix.translateM(model_mat, model_mat_pos, 
-				m_position.x, m_position.y, 0.f);
-		Matrix.scaleM(model_mat, model_mat_pos, m_scaling*m_radius*2.f
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+		renderer.modelMatScale(m_scaling*m_radius*2.f
 				, m_scaling*m_radius*2.f, 0.f);
-		Matrix.translateM(model_mat, model_mat_pos, 
-				-0.5f, -0.5f, 0.f);
+		renderer.modelMatTranslate(-0.5f, -0.5f, 0.f);
 	}
 	protected void undoModelTransformation(RenderHelper renderer) {
 		renderer.popModelMat();
