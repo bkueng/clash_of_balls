@@ -237,15 +237,33 @@ public abstract class GameBase {
 										Vector normal = new Vector();
 										Vector intersect_point = new Vector();
 										
+										/*
+										 *  d----c
+										 *  |    |
+										 *  |    |
+										 *  a----b
+										 */
+										
+										// absolute positions of rectangle corners
+										float ax = rect_center.x - rect.width()/2.0f;
+										float ay = rect_center.y - rect.height()/2.0f;
+										float bx = rect_center.x + rect.width()/2.0f;
+										float by = rect_center.y - rect.height()/2.0f;
+										float cx = rect_center.x + rect.width()/2.0f;
+										float cy = rect_center.y + rect.height()/2.0f;
+										float dx = rect_center.x - rect.width()/2.0f;
+										float dy = rect_center.y + rect.height()/2.0f;
+												
 										if (player.pos().x <= rect_center.x) {
 											if (player.pos().y <= rect_center.y) {
 												// player is in the lower left area
 												
 												// check for intersection with vertical edge
-												if (lineCircleIntersection(rect_center.x - rect.width()/2.0f, rect_center.y - rect.height()/2.0f, rect_center.x - rect.width()/2.0f, rect_center.y + rect.height()/2.0f, player.newPosition(), player.m_radius, intersect_point)) {
+												// lineCircleIntersection(x1, y1, x2, y2, circ_pos, circ_radius, intersection_points)
+												if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, intersect_point)) {
 													
 													// check if intersection point lies on the line
-													if (intersect_point.y > rect_center.y - rect.height()/2.0f && intersect_point.y < rect_center.y + rect.height()/2.0f) {
+													if (intersect_point.y > ay && intersect_point.y < dy) {
 														
 														// normal of this edge
 														normal.set(-1.0f, 0.0f);
@@ -270,10 +288,10 @@ public abstract class GameBase {
 												}
 													
 												// check for intersection with horizontal edge
-												if (lineCircleIntersection(rect_center.x - rect.width()/2.0f, rect_center.y - rect.height()/2.0f, rect_center.x + rect.width()/2.0f, rect_center.y - rect.height()/2.0f, player.newPosition(), player.m_radius, intersect_point)) {
+												if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, intersect_point)) {
 													
 													// check if intersection point lies on the line
-													if (intersect_point.y > rect_center.y - rect.height()/2.0f && intersect_point.y < rect_center.y + rect.height()/2.0f) {
+													if (intersect_point.x > ax && intersect_point.x < bx) {
 														
 														// normal of this edge
 														normal.set(0.0f, -1.0f);
@@ -300,10 +318,10 @@ public abstract class GameBase {
 												// player is in the upper left area
 												
 												// check for intersection with vertical edge
-												if (lineCircleIntersection(rect_center.x - rect.width()/2.0f, rect_center.y - rect.height()/2.0f, rect_center.x - rect.width()/2.0f, rect_center.y + rect.height()/2.0f, player.newPosition(), player.m_radius, intersect_point)) {
+												if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, intersect_point)) {
 													
 													// check if intersection point lies on the line
-													if (intersect_point.y > rect_center.y - rect.height()/2.0f && intersect_point.y < rect_center.y + rect.height()/2.0f) {
+													if (intersect_point.y > ay && intersect_point.y < dy) {
 														
 														// normal of this edge
 														normal.set(-1.0f, 0.0f);
@@ -328,10 +346,10 @@ public abstract class GameBase {
 												}
 													
 												// check for intersection with horizontal edge
-												if (lineCircleIntersection(rect_center.x - rect.width()/2.0f, rect_center.y + rect.height()/2.0f, rect_center.x + rect.width()/2.0f, rect_center.y + rect.height()/2.0f, player.newPosition(), player.m_radius, intersect_point)) {
+												if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
 													
 													// check if intersection point lies on the line
-													if (intersect_point.y > rect_center.y - rect.height()/2.0f && intersect_point.y < rect_center.y + rect.height()/2.0f) {
+													if (intersect_point.x > dx && intersect_point.x < cx) {
 														
 														// normal of this edge
 														normal.set(0.0f, 1.0f);
@@ -360,10 +378,10 @@ public abstract class GameBase {
 												// player is in the lower right area
 												
 												// check for intersection with vertical edge
-												if (lineCircleIntersection(rect_center.x + rect.width()/2.0f, rect_center.y - rect.height()/2.0f, rect_center.x + rect.width()/2.0f, rect_center.y + rect.height()/2.0f, player.newPosition(), player.m_radius, intersect_point)) {
+												if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
 													
 													// check if intersection point lies on the line
-													if (intersect_point.y > rect_center.y - rect.height()/2.0f && intersect_point.y < rect_center.y + rect.height()/2.0f) {
+													if (intersect_point.y > by && intersect_point.y < cy) {
 														
 														// normal of this edge
 														normal.set(1.0f, 0.0f);
@@ -388,10 +406,10 @@ public abstract class GameBase {
 												}
 													
 												// check for intersection with horizontal edge
-												if (lineCircleIntersection(rect_center.x - rect.width()/2.0f, rect_center.y - rect.height()/2.0f, rect_center.x + rect.width()/2.0f, rect_center.y - rect.height()/2.0f, player.newPosition(), player.m_radius, intersect_point)) {
+												if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, intersect_point)) {
 													
 													// check if intersection point lies on the line
-													if (intersect_point.y > rect_center.y - rect.height()/2.0f && intersect_point.y < rect_center.y + rect.height()/2.0f) {
+													if (intersect_point.x > ax && intersect_point.x < bx) {
 														
 														// normal of this edge
 														normal.set(0.0f, -1.0f);
@@ -418,10 +436,10 @@ public abstract class GameBase {
 												// player is in the upper right area
 												
 												// check for intersection with vertical edge
-												if (lineCircleIntersection(rect_center.x + rect.width()/2.0f, rect_center.y + rect.height()/2.0f, rect_center.x + rect.width()/2.0f, rect_center.y - rect.height()/2.0f, player.newPosition(), player.m_radius, intersect_point)) {
+												if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
 													
 													// check if intersection point lies on the line
-													if (intersect_point.y > rect_center.y - rect.height()/2.0f && intersect_point.y < rect_center.y + rect.height()/2.0f) {
+													if (intersect_point.y > by && intersect_point.y < cy) {
 														
 														// normal of this edge
 														normal.set(1.0f, 0.0f);
@@ -446,10 +464,10 @@ public abstract class GameBase {
 												}
 													
 												// check for intersection with horizontal edge
-												if (lineCircleIntersection(rect_center.x - rect.width()/2.0f, rect_center.y + rect.height()/2.0f, rect_center.x + rect.width()/2.0f, rect_center.y + rect.height()/2.0f, player.newPosition(), player.m_radius, intersect_point)) {
+												if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
 													
 													// check if intersection point lies on the line
-													if (intersect_point.y > rect_center.y - rect.height()/2.0f && intersect_point.y < rect_center.y + rect.height()/2.0f) {
+													if (intersect_point.x > dx && intersect_point.y < cx) {
 														
 														// normal of this edge
 														normal.set(0.0f, 1.0f);
@@ -471,18 +489,8 @@ public abstract class GameBase {
 														// TODO
 													}
 												}
-
 											}
 										}
-										
-										/*
-										if (rect.intersectCircle(
-												player.newPosition(),
-												player.m_radius)) {
-											// TODO:
-											Log.d(TAG, "Player - Wall collided");
-
-										} */
 									}
 									
 									break;
