@@ -102,7 +102,7 @@ public class CreationMenu extends GameMenuBase {
 		for(int i=0; i<level_manager.levelCount(); ++i) {
 			m_level_list.addItem(new MenuItemLevel(new Vector()
 				, new Vector(level_item_width, size.y/2.f/3.f)
-				, level_manager.level(i), tex_manager));
+				, level_manager.level(i), tex_manager,font_settings));
 		}
 		m_level_list.selectItem(0);
 		

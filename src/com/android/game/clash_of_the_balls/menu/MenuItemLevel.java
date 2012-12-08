@@ -2,6 +2,7 @@ package com.android.game.clash_of_the_balls.menu;
 
 import android.opengl.Matrix;
 
+import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Texture;
@@ -22,13 +23,15 @@ public class MenuItemLevel extends MenuItem {
 	private GameView m_game_view;
 	private GameField m_game_field;
 	
+	private MenuItemStringMultiline m_player;
+	
 	Texture m_sel_texture;
 	boolean m_is_selected=false;
 	
 	public GameLevel level() { return m_level; }
 
 	public MenuItemLevel(Vector position, Vector size, GameLevel level
-			, TextureManager texture_manager) {
+			, TextureManager texture_manager, Font2D.Font2DSettings font_settings) {
 		super(position, size);
 		m_level = level;
 		m_game_field = new GameField(texture_manager);
@@ -44,23 +47,29 @@ public class MenuItemLevel extends MenuItem {
 		m_color_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_color_data_white, 4);
 		
+		m_player = new MenuItemStringMultiline(new Vector(0f,0f),new Vector(size.x/2,size.y/2), font_settings, 
+				String.valueOf(level.player_count)+" Play.", texture_manager);
+		
 	}
 	
 	
 	public void draw(RenderHelper renderer) {
-		
 		renderer.pushModelMat();
 		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
 		
 		m_game_view.applyView(renderer);
 		m_game_field.draw(renderer);
+		
 		if(m_is_selected) {
 			renderer.modelMatScale((float)m_level.width, 
 					(float)m_level.height, 0.f);
+			
 			drawTexture(renderer, m_sel_texture);
 		}
-		m_game_view.resetView(renderer);
 		
+		m_game_view.resetView(renderer);
+		renderer.modelMatTranslate(3*size().x/5,0.f, 0.f);
+		m_player.draw(renderer);
 		renderer.popModelMat();
 	}
 	
