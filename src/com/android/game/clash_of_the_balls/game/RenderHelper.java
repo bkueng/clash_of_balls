@@ -90,8 +90,6 @@ public class RenderHelper {
 				&& m_max_model_mat_pos > 3*mat_size) {
 			resizeModelMat(m_model_mat.length/2);
 		}
-		if(m_cur_model_mat_pos < 0)
-			throw new RuntimeException("Model Matrix Stuck underflow");
 		
 		return m_cur_model_mat_pos;
 	}
@@ -99,7 +97,7 @@ public class RenderHelper {
 	
 	private void resizeModelMat(int new_size) {
 		
-		Log.d(LOG_TAG, "need to resize model view matrix. new size="+new_size);
+		Log.w(LOG_TAG, "need to resize model view matrix. new size="+new_size);
 		
 		float new_mat[]=new float[new_size];
 		for(int i=0; i<Math.min(new_size, m_model_mat.length); ++i)
