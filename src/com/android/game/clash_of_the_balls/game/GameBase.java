@@ -262,11 +262,10 @@ public abstract class GameBase {
 											
 											// check intersection with left edge of the wall
 											if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, intersect_point)) {
-												if (intersect_point.y <= ay && intersect_point.y >= player.m_radius) {
+												if (intersect_point.y <= ay && intersect_point.y >= ay - player.m_radius) {
 													// check for lower left corner
-													Log.d(TAG, "hit left lower corner");
+													Log.d(TAG, "hit lower left corner");
 													
-													/*
 													// normal vector for corner
 													normal.set(player.pos().x - ax, player.pos().y - ay);
 													normal.normalize();
@@ -284,11 +283,28 @@ public abstract class GameBase {
 													// set new position of player
 													player_pos.mul(player.m_radius + eps);
 													player.newPosition().add(player_pos);
-													*/
 													
-												} else if (intersect_point.y >= dy) {
+												} else if (intersect_point.y >= dy && intersect_point.y <= dy + player.m_radius) {
 													// check for upper left corner
 													Log.d(TAG, "hit upper left corner");
+													
+													// normal vector for corner
+													normal.set(player.pos().x - dx, player.pos().y - dy);
+													normal.normalize();
+
+													// prepare position of player regarding distance to wall
+													Vector player_pos = new Vector(normal);
+													
+													// calculate new velocity
+													normal.mul(player.speed().dot(normal));
+													normal.mul(-2.0f);
+													normal.add(player.speed());
+													// set new velocity
+													player.speed().set(normal);
+													
+													// set new position of player
+													player_pos.mul(player.m_radius + eps);
+													player.newPosition().add(player_pos);
 													
 												} else {
 													// intersection point lies inbetween corners
