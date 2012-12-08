@@ -265,21 +265,11 @@ public abstract class GameBase {
 													// check if intersection point lies on the line
 													if (intersect_point.y > ay && intersect_point.y < dy) {
 														
-														// normal of this edge
+														// normal vector for left edge (vertical)
 														normal.set(-1.0f, 0.0f);
-														Vector player_pos = new Vector(normal);
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, eps);
 														
-														// calculate new velocity
-														normal.mul(player.speed().dot(normal));
-														normal.mul(-2.0f);
-														normal.add(player.speed());
-														// set new velocity
-														player.speed().set(normal);
-														
-														// set new position of player
-														player_pos.mul(player.m_radius + eps);
-														player.newPosition().add(player_pos);
-													
 													} else {
 														// check corner
 														// TODO
@@ -374,7 +364,7 @@ public abstract class GameBase {
 												
 											}
 										} else {
-											if (player.newPosition().y <= rect_center.y) {
+											if (player.pos().y <= rect_center.y) {
 												// player is in the lower right area
 												
 												// check for intersection with vertical edge
@@ -665,10 +655,33 @@ public abstract class GameBase {
 					objb.m_id, pos_b));
 		}
 	}
+	
+	private void setSpeedAndPosition(GamePlayer player, Vector normal, float eps) {
+		
+		Log.d(TAG, "speed before collision, x: " + player.speed().x + " y: " + player.speed().y);
+		
+		// prepare position of player regarding distance to wall
+		Vector player_pos = new Vector(normal);
+		
+		// calculate new velocity
+		normal.mul(player.speed().dot(normal));
+		normal.mul(-2.0f);
+		normal.add(player.speed());
+		// set new velocity
+		player.speed().set(normal);
+		
+		// set new position of player
+		player_pos.mul(player.m_radius + eps);
+		player.newPosition().add(player_pos);
+		
+		Log.d(TAG, "speed after collision, x: " + player.speed().x + " y: " + player.speed().y);
+	
+	}
 
 	private boolean lineCircleIntersection(float x1, float y1, float x2, float y2, Vector circ_pos, float cr, Vector intersect_point) {
 		
-		Log.d(TAG, "vector of intersection: (" + x1 + "," + y1 + ", " + x2 + "," + y2 + ")");
+		//Log.d(TAG, "vector of intersection: (" + x1 + "," + y1 + ", " + x2 + "," + y2 + ")");
+		
 		float cx = circ_pos.x;
 		float cy = circ_pos.y;
 		float dx = x2 - x1;
@@ -694,8 +707,8 @@ public abstract class GameBase {
 			// set new position of player to impact point
 			intersect_point.set( (ix1 + ix2) / 2.0f, (iy1 + iy2) / 2.0f );
 			
-			Log.d(TAG, "intersection point 1, x: " + ix1 + " y: " + iy1);
-			Log.d(TAG, "intersection point 2, x: " + ix2 + " y: " + iy2);
+			//Log.d(TAG, "intersection point 1, x: " + ix1 + " y: " + iy1);
+			//Log.d(TAG, "intersection point 2, x: " + ix2 + " y: " + iy2);
 			
 			return true;
 		}
