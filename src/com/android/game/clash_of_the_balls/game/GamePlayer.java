@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
+import com.android.game.clash_of_the_balls.game.GameItem.ItemType;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 
 /**
@@ -14,8 +15,10 @@ import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
  */
 public class GamePlayer extends DynamicGameObject {
 	
-	public final float m_radius = 0.5f;
-	public final float m_mass = 10;
+	public float m_radius = 0.5f;
+	public float m_mass = 10.f;
+	
+	public float m_radius_dest; //m_radius should change to this value
 	
 	private float m_max_speed = 3.f;
 	
@@ -24,6 +27,10 @@ public class GamePlayer extends DynamicGameObject {
 	
 	private float m_scaling=1.f; //for drawing, used for dying effect
 	private float m_scaling_speed;
+	
+	//item
+	private float m_item_timeout;
+	private ItemType m_item_type = ItemType.None;
 	
 	public int color() { return m_color; }
 	
@@ -34,6 +41,8 @@ public class GamePlayer extends DynamicGameObject {
 	public void applySensorVector(Vector v) {
 		if(!m_bIs_dead) {
 			m_acceleration.set(v);
+			if(m_item_type == ItemType.InvertControls)
+				m_acceleration.mul(-1.f);
 			m_acceleration.mul(m_sensor_scaling);
 		}
 	}
@@ -46,6 +55,7 @@ public class GamePlayer extends DynamicGameObject {
 		m_overlay_texture = texture_overlay;
 		m_color = color;
 		initColorData(m_color);
+		m_radius_dest = m_radius;
 	}
 	
 	public GamePlayer(PlayerInfo info, GameBase owner, Texture texture_base
@@ -55,6 +65,7 @@ public class GamePlayer extends DynamicGameObject {
 		m_overlay_texture = texture_overlay;
 		m_color = info.color;
 		initColorData(m_color);
+		m_radius_dest = m_radius;
 	}
 	
 	private void initColorData(int color) {
@@ -80,6 +91,17 @@ public class GamePlayer extends DynamicGameObject {
 			m_speed.y += dsec * m_acceleration.y;
 			float speed = m_speed.length();
 			if(speed > m_max_speed) m_speed.mul(m_max_speed / speed);
+			
+			//current item
+			if(m_item_type != ItemType.None) {
+				if(m_item_timeout - dsec <= 0.f) {
+					disableItem();
+				} else {
+					//move item if needed ...
+					
+					m_item_timeout-=dsec;
+				}
+			}
 		}
 		
 		m_has_moved = true;
@@ -91,7 +113,19 @@ public class GamePlayer extends DynamicGameObject {
 				m_bIs_dying = false;
 				m_scaling = 0.01f;
 			}
+		} else {
+			//is radius changing?
+			if(m_radius != m_radius_dest) {
+				if(m_radius < m_radius_dest) {
+					m_radius += dsec * 0.5f;
+					if(m_radius > m_radius_dest) m_radius = m_radius_dest;
+				} else {
+					m_radius -= dsec * 0.5f;
+					if(m_radius < m_radius_dest) m_radius = m_radius_dest;
+				}
+			}
 		}
+		
 	}
 	
 	public void handleImpact(StaticGameObject other) {
@@ -99,11 +133,61 @@ public class GamePlayer extends DynamicGameObject {
 		switch(other.type) {
 		case Hole: die();
 			break;
+		case Item: applyItem((GameItem) other);
+			break;
 		default:
 		}
 	}
+	
+	public void applyItem(GameItem item) {
+		//we only allow one item at a time
+		disableItem();
+		
+		m_item_type = item.itemType();
+		switch(item.itemType()) {
+		case IncreaseMaxSpeed: 
+			m_max_speed *= 2.f;
+			break;
+		case InvertControls:
+			break;
+		case InvisibleToOthers:
+			break;
+		case MassAndSize:
+			m_mass /= 2.f;
+			m_radius_dest = 0.5f / 2.f;
+			break;
+		}
+		m_item_timeout = GameItem.item_effect_duration;
+	}
+	
+	private void disableItem() {
+		if(m_item_type != ItemType.None) {
+			switch(m_item_type) {
+			case IncreaseMaxSpeed: m_max_speed /= 2.f;
+				break;
+			case InvertControls:
+				break;
+			case InvisibleToOthers:
+				break;
+			case MassAndSize:
+				m_mass *= 2.f;
+				m_radius_dest = 0.5f;
+				break;
+			}
+			
+			m_item_timeout = 0.f;
+			m_item_type = ItemType.None;
+		}
+	}
+	private boolean isInvisible() {
+		return m_item_type == ItemType.InvisibleToOthers
+				&& m_owner.ownPlayer()!=this;
+	}
+	
+	
 	public void die() {
 		if(!m_bIs_dead) {
+			disableItem();
 			m_acceleration.set(0.f, 0.f);
 			m_scaling = 1.f;
 			m_scaling_speed = 0.f;
@@ -114,7 +198,7 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	public void draw(RenderHelper renderer) {
-		if(!isReallyDead()) {
+		if(!isReallyDead() && !isInvisible()) {
 			
 			doModelTransformation(renderer);
 			

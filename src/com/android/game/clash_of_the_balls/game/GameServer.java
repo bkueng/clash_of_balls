@@ -14,12 +14,14 @@ import android.util.Log;
 
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
+import com.android.game.clash_of_the_balls.game.GameItem.ItemType;
 import com.android.game.clash_of_the_balls.game.GameStatistics.Statistic;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameEnd;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo;
 import com.android.game.clash_of_the_balls.game.event.EventGameStartNow;
+import com.android.game.clash_of_the_balls.game.event.EventItemAdded;
 import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.network.Networking;
@@ -256,6 +258,7 @@ public class GameServer extends GameBase implements Runnable {
 		Log.d(TAG_SERVER, "Server: starting the game");
 		
 		m_network_server.resetSequenceNum();
+		m_next_item_time = 0.f;
 		
 		//first throw away all waiting incoming sensor updates & acks
 		while(m_networking.receiveAck()!=null) {}
@@ -298,12 +301,39 @@ public class GameServer extends GameBase implements Runnable {
 		move(elapsed_time);
 		doCollisionHandling();
 		applyMove();
+		handleGenerateItems(elapsed_time);
 		removeDeadObjects();
 		checkGameEnd(elapsed_time);
 		
 		sendAllEvents();
 		generate_events = false;
 	}
+	
+	private float m_next_item_time=0.f; //[sec] when to generate next item
+	
+	private void handleGenerateItems(float dsec) {
+		if(!GameSettings.place_items) return;
+		
+		if(m_next_item_time <= 0.f) {
+			m_next_item_time = 10.f + (float)Math.random()*10.f; //10-20 sec
+		}
+		
+		if((m_next_item_time-=dsec) <= 0.f) {
+			Log.d(TAG_SERVER, "trying to put an Item on the field");
+			
+			ItemType type = GameItem.getRandomType();
+			Vector position = new Vector();
+			if(getFreeRandomField(position, 1.1f)) {
+				Log.d(TAG_SERVER, "adding Item at x="+position.x+", y="+position.y);
+
+				GameItem item = addItem(getNextItemId(), type, position);
+				if(generate_events) {
+					addEvent(new EventItemAdded(this, getNextSequenceNum(), item));
+				}
+			}
+		}
+	}
+	
 	
 	private boolean m_is_game_ending = false;
 	private float m_game_ending_timeout;

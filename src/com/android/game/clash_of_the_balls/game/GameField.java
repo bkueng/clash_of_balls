@@ -33,9 +33,40 @@ public class GameField extends GameObject {
 	StaticGameObject[] m_fg_objects;
 	public StaticGameObject foreground(int x, int y) { return m_fg_objects[y*m_width+x]; }
 	
+	//x & y indexes of foreground fields which are null
+	private int[] m_fg_empty_idx_x=null;
+	private int[] m_fg_empty_idx_y=null;
+	
 	
 	public GameField(TextureManager texture_manager) {
 		m_texture_manager = texture_manager;
+	}
+	
+	public int[] fgEmptyFieldIdxX() {
+		if(m_fg_empty_idx_x==null) initEmptyIdx();
+		return m_fg_empty_idx_x;
+	}
+	public int[] fgEmptyFieldIdxY() {
+		if(m_fg_empty_idx_y==null) initEmptyIdx();
+		return m_fg_empty_idx_y;
+	}
+	private void initEmptyIdx() {
+		int empty_count = 0;
+		for(int i=0; i<m_width*m_height; ++i) {
+			if(m_fg_objects[i] == null) ++empty_count;
+		}
+		m_fg_empty_idx_x = new int[empty_count];
+		m_fg_empty_idx_y = new int[empty_count];
+		int i=0;
+		for(int y=0; y<m_height; ++y) {
+			for(int x=0; x<m_width; ++x) {
+				if(m_fg_objects[y*m_width+x] == null) {
+					m_fg_empty_idx_x[i] = x;
+					m_fg_empty_idx_y[i] = y;
+					++i;
+				}
+			}
+		}
 	}
 	
 	//returns the next object id to be used
@@ -43,6 +74,7 @@ public class GameField extends GameObject {
 	public short init(GameLevel level, short next_object_id) {
 		m_width = level.width;
 		m_height = level.height;
+		m_fg_empty_idx_x = m_fg_empty_idx_y = null;
 		
 		//background
 		if(m_texture_manager != null) {
