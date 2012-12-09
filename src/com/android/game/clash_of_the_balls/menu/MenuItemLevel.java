@@ -8,6 +8,7 @@ import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
+import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.game.GameField;
 import com.android.game.clash_of_the_balls.game.GameView;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
@@ -23,7 +24,7 @@ public class MenuItemLevel extends MenuItem {
 	private GameView m_game_view;
 	private GameField m_game_field;
 	
-	private MenuItemStringMultiline m_player;
+	private MenuItemStringMultiline m_player; //max player count
 	
 	Texture m_sel_texture;
 	boolean m_is_selected=false;
@@ -33,10 +34,20 @@ public class MenuItemLevel extends MenuItem {
 	public MenuItemLevel(Vector position, Vector size, GameLevel level
 			, TextureManager texture_manager, Font2D.Font2DSettings font_settings) {
 		super(position, size);
+		
+		Font2D.Font2DSettings label_font_settings = new Font2D.Font2DSettings(
+				font_settings.m_typeface, TextAlign.LEFT, font_settings.m_color);
+		
+		Vector player_size = new Vector(size.x/3.f,size.y*0.8f);
+		m_player = new MenuItemStringMultiline(new Vector(size.x*2.f/3.f,
+					(size.y - player_size.y)/2.f),
+				player_size, label_font_settings, 
+				"max. "+level.player_count+"\nPlayers", texture_manager);
+		
 		m_level = level;
 		m_game_field = new GameField(texture_manager);
 		m_game_field.init(m_level, (short)1);
-		m_game_view = new GameView(size.x, size.y, null
+		m_game_view = new GameView(size.x - m_player.size().x, size.y, null
 				, m_level.width, m_level.height);
 		
 		
@@ -46,9 +57,6 @@ public class MenuItemLevel extends MenuItem {
 				(VertexBufferFloat.sprite_position_data, 3);
 		m_color_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_color_data_white, 4);
-		
-		m_player = new MenuItemStringMultiline(new Vector(0f,0f),new Vector(size.x/2,size.y/2), font_settings, 
-				String.valueOf(level.player_count)+" Play.", texture_manager);
 		
 	}
 	
@@ -68,7 +76,7 @@ public class MenuItemLevel extends MenuItem {
 		}
 		
 		m_game_view.resetView(renderer);
-		renderer.modelMatTranslate(3*size().x/5,0.f, 0.f);
+		
 		m_player.draw(renderer);
 		renderer.popModelMat();
 	}
