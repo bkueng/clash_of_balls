@@ -312,6 +312,8 @@ public class GameServer extends GameBase implements Runnable {
 	private float m_next_item_time=0.f; //[sec] when to generate next item
 	
 	private void handleGenerateItems(float dsec) {
+		if(!GameSettings.place_items) return;
+		
 		if(m_next_item_time <= 0.f) {
 			m_next_item_time = 10.f + (float)Math.random()*10.f; //10-20 sec
 		}
