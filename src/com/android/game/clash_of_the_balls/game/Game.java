@@ -208,11 +208,13 @@ public class Game extends GameBase implements UIBase {
 				//strictly synchronized with the server
 				moveClient(dsec);
 				
-				//even if we had network updates, we should move one step
-				//to apply the new positions smoothly
-				super.move(dsec);
-				doCollisionHandling();
-				super.applyMove();
+				if(GameSettings.client_prediction) { 
+					//even if we had network updates, we should move one step
+					//to apply the new positions smoothly
+					super.move(dsec);
+					doCollisionHandling();
+					super.applyMove();
+				}
 				
 				
 				m_game_field.move(dsec);

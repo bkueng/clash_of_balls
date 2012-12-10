@@ -1,5 +1,6 @@
 package com.android.game.clash_of_the_balls.game;
 
+import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 
@@ -63,10 +64,14 @@ public class DynamicGameObject extends StaticGameObject {
 	public void applyVectorData(Vector new_pos, Vector new_speed) {
 		m_speed.set(new_speed);
 		
-		//apply position smoothly
-		//we cannot simply change m_position or m_new_pos because we would need
-		//to do collision handling
-		m_server_translation.set(new_pos.x - m_new_pos.x, new_pos.y - m_new_pos.y);
+		if(GameSettings.client_prediction) {
+			//apply position smoothly
+			//we cannot simply change m_position or m_new_pos because we would need
+			//to do collision handling
+			m_server_translation.set(new_pos.x - m_new_pos.x, new_pos.y - m_new_pos.y);
+		} else {
+			m_position.set(new_pos);
+		}
 		
 	}
 
