@@ -42,10 +42,7 @@ public interface AlljoynInterface {
 	
 	/* client --> server */
     @BusSignal(signature="idd")
-    public void sensorUpdate(int ack_seq_num, double pos_x, double pos_y) throws BusException;
-    
-    @BusSignal(signature="i")
-    public void ack(int ack_seq_num) throws BusException;
+    public void sensorUpdate(double pos_x, double pos_y) throws BusException;
     
     //let the server know our well-known name
     @BusSignal

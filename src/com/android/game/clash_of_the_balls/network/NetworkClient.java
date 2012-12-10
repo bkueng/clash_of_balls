@@ -123,15 +123,12 @@ public class NetworkClient {
 				Event e;
 				while((e=Event.read(di)) != null) {
 					m_available_events.add(e);
-					
-					//TODO: timestamp handling
-					
 				}
 			}
 			
 			if(m_bHas_sensor_update) {
 				m_bHas_sensor_update=false;
-				m_networking.sendSensorUpdate(-1, m_sensor_update);
+				m_networking.sendSensorUpdate(m_sensor_update);
 			}
 		} catch(BusException e) {
 			Log.e(TAG, "BusException");

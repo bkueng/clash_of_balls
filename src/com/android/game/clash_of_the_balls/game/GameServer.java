@@ -261,7 +261,6 @@ public class GameServer extends GameBase implements Runnable {
 		m_next_item_time = 0.f;
 		
 		//first throw away all waiting incoming sensor updates & acks
-		while(m_networking.receiveAck()!=null) {}
 		while(m_networking.receiveSensorUpdate()!=null) {}
 		
 		
