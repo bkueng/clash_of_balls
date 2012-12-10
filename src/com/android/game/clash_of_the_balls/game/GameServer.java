@@ -226,7 +226,6 @@ public class GameServer extends GameBase implements Runnable {
 	private boolean m_had_network_packets=false;
 	
 	private void handleNetworkReceivedSignal(boolean force_move) {
-		Log.v(TAG_SERVER, "Server: received a network signal");
 		
 		m_had_network_packets = true;
 		
@@ -287,7 +286,6 @@ public class GameServer extends GameBase implements Runnable {
 	private long m_last_time; //for timestepping
 	
 	private void moveGame() {
-		Log.v(TAG_SERVER, "Server: moving the game");
 		
 		long time = SystemClock.elapsedRealtime(); //or: nanoTime()
 		float elapsed_time = (float)(time - m_last_time) / 1000.f;

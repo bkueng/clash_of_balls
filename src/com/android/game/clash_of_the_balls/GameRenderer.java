@@ -100,7 +100,6 @@ public class GameRenderer implements GLSurfaceView.Renderer {
 
 
     		/* Render the scene */
-    		Log.v(LOG_TAG, "rendering frame");
 
     		// Draw background color
     		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
