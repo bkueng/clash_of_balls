@@ -356,6 +356,7 @@ public class GameServer extends GameBase implements Runnable {
 	}
 	
 	public void run() {
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		Looper.prepare();
 		m_looper = Looper.myLooper();
 		
