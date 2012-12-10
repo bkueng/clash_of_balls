@@ -20,7 +20,7 @@ public class EventItemUpdate extends Event {
 	private float m_speed_y;
 
 	public EventItemUpdate(DataInputStream s) throws IOException {
-		super(type_item_update, -1);
+		super(type_item_update);
 		m_id = s.readShort();
 		m_pos_x = s.readFloat();
 		m_pos_y = s.readFloat();
@@ -29,7 +29,7 @@ public class EventItemUpdate extends Event {
 	}
 	
 	public EventItemUpdate(DynamicGameObject obj) {
-		super(type_item_update, -1);
+		super(type_item_update);
 		m_id = obj.m_id;
 		m_pos_x = obj.pos().x;
 		m_pos_y = obj.pos().y;
@@ -38,7 +38,6 @@ public class EventItemUpdate extends Event {
 	}
 
 	public void write(DataOutputStream s) throws IOException {
-		super.write(s);
 		s.writeByte(type);
 		s.writeShort(m_id);
 		s.writeFloat(m_pos_x);

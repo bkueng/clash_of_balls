@@ -20,8 +20,8 @@ public class EventItemAdded extends Event {
 	//item specific stuff
 	private ItemType m_item_type;
 
-	public EventItemAdded(DataInputStream s, int seq_num) throws IOException {
-		super(type_item_added, seq_num);
+	public EventItemAdded(DataInputStream s) throws IOException {
+		super(type_item_added);
 		m_object_type = Type.values()[s.readByte()];
 		m_id = s.readShort();
 		m_pos_x = s.readFloat();
@@ -35,8 +35,8 @@ public class EventItemAdded extends Event {
 		}
 	}
 	
-	public EventItemAdded(GameBase game, int seq_num, StaticGameObject obj) {
-		super(type_item_added, seq_num);
+	public EventItemAdded(GameBase game, StaticGameObject obj) {
+		super(type_item_added);
 		m_object_type = obj.type;
 		m_id = obj.m_id;
 		m_pos_x = obj.pos().x;
@@ -52,7 +52,6 @@ public class EventItemAdded extends Event {
 	}
 
 	public void write(DataOutputStream s) throws IOException {
-		super.write(s);
 		s.writeByte(type);
 		s.writeByte(m_object_type.ordinal());
 		s.writeShort(m_id);

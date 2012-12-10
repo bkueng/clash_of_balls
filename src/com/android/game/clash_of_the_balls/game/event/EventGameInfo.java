@@ -27,8 +27,8 @@ public class EventGameInfo extends Event {
 	private short m_round_count;
 	private short m_current_round;
 
-	public EventGameInfo(DataInputStream s, int seq_num) throws IOException {
-		super(type_game_info, seq_num);
+	public EventGameInfo(DataInputStream s) throws IOException {
+		super(type_game_info);
 		//players
 		m_player_count = s.readInt();
 		m_players = new PlayerInfo[m_player_count];
@@ -50,8 +50,8 @@ public class EventGameInfo extends Event {
 		m_level = new GameLevel(null);
 		m_level.loadLevel(s);
 	}
-	public EventGameInfo(GameBase game, int seq_num) {
-		super(type_game_info, seq_num);
+	public EventGameInfo(GameBase game) {
+		super(type_game_info);
 		//players
 		m_player_count = game.currentPlayerCount();
 		m_players = new PlayerInfo[m_player_count];
@@ -79,7 +79,6 @@ public class EventGameInfo extends Event {
 	}
 
 	public void write(DataOutputStream s) throws IOException {
-		super.write(s);
 		s.writeByte(type);
 		//players
 		s.writeInt(m_player_count);
