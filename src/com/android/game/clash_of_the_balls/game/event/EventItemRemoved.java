@@ -14,18 +14,17 @@ public class EventItemRemoved extends Event {
 	
 	private short m_id;
 
-	public EventItemRemoved(DataInputStream s, int seq_num) throws IOException {
-		super(type_item_removed, seq_num);
+	public EventItemRemoved(DataInputStream s) throws IOException {
+		super(type_item_removed);
 		m_id = s.readShort();
 	}
 	
-	public EventItemRemoved(int seq_num, short item_id) {
-		super(type_item_removed, seq_num);
+	public EventItemRemoved(short item_id) {
+		super(type_item_removed);
 		m_id = item_id;
 	}
 
 	public void write(DataOutputStream s) throws IOException {
-		super.write(s);
 		s.writeByte(type);
 		s.writeShort(m_id);
 	}

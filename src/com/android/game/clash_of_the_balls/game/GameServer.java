@@ -257,7 +257,6 @@ public class GameServer extends GameBase implements Runnable {
 	private void handleGameStart() {
 		Log.d(TAG_SERVER, "Server: starting the game");
 		
-		m_network_server.resetSequenceNum();
 		m_next_item_time = 0.f;
 		
 		//first throw away all waiting incoming sensor updates & acks
@@ -265,7 +264,7 @@ public class GameServer extends GameBase implements Runnable {
 		
 		
 		/* first send 'game about to start' event with level information */
-		addEvent(new EventGameInfo(this, getNextSequenceNum()));
+		addEvent(new EventGameInfo(this));
 		sendAllEvents();
 		
 		//wait for start: wait_to_start_game seconds
@@ -327,7 +326,7 @@ public class GameServer extends GameBase implements Runnable {
 
 				GameItem item = addItem(getNextItemId(), type, position);
 				if(generate_events) {
-					addEvent(new EventItemAdded(this, getNextSequenceNum(), item));
+					addEvent(new EventItemAdded(this, item));
 				}
 			}
 		}
@@ -371,7 +370,7 @@ public class GameServer extends GameBase implements Runnable {
 	
 	public void gameStartNow() {
 		super.gameStartNow();
-		addEvent(new EventGameStartNow(getNextSequenceNum()));
+		addEvent(new EventGameStartNow());
 		sendAllEvents();
 		m_is_game_ending=false;
 		IncomingHandler h = m_msg_handler;
@@ -390,7 +389,7 @@ public class GameServer extends GameBase implements Runnable {
 		}
 		m_settings.game_statistics.applyCurrentRoundStatistics();
 		
-		addEvent(new EventGameEnd(getNextSequenceNum(), m_settings.game_statistics));
+		addEvent(new EventGameEnd(m_settings.game_statistics));
 		//after here the game stopped & this thread is simply waiting 
 		//for next game initialization & game start (called from UIHandler)
 	}
@@ -418,10 +417,6 @@ public class GameServer extends GameBase implements Runnable {
 		}
 	}
 
-	public int getNextSequenceNum() {
-		return m_network_server.getSequenceNum();
-	}
-	
 	public String getUniqueNameFromPlayerId(short player_id) {
 		return m_network_server.getClientUniqueName(player_id);
 	}

@@ -11,18 +11,17 @@ public class EventGameEnd extends Event {
 	
 	private GameStatistics m_statistics=new GameStatistics();
 
-	public EventGameEnd(DataInputStream s, int seq_num) throws IOException {
-		super(type_game_end, seq_num);
+	public EventGameEnd(DataInputStream s) throws IOException {
+		super(type_game_end);
 		m_statistics.read(s);
 	}
 	
-	public EventGameEnd(int seq_num, GameStatistics statistics) {
-		super(type_game_end, seq_num);
+	public EventGameEnd(GameStatistics statistics) {
+		super(type_game_end);
 		m_statistics.set(statistics);
 	}
 
 	public void write(DataOutputStream s) throws IOException {
-		super.write(s);
 		s.writeByte(type);
 		m_statistics.write(s);
 	}

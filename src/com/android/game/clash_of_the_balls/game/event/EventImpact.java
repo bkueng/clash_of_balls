@@ -22,8 +22,8 @@ public class EventImpact extends Event {
 	private float m_b_x;
 	private float m_b_y;
 
-	public EventImpact(DataInputStream s, int seq_num) throws IOException {
-		super(type_impact, seq_num);
+	public EventImpact(DataInputStream s) throws IOException {
+		super(type_impact);
 		m_id_a = s.readShort();
 		m_a_x = s.readFloat();
 		m_a_y = s.readFloat();
@@ -33,8 +33,8 @@ public class EventImpact extends Event {
 		m_b_y = s.readFloat();
 	}
 	
-	public EventImpact(int seq_num, short id_a, Vector pos_a, short id_b, Vector pos_b) {
-		super(type_impact, seq_num);
+	public EventImpact(short id_a, Vector pos_a, short id_b, Vector pos_b) {
+		super(type_impact);
 		m_id_a = id_a;
 		m_a_x = pos_a.x;
 		m_a_y = pos_a.y;
@@ -46,7 +46,6 @@ public class EventImpact extends Event {
 	}
 
 	public void write(DataOutputStream s) throws IOException {
-		super.write(s);
 		s.writeByte(type);
 		
 		s.writeShort(m_id_a);

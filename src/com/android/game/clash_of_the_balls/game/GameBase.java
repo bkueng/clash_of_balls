@@ -183,8 +183,6 @@ public abstract class GameBase {
 		return m_next_object_id++;
 	}
 	
-	public abstract int getNextSequenceNum();
-
 	public void gameEnd() {
 		m_bIs_game_running = false;
 	}
@@ -207,7 +205,7 @@ public abstract class GameBase {
 	}
 	protected void handleObjectDied(DynamicGameObject obj) {
 		if(generate_events) {
-			addEvent(new EventItemRemoved(getNextSequenceNum(), obj.m_id));
+			addEvent(new EventItemRemoved(obj.m_id));
 		}
 		if(obj.type == Type.Player) --m_current_player_count;
 	}
@@ -701,8 +699,7 @@ public abstract class GameBase {
 		obja.handleImpact(objb);
 		objb.handleImpact(obja);
 		if (generate_events) {
-			addEvent(new EventImpact(getNextSequenceNum(), obja.m_id, pos_a,
-					objb.m_id, pos_b));
+			addEvent(new EventImpact(obja.m_id, pos_a, objb.m_id, pos_b));
 		}
 	}
 

@@ -26,8 +26,6 @@ import com.android.game.clash_of_the_balls.network.Networking.NetworkData;
 public class NetworkServer {
 	private static final String TAG = "NetworkServer";
 	
-	private int m_next_sequence_num;
-	
 	private final ByteArrayOutputStream m_outgoing_byte_stream
 			= new ByteArrayOutputStream();
 	private final DataOutputStream m_outgoing_stream
@@ -37,20 +35,11 @@ public class NetworkServer {
 	
 	public NetworkServer(Networking networking) {
 		m_networking = networking;
-		resetSequenceNum();
 	}
 	
 	public ConnectedClient getConnectedClient(int idx) 
 		{ return m_networking.connectedClient(idx); }
 	public int getConnectedClientCount() { return m_networking.connectedClientCount(); }
-	
-	
-	public int getSequenceNum() {
-		return m_next_sequence_num++;
-	}
-	public void resetSequenceNum() {
-		m_next_sequence_num = 0;
-	}
 	
 	public void setOwnName(String name) {
 		m_networking.setServerName(name);
