@@ -229,14 +229,16 @@ public abstract class GameBase {
 									GamePlayer player = ((GamePlayer) obj);
 									GameWall wall = ((GameWall) field_obj);  
 									
+									// Temporary vectors that are necessary for the collision detection computation
+									Vector normal = new Vector();
+									Vector isect_p1 = new Vector(); // first intersection point
+									Vector isect_p2 = new Vector(); // second intersection point (can be identical)
+									Vector isect_middle = new Vector();
+									
 									for (Rectangle rect : wall.m_wall_items) {
 										
-										// Temporary vectors that are necessary for the collision detection computation
+										// rectangle center of current rectangle
 										Vector rect_center = new Vector(wall.m_position.x + rect.pos.x + rect.size.x/2.0f, wall.m_position.y + rect.pos.y + rect.size.y/2.0f);
-										Vector normal = new Vector();
-										Vector isect_p1 = new Vector(); // first intersection point
-										Vector isect_p2 = new Vector(); // second intersection point (can be identical)
-										Vector isect_middle = new Vector();
 										
 										/*
 										 *  d----c
