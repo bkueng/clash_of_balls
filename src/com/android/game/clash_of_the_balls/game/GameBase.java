@@ -544,7 +544,7 @@ public abstract class GameBase {
 												
 											} else {
 												// TODO: This should not be the case!!!
-												// players pos is in the rectangle what to do?
+												// if it should happen we have to split timesteps
 												Log.d(TAG, "Error: player is inside rectangle");
 											}
 										}
