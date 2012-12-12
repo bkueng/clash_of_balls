@@ -237,6 +237,7 @@ public abstract class GameBase {
 										Vector isect_p1 = new Vector(); // first intersection point
 										Vector isect_p2 = new Vector(); // second intersection point (can be identical)
 										Vector isect_middle = new Vector();
+										Vector corner = new Vector(); // temporary corner point
 										
 										/*
 										 *  d----c
@@ -265,10 +266,11 @@ public abstract class GameBase {
 											// check intersection with left edge of the wall
 											if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 												
-												/* 
+												/*
 												 * player intersects left edge
 												 */
 												if ((isect_p1.y >= ay && isect_p2.y <= ay) || (isect_p2.y >= ay && isect_p1.y <= ay)) {
+													
 													// check collision for lower left corner
 													Log.d(TAG, "hit lower left corner");
 													
@@ -296,6 +298,7 @@ public abstract class GameBase {
 													}
 													
 												} else if ((isect_p1.y >= dy && isect_p2.y <= dy) || (isect_p2.y >= dy && isect_p1.y <= dy)) {
+													
 													// check collision for upper left corner
 													Log.d(TAG, "hit upper left corner");
 													
@@ -323,6 +326,7 @@ public abstract class GameBase {
 													}
 													
 												} else if (isect_p1.y <= dy && isect_p2.y <= dy && isect_p1.y >= ay && isect_p2.y >= ay) {
+												
 													// intersection point lies inbetween corners
 													Log.d(TAG, "left edge collision");
 													
@@ -332,14 +336,17 @@ public abstract class GameBase {
 													normal.set(-1.0f, 0.0f);
 													// calculate and set new velocity and position of player
 													setSpeedAndPosition(player, normal, isect_middle);
+												
 												} else {
 													// TODO: remove this case
 													// no collision
 													//Log.d(TAG, "no collision with rectangle");
 												}
+												
 											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 													
 												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x<= bx) {
+													
 													// intersection with lower edge
 													Log.d(TAG, "player was on the left side but hit the lower edge");
 													
@@ -354,6 +361,7 @@ public abstract class GameBase {
 											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 												
 												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x<= cx) {
+													
 													// intersection with upper edge
 													Log.d(TAG, "player was on the left side but hit the upper edge");
 													
@@ -372,10 +380,13 @@ public abstract class GameBase {
 										} else if (player.pos().x >= rect_center.x + rect_half_width) {
 											// players pos is right to the wall
 											
-											// check intersection with right edge of the wall
 											if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 												
+												/*
+												 * player intersects right edge
+												 */
 												if ((isect_p1.y >= by && isect_p2.y <= by) || (isect_p2.y >= by && isect_p1.y <= by)) {
+													
 													// check collision for lower right corner
 													Log.d(TAG, "hit lower right corner");
 													
@@ -403,6 +414,7 @@ public abstract class GameBase {
 													}
 													
 												} else if ((isect_p1.y >= cy && isect_p2.y <= cy) || (isect_p2.y >= cy && isect_p1.y <= cy)) {
+													
 													// check collision for upper right corner
 													Log.d(TAG, "hit upper right corner");
 													
@@ -430,6 +442,7 @@ public abstract class GameBase {
 													}
 
 												} else if (isect_p1.y <= cy && isect_p2.y <= cy && isect_p1.y >= by && isect_p2.y >= by) {
+													
 													// intersection point lies inbetween corners
 													Log.d(TAG, "right edge collision");
 
@@ -439,6 +452,7 @@ public abstract class GameBase {
 													normal.set(1.0f, 0.0f);
 													// calculate and set new velocity and position of player
 													setSpeedAndPosition(player, normal, isect_middle);
+													
 												} else {
 													// TODO: remove
 													// no collision
@@ -478,12 +492,17 @@ public abstract class GameBase {
 											// No collision
 											
 										} else {
+
 											if (player.pos().y <= rect_center.y - rect_half_height) {
 												// players pos is inbetween left and right edge and below the lower edge
 												
 												if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
-													
+												
+													/*
+													 * player intersects lower edge
+													 */
 													if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x<= bx) {
+														
 														Log.d(TAG, "lower edge collision");
 														
 														// middle point of intersection points
@@ -503,7 +522,11 @@ public abstract class GameBase {
 												
 												if (lineCircleIntersection(cx, cy, dx, dy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 													
+													/*
+													 * player intersects upper edge
+													 */
 													if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x<= cx) {
+														
 														Log.d(TAG, "upper edge collision");
 	
 														// middle point of intersection points
@@ -512,6 +535,7 @@ public abstract class GameBase {
 														normal.set(0.0f, 1.0f);
 														// calculate and set new velocity and position of player
 														setSpeedAndPosition(player, normal, isect_middle);
+														
 													} else {
 														Log.d(TAG, "Error: should hit lower left or lower right corner");
 														// TODO: hit lower right or lower left corner
@@ -600,7 +624,6 @@ public abstract class GameBase {
 									if (t2 < t1) t = t2;
 									
 									// Set the new position of player a
-									// TODO new Vector(plyer_a.newPosition());
 									Vector new_position_a = player_a.newPosition();
 									new_position_a.sub(player_a.pos());
 									new_position_a.mul(t);
@@ -725,12 +748,12 @@ public abstract class GameBase {
 	
 	}
 
-	private boolean lineCircleIntersection(float x1, float y1, float x2, float y2, Vector c_center, float c_radius, Vector isect_point1, Vector isect_point2) {
+	private boolean lineCircleIntersection(float x1, float y1, float x2, float y2, Vector circ_center, float circ_radius, Vector isect_point1, Vector isect_point2) {
 		
 		//Log.d(TAG, "vector of intersection: (" + x1 + "," + y1 + ", " + x2 + "," + y2 + ")");
 		
-		float cx = c_center.x;
-		float cy = c_center.y;
+		float cx = circ_center.x;
+		float cy = circ_center.y;
 		float dx = x2 - x1;
 		float dy = y2 - y1;
 		float a = dx * dx + dy * dy;
@@ -738,7 +761,7 @@ public abstract class GameBase {
 		float c = cx * cx + cy * cy;
 		c += x1 * x1 + y1 * y1;
 		c -= 2.0f * (cx * x1 + cy * y1);
-		c -= c_radius * c_radius;
+		c -= circ_radius * circ_radius;
 		float D = b * b - 4.0f * a * c;
 
 		if (D < 0) { // Not intersecting
