@@ -237,7 +237,6 @@ public abstract class GameBase {
 										Vector isect_p1 = new Vector(); // first intersection point
 										Vector isect_p2 = new Vector(); // second intersection point (can be identical)
 										Vector isect_middle = new Vector();
-										Vector corner = new Vector(); // temporary corner point
 										
 										/*
 										 *  d----c
@@ -269,7 +268,7 @@ public abstract class GameBase {
 												/*
 												 * player intersects left edge
 												 */
-												if ((isect_p1.y >= ay && isect_p2.y <= ay) || (isect_p2.y >= ay && isect_p1.y <= ay)) {
+												if ((isect_p1.y >= ay && isect_p2.y <= ay) || (isect_p1.y >= ay && isect_p2.y <= ay)) {
 													
 													// check collision for lower left corner
 													Log.d(TAG, "hit lower left corner");
@@ -345,7 +344,7 @@ public abstract class GameBase {
 												
 											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 													
-												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x<= bx) {
+												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p1.x <= bx && isect_p2.x <= bx) {
 													
 													// intersection with lower edge
 													Log.d(TAG, "player was on the left side but hit the lower edge");
@@ -360,7 +359,7 @@ public abstract class GameBase {
 												
 											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 												
-												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x<= cx) {
+												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p1.x <= cx && isect_p2.x <= cx) {
 													
 													// intersection with upper edge
 													Log.d(TAG, "player was on the left side but hit the upper edge");
@@ -461,7 +460,7 @@ public abstract class GameBase {
 												
 											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 												
-												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x<= bx) {
+												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p1.x <= bx && isect_p2.x <= bx) {
 													// intersection with lower edge
 													Log.d(TAG, "player was on the right side but hit the lower edge");
 													
@@ -475,7 +474,7 @@ public abstract class GameBase {
 												
 											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 												
-												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x<= cx) {
+												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p1.x <= cx && isect_p2.x <= cx) {
 													// intersection with upper edge
 													Log.d(TAG, "player was on the right side but hit the upper edge");
 													
@@ -487,7 +486,7 @@ public abstract class GameBase {
 													setSpeedAndPosition(player, normal, isect_middle);
 												}
 												
-											} 
+											}
 											
 											// No collision
 											
@@ -501,7 +500,7 @@ public abstract class GameBase {
 													/*
 													 * player intersects lower edge
 													 */
-													if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x<= bx) {
+													if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x <= bx) {
 														
 														Log.d(TAG, "lower edge collision");
 														
@@ -511,6 +510,7 @@ public abstract class GameBase {
 														normal.set(0.0f, -1.0f);
 														// calculate and set new velocity and position of player
 														setSpeedAndPosition(player, normal, isect_middle);
+														
 													} else {
 														Log.d(TAG, "Error: should hit lower left or lower right corner");
 														// TODO: hit lower right or lower left corner
@@ -525,7 +525,7 @@ public abstract class GameBase {
 													/*
 													 * player intersects upper edge
 													 */
-													if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x<= cx) {
+													if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x <= cx) {
 														
 														Log.d(TAG, "upper edge collision");
 	
