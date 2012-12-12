@@ -230,12 +230,13 @@ public abstract class GameBase {
 									GameWall wall = ((GameWall) field_obj);  
 									
 									for (Rectangle rect : wall.m_wall_items) {
-
-										final float eps = 0.00001f;
 										
-										Vector rect_center = new Vector(wall.m_position.x + rect.pos.x, wall.m_position.y + rect.pos.y);
+										// Temporary vectors that are necessary for the collision detection computation
+										Vector rect_center = new Vector(wall.m_position.x + rect.pos.x + rect.size.x/2.0f, wall.m_position.y + rect.pos.y + rect.size.y/2.0f);
 										Vector normal = new Vector();
-										Vector intersect_point = new Vector();
+										Vector isect_p1 = new Vector(); // first intersection point
+										Vector isect_p2 = new Vector(); // second intersection point (can be identical)
+										Vector isect_middle = new Vector();
 										
 										/*
 										 *  d----c
@@ -245,294 +246,284 @@ public abstract class GameBase {
 										 */
 										
 										// absolute positions of rectangle corners
-										float ax = rect_center.x - rect.width()/2.0f;
-										float ay = rect_center.y - rect.height()/2.0f;
-										float bx = rect_center.x + rect.width()/2.0f;
-										float by = rect_center.y - rect.height()/2.0f;
-										float cx = rect_center.x + rect.width()/2.0f;
-										float cy = rect_center.y + rect.height()/2.0f;
-										float dx = rect_center.x - rect.width()/2.0f;
-										float dy = rect_center.y + rect.height()/2.0f;
-										
 										float rect_half_width = rect.width()/2.0f;
 										float rect_half_height = rect.height()/2.0f;
 										
+										float ax = rect_center.x - rect_half_width;
+										float ay = rect_center.y - rect_half_height;
+										float bx = rect_center.x + rect_half_width;
+										float by = rect_center.y - rect_half_height;
+										float cx = rect_center.x + rect_half_width;
+										float cy = rect_center.y + rect_half_height;
+										float dx = rect_center.x - rect_half_width;
+										float dy = rect_center.y + rect_half_height;
+										
+										// Check players position before the collision
 										if (player.pos().x <= rect_center.x - rect_half_width) {
 											// players pos is left to the wall
-											
+
 											// check intersection with left edge of the wall
-											if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, intersect_point)) {
-												if (intersect_point.y <= ay && intersect_point.y >= ay - player.m_radius) {
-													// check for lower left corner
+											if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+												
+												/* 
+												 * player intersects left edge
+												 */
+												if ((isect_p1.y >= ay && isect_p2.y <= ay) || (isect_p2.y >= ay && isect_p1.y <= ay)) {
+													// check collision for lower left corner
 													Log.d(TAG, "hit lower left corner");
 													
-													// normal vector for corner
-													normal.set(player.pos().x - ax, player.pos().y - ay);
-													normal.normalize();
-
-													// prepare position of player regarding distance to wall
-													Vector player_pos = new Vector(normal);
+													/* calculate the intersection between corner circle with radius: player.m_radius
+													 * and the direction vector of newPosition() - pos() to find the position of intersection
+													 * of the player and the corner
+													 */
+													if (lineCircleIntersection(player.pos().x, player.pos().y, player.newPosition().x, player.newPosition().y, new Vector(ax, ay), player.m_radius, isect_p1, isect_p2)) {
+														
+														/* 
+														 * take the point of intersection which lies close to the player.pos() and
+														 * compute normal vector which is the vector pointing from the corner to 
+														 * the intersection point isect_p
+														 */
+														if (isect_p1.distSquared(player.pos()) < isect_p2.distSquared(player.pos())) {															
+															isect_p1.sub(ax, ay);
+															normal.set(isect_p1);
+														} else {
+															isect_p2.sub(ax, ay);
+															normal.set(isect_p2);
+														}
+														normal.normalize();
+														// Calculate new position and speed
+														setSpeedAndPosition(player, normal, new Vector(ax, ay));
+													}
 													
-													// calculate new velocity
-													normal.mul(player.speed().dot(normal));
-													normal.mul(-2.0f);
-													normal.add(player.speed());
-													// set new velocity
-													player.speed().set(normal);
-													
-													// set new position of player
-													player_pos.mul(player.m_radius + eps);
-													player.newPosition().add(player_pos);
-													
-												} else if (intersect_point.y >= dy && intersect_point.y <= dy + player.m_radius) {
-													// check for upper left corner
+												} else if ((isect_p1.y >= dy && isect_p2.y <= dy) || (isect_p2.y >= dy && isect_p1.y <= dy)) {
+													// check collision for upper left corner
 													Log.d(TAG, "hit upper left corner");
 													
-													// normal vector for corner
-													normal.set(player.pos().x - dx, player.pos().y - dy);
-													normal.normalize();
-
-													// prepare position of player regarding distance to wall
-													Vector player_pos = new Vector(normal);
+													/* calculate the intersection between corner circle with radius: player.m_radius
+													 * and the direction vector of newPosition() - pos() to find the position of intersection
+													 * of the player and the corner
+													 */
+													if (lineCircleIntersection(player.pos().x, player.pos().y, player.newPosition().x, player.newPosition().y, new Vector(dx, dy), player.m_radius, isect_p1, isect_p2)) {
+														
+														/* 
+														 * take the point of intersection which lies close to the player.pos() and
+														 * compute normal vector which is the vector pointing from the corner to 
+														 * the intersection point isect_p
+														 */
+														if (isect_p1.distSquared(player.pos()) < isect_p2.distSquared(player.pos())) {															
+															isect_p1.sub(dx, dy);
+															normal.set(isect_p1);
+														} else {
+															isect_p2.sub(dx, dy);
+															normal.set(isect_p2);
+														}
+														normal.normalize();
+														// Calculate new position and speed
+														setSpeedAndPosition(player, normal, new Vector(dx, dy));
+													}
 													
-													// calculate new velocity
-													normal.mul(player.speed().dot(normal));
-													normal.mul(-2.0f);
-													normal.add(player.speed());
-													// set new velocity
-													player.speed().set(normal);
-													
-													// set new position of player
-													player_pos.mul(player.m_radius + eps);
-													player.newPosition().add(player_pos);
-													
-												} else {
+												} else if (isect_p1.y <= dy && isect_p2.y <= dy && isect_p1.y >= ay && isect_p2.y >= ay) {
 													// intersection point lies inbetween corners
 													Log.d(TAG, "left edge collision");
+													
+													// middle point of intersection points
+													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
 													// normal vector for left edge (vertical)
 													normal.set(-1.0f, 0.0f);
 													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, normal, intersect_point, eps);
+													setSpeedAndPosition(player, normal, isect_middle);
+												} else {
+													// TODO: remove this case
+													// no collision
+													//Log.d(TAG, "no collision with rectangle");
 												}
-											}
+											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+													
+												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x<= bx) {
+													// intersection with lower edge
+													Log.d(TAG, "player was on the left side but hit the lower edge");
+													
+													// middle point of intersection points
+													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
+													// normal vector for left edge (vertical)
+													normal.set(0.0f, -1.0f);
+													// calculate and set new velocity and position of player
+													setSpeedAndPosition(player, normal, isect_middle);
+												}
+												
+											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+												
+												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x<= cx) {
+													// intersection with upper edge
+													Log.d(TAG, "player was on the left side but hit the upper edge");
+													
+													// middle point of intersection points
+													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
+													// normal vector for left edge (vertical)
+													normal.set(0.0f, 1.0f);
+													// calculate and set new velocity and position of player
+													setSpeedAndPosition(player, normal, isect_middle);
+												}
+												
+											} 
+
+											// No collision
 											
 										} else if (player.pos().x >= rect_center.x + rect_half_width) {
 											// players pos is right to the wall
 											
 											// check intersection with right edge of the wall
-											if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
-												if (intersect_point.y <= by) {
-													// check for lower left corner
-													// TODO
-												} else if (intersect_point.y >= cy) {
-													// check for upper left corner
-													// TODO
-												} else {
+											if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+												
+												if ((isect_p1.y >= by && isect_p2.y <= by) || (isect_p2.y >= by && isect_p1.y <= by)) {
+													// check collision for lower right corner
+													Log.d(TAG, "hit lower right corner");
+													
+													/* calculate the intersection between corner circle with radius: player.m_radius
+													 * and the direction vector of newPosition() - pos() to find the position of intersection
+													 * of the player and the corner
+													 */
+													if (lineCircleIntersection(player.pos().x, player.pos().y, player.newPosition().x, player.newPosition().y, new Vector(bx, by), player.m_radius, isect_p1, isect_p2)) {
+														
+														/* 
+														 * take the point of intersection which lies close to the player.pos() and
+														 * compute normal vector which is the vector pointing from the corner to 
+														 * the intersection point isect_p
+														 */
+														if (isect_p1.distSquared(player.pos()) < isect_p2.distSquared(player.pos())) {															
+															isect_p1.sub(bx, by);
+															normal.set(isect_p1);
+														} else {
+															isect_p2.sub(bx, by);
+															normal.set(isect_p2);
+														}
+														normal.normalize();
+														// Calculate new position and speed
+														setSpeedAndPosition(player, normal, new Vector(bx, by));
+													}
+													
+												} else if ((isect_p1.y >= cy && isect_p2.y <= cy) || (isect_p2.y >= cy && isect_p1.y <= cy)) {
+													// check collision for upper right corner
+													Log.d(TAG, "hit upper right corner");
+													
+													/* calculate the intersection between corner circle with radius: player.m_radius
+													 * and the direction vector of newPosition() - pos() to find the position of intersection
+													 * of the player and the corner
+													 */
+													if (lineCircleIntersection(player.pos().x, player.pos().y, player.newPosition().x, player.newPosition().y, new Vector(cx, cy), player.m_radius, isect_p1, isect_p2)) {
+														
+														/* 
+														 * take the point of intersection which lies close to the player.pos() and
+														 * compute normal vector which is the vector pointing from the corner to 
+														 * the intersection point isect_p
+														 */
+														if (isect_p1.distSquared(player.pos()) < isect_p2.distSquared(player.pos())) {															
+															isect_p1.sub(cx, cy);
+															normal.set(isect_p1);
+														} else {
+															isect_p2.sub(cx, cy);
+															normal.set(isect_p2);
+														}
+														normal.normalize();
+														// Calculate new position and speed
+														setSpeedAndPosition(player, normal, new Vector(cx, cy));
+													}
+
+												} else if (isect_p1.y <= cy && isect_p2.y <= cy && isect_p1.y >= by && isect_p2.y >= by) {
 													// intersection point lies inbetween corners
 													Log.d(TAG, "right edge collision");
+
+													// middle point of intersection points
+													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
 													// normal vector for left edge (vertical)
 													normal.set(1.0f, 0.0f);
 													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, normal, intersect_point, eps);
+													setSpeedAndPosition(player, normal, isect_middle);
+												} else {
+													// TODO: remove
+													// no collision
+													// Log.d(TAG, "no collision with rectangle");
 												}
-											}
+												
+											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+												
+												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x<= bx) {
+													// intersection with lower edge
+													Log.d(TAG, "player was on the right side but hit the lower edge");
+													
+													// middle point of intersection points
+													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
+													// normal vector for left edge (vertical)
+													normal.set(0.0f, -1.0f);
+													// calculate and set new velocity and position of player
+													setSpeedAndPosition(player, normal, isect_middle);
+												}
+												
+											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+												
+												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x<= cx) {
+													// intersection with upper edge
+													Log.d(TAG, "player was on the right side but hit the upper edge");
+													
+													// middle point of intersection points
+													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
+													// normal vector for left edge (vertical)
+													normal.set(0.0f, 1.0f);
+													// calculate and set new velocity and position of player
+													setSpeedAndPosition(player, normal, isect_middle);
+												}
+												
+											} 
+											
+											// No collision
 											
 										} else {
 											if (player.pos().y <= rect_center.y - rect_half_height) {
 												// players pos is inbetween left and right edge and below the lower edge
 												
-												if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, intersect_point)) {
-													Log.d(TAG, "lower edge collision");
-													// normal vector for left edge (vertical)
-													normal.set(0.0f, -1.0f);
-													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, normal, intersect_point, eps);
+												if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+													
+													if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x<= bx) {
+														Log.d(TAG, "lower edge collision");
+														
+														// middle point of intersection points
+														isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
+														// normal vector for left edge (vertical)
+														normal.set(0.0f, -1.0f);
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, isect_middle);
+													} else {
+														Log.d(TAG, "Error: should hit lower left or lower right corner");
+														// TODO: hit lower right or lower left corner
+													}
 												}
 												
 											} else if (player.pos().y >= rect_center.y + rect_half_height) {
 												// players pos is inbetween left and right edge and above the upper edge
 												
-												if (lineCircleIntersection(cx, cy, dx, dy, player.newPosition(), player.m_radius, intersect_point)) {
-													Log.d(TAG, "upper edge collision");
-													// normal vector for left edge (vertical)
-													normal.set(0.0f, 1.0f);
-													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, normal, intersect_point, eps);
+												if (lineCircleIntersection(cx, cy, dx, dy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+													
+													if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x<= cx) {
+														Log.d(TAG, "upper edge collision");
+	
+														// middle point of intersection points
+														isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
+														// normal vector for left edge (vertical)
+														normal.set(0.0f, 1.0f);
+														// calculate and set new velocity and position of player
+														setSpeedAndPosition(player, normal, isect_middle);
+													} else {
+														Log.d(TAG, "Error: should hit lower left or lower right corner");
+														// TODO: hit lower right or lower left corner
+													}
 												}
 												
 											} else {
 												// TODO: This should not be the case!!!
 												// players pos is in the rectangle what to do?
+												Log.d(TAG, "Error: player is inside rectangle");
 											}
 										}
-										
-										/*
-										if (player.pos().x <= rect_center.x) {
-											if (player.pos().y <= rect_center.y) {
-												// player is in the lower left area
-												
-												// check for intersection with vertical edge
-												if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, intersect_point)) {
-													
-													// check if intersection point lies on the line
-													if (intersect_point.y > ay && intersect_point.y < dy) {
-														
-														Log.d(TAG, "left edge collision");
-														// normal vector for left edge (vertical)
-														normal.set(-1.0f, 0.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, normal, intersect_point, eps);
-														
-													} else {
-														// check corner
-														// TODO
-													}
-													
-												}
-													
-												// check for intersection with horizontal edge
-												if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, intersect_point)) {
-													
-													// check if intersection point lies on the line
-													if (intersect_point.x > ax && intersect_point.x < bx) {
-														
-														Log.d(TAG, "lower edge collision");
-														// normal vector for lower edge (horizontal)
-														normal.set(0.0f, -1.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, normal, intersect_point, eps);
-													
-													} else {
-														// check corner
-														// TODO
-													}
-												}
-													
-											} else {
-												// player is in the upper left area
-												
-												// check for intersection with vertical edge
-												if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, intersect_point)) {
-													
-													// check if intersection point lies on the line
-													if (intersect_point.y > ay && intersect_point.y < dy) {
-
-														Log.d(TAG, "left edge collision");
-														// normal vector for left edge (vertical)
-														normal.set(-1.0f, 0.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, normal, intersect_point, eps);
-													
-													} else {
-														// check corner
-														// TODO
-													}
-													
-												}
-													
-												// check for intersection with horizontal edge
-												if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
-													
-													// check if intersection point lies on the line
-													if (intersect_point.x > dx && intersect_point.x < cx) {
-
-														Log.d(TAG, "upper edge collision");
-														// normal vector for upper edge (horizontal)
-														normal.set(0.0f, 1.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, normal, intersect_point, eps);
-														
-													} else {
-														// check corner
-														// TODO
-													}
-												}
-												
-											}
-										} else {
-											Log.d(TAG, "player pos.x: " + player.pos().x);
-											Log.d(TAG, "rect_center.x " + rect_center.x);
-											if (player.pos().y <= rect_center.y) {
-												// player is in the lower right area
-												
-												// check for intersection with vertical edge
-												if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
-													
-													// check if intersection point lies on the line
-													if (intersect_point.y > by && intersect_point.y < cy) {
-
-														Log.d(TAG, "right edge collision");
-														// normal vector for right edge (vertical)
-														normal.set(1.0f, 0.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, normal, intersect_point, eps);
-
-													} else {
-														// check corner
-														// TODO
-													}
-													
-												}
-													
-												// check for intersection with horizontal edge
-												if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, intersect_point)) {
-													
-													// check if intersection point lies on the line
-													if (intersect_point.x > ax && intersect_point.x < bx) {
-
-														Log.d(TAG, "lower edge collision");
-														// normal vector for lower edge (horizontal)
-														normal.set(0.0f, -1.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, normal, intersect_point, eps);
-														
-													} else {
-														// check corner
-														// TODO
-													}
-												}
-
-											} else {
-												// player is in the upper right area
-												
-												// check for intersection with vertical edge
-												if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
-													
-													// check if intersection point lies on the line
-													if (intersect_point.y > by && intersect_point.y < cy) {
-
-														Log.d(TAG, "right edge collision");
-														// normal vector for right edge (vertical)
-														normal.set(1.0f, 0.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, normal, intersect_point, eps);
-														
-													} else {
-														// check corner
-														// TODO
-													}
-													
-												}
-													
-												// check for intersection with horizontal edge
-												if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, intersect_point)) {
-													
-													// check if intersection point lies on the line
-													if (intersect_point.x > dx && intersect_point.y < cx) {
-														
-														Log.d(TAG, "upper edge collision");
-														// normal vector for upper edge (horizontal)
-														normal.set(0.0f, 1.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, normal, intersect_point, eps);
-
-													} else {
-														// check corner
-														// TODO
-													}
-												}
-											}
-										} */
 									}
 									
 									break;
@@ -609,6 +600,7 @@ public abstract class GameBase {
 									if (t2 < t1) t = t2;
 									
 									// Set the new position of player a
+									// TODO new Vector(plyer_a.newPosition());
 									Vector new_position_a = player_a.newPosition();
 									new_position_a.sub(player_a.pos());
 									new_position_a.mul(t);
@@ -708,7 +700,7 @@ public abstract class GameBase {
 		}
 	}
 	
-	private void setSpeedAndPosition(GamePlayer player, Vector normal, Vector intersect_point, float eps) {
+	private void setSpeedAndPosition(GamePlayer player, Vector normal, Vector intersect_point) {
 		
 		Log.d(TAG, "speed before collision, x: " + player.speed().x + " y: " + player.speed().y);
 		
@@ -726,19 +718,19 @@ public abstract class GameBase {
 		player.speed().set(normal);
 		
 		// set new position of player
-		player_pos.mul(player.m_radius + eps);
+		player_pos.mul(player.m_radius + EPS);
 		player.newPosition().add(player_pos);
 		
 		Log.d(TAG, "speed after collision, x: " + player.speed().x + " y: " + player.speed().y);
 	
 	}
 
-	private boolean lineCircleIntersection(float x1, float y1, float x2, float y2, Vector player_pos, float cr, Vector intersect_point) {
+	private boolean lineCircleIntersection(float x1, float y1, float x2, float y2, Vector c_center, float c_radius, Vector isect_point1, Vector isect_point2) {
 		
 		//Log.d(TAG, "vector of intersection: (" + x1 + "," + y1 + ", " + x2 + "," + y2 + ")");
 		
-		float cx = player_pos.x;
-		float cy = player_pos.y;
+		float cx = c_center.x;
+		float cy = c_center.y;
 		float dx = x2 - x1;
 		float dy = y2 - y1;
 		float a = dx * dx + dy * dy;
@@ -746,7 +738,7 @@ public abstract class GameBase {
 		float c = cx * cx + cy * cy;
 		c += x1 * x1 + y1 * y1;
 		c -= 2.0f * (cx * x1 + cy * y1);
-		c -= cr * cr;
+		c -= c_radius * c_radius;
 		float D = b * b - 4.0f * a * c;
 
 		if (D < 0) { // Not intersecting
@@ -760,7 +752,8 @@ public abstract class GameBase {
 			float iy2 = y1 + mu * (dy);
 
 			// set new position of player to impact point
-			intersect_point.set( (ix1 + ix2) / 2.0f, (iy1 + iy2) / 2.0f );
+			isect_point1.set(ix1, iy1);
+			isect_point2.set(ix2, iy2);
 			
 			//Log.d(TAG, "intersection point 1, x: " + ix1 + " y: " + iy1);
 			//Log.d(TAG, "intersection point 2, x: " + ix2 + " y: " + iy2);
