@@ -26,8 +26,6 @@ import com.android.game.clash_of_the_balls.network.Networking.NetworkData;
 public class NetworkServer {
 	private static final String TAG = "NetworkServer";
 	
-	private int m_next_sequence_num;
-	
 	private final ByteArrayOutputStream m_outgoing_byte_stream
 			= new ByteArrayOutputStream();
 	private final DataOutputStream m_outgoing_stream
@@ -37,20 +35,11 @@ public class NetworkServer {
 	
 	public NetworkServer(Networking networking) {
 		m_networking = networking;
-		resetSequenceNum();
 	}
 	
 	public ConnectedClient getConnectedClient(int idx) 
 		{ return m_networking.connectedClient(idx); }
 	public int getConnectedClientCount() { return m_networking.connectedClientCount(); }
-	
-	
-	public int getSequenceNum() {
-		return m_next_sequence_num++;
-	}
-	public void resetSequenceNum() {
-		m_next_sequence_num = 0;
-	}
 	
 	public void setOwnName(String name) {
 		m_networking.setServerName(name);
@@ -71,8 +60,6 @@ public class NetworkServer {
 	
 	//send events to clients
 	public void addOutgoingEvent(Event e) {
-		//TODO: add important events to queue to be acked
-		
 		try {
 			e.write(m_outgoing_stream);
 		} catch (IOException e1) {
@@ -96,14 +83,7 @@ public class NetworkServer {
 	
 	//call this regularly to handle incoming network data
 	public void handleReceive() {
-		
-		//acks 
-		NetworkData d;
-		while((d=m_networking.receiveAck()) != null) {
-			short client_id = getClientId(d.sender);
-			handleAckReceived(d.ack_num, client_id);
-		}
-		
+		//nothing to do
 	}
 	
 	//receive sensor updates
@@ -112,9 +92,7 @@ public class NetworkServer {
 		NetworkData d=m_networking.receiveSensorUpdate();
 		if(d!=null) {
 			pos_out.set((Vector)d.arg1);
-			short player_id = getClientId(d.sender);
-			if(player_id!=-1) handleAckReceived(d.ack_num, player_id);
-			return player_id;
+			return getClientId(d.sender);
 		}
 		return (short)-1;
 	}
@@ -142,11 +120,6 @@ public class NetworkServer {
 				return client.unique_id;
 		}
 		return "";
-	}
-	
-	private void handleAckReceived(int ack_seq_num, int player_id) {
-		//TODO
-		
 	}
 	
 }

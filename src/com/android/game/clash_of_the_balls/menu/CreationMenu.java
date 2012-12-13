@@ -102,7 +102,7 @@ public class CreationMenu extends GameMenuBase {
 		for(int i=0; i<level_manager.levelCount(); ++i) {
 			m_level_list.addItem(new MenuItemLevel(new Vector()
 				, new Vector(level_item_width, size.y/2.f/3.f)
-				, level_manager.level(i), tex_manager));
+				, level_manager.level(i), tex_manager,font_settings));
 		}
 		m_level_list.selectItem(0);
 		
@@ -207,7 +207,6 @@ public class CreationMenu extends GameMenuBase {
 		if (item == m_create_button) {
 			if(!m_create_button.isDisabled()) {
 				m_settings.is_host = true;
-				//1->1 Round, 2->2 Round, 3-> 4 Rounds, 4-> 10 Rounds?? TODO
 				int idx= 0;
 				for(int i=0; i<m_round_buttons.length; ++i)
 					if(m_round_buttons[i].isPressed()) idx = i;

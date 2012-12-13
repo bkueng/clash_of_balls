@@ -14,12 +14,14 @@ import android.util.Log;
 
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
+import com.android.game.clash_of_the_balls.game.GameItem.ItemType;
 import com.android.game.clash_of_the_balls.game.GameStatistics.Statistic;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameEnd;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo;
 import com.android.game.clash_of_the_balls.game.event.EventGameStartNow;
+import com.android.game.clash_of_the_balls.game.event.EventItemAdded;
 import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.network.Networking;
@@ -224,7 +226,6 @@ public class GameServer extends GameBase implements Runnable {
 	private boolean m_had_network_packets=false;
 	
 	private void handleNetworkReceivedSignal(boolean force_move) {
-		Log.v(TAG_SERVER, "Server: received a network signal");
 		
 		m_had_network_packets = true;
 		
@@ -255,15 +256,14 @@ public class GameServer extends GameBase implements Runnable {
 	private void handleGameStart() {
 		Log.d(TAG_SERVER, "Server: starting the game");
 		
-		m_network_server.resetSequenceNum();
+		m_next_item_time = 0.f;
 		
 		//first throw away all waiting incoming sensor updates & acks
-		while(m_networking.receiveAck()!=null) {}
 		while(m_networking.receiveSensorUpdate()!=null) {}
 		
 		
 		/* first send 'game about to start' event with level information */
-		addEvent(new EventGameInfo(this, getNextSequenceNum()));
+		addEvent(new EventGameInfo(this));
 		sendAllEvents();
 		
 		//wait for start: wait_to_start_game seconds
@@ -286,7 +286,6 @@ public class GameServer extends GameBase implements Runnable {
 	private long m_last_time; //for timestepping
 	
 	private void moveGame() {
-		Log.v(TAG_SERVER, "Server: moving the game");
 		
 		long time = SystemClock.elapsedRealtime(); //or: nanoTime()
 		float elapsed_time = (float)(time - m_last_time) / 1000.f;
@@ -298,12 +297,39 @@ public class GameServer extends GameBase implements Runnable {
 		move(elapsed_time);
 		doCollisionHandling();
 		applyMove();
+		handleGenerateItems(elapsed_time);
 		removeDeadObjects();
 		checkGameEnd(elapsed_time);
 		
 		sendAllEvents();
 		generate_events = false;
 	}
+	
+	private float m_next_item_time=0.f; //[sec] when to generate next item
+	
+	private void handleGenerateItems(float dsec) {
+		if(!GameSettings.place_items) return;
+		
+		if(m_next_item_time <= 0.f) {
+			m_next_item_time = 10.f + (float)Math.random()*10.f; //10-20 sec
+		}
+		
+		if((m_next_item_time-=dsec) <= 0.f) {
+			Log.d(TAG_SERVER, "trying to put an Item on the field");
+			
+			ItemType type = GameItem.getRandomType();
+			Vector position = new Vector();
+			if(getFreeRandomField(position, 1.1f)) {
+				Log.d(TAG_SERVER, "adding Item at x="+position.x+", y="+position.y);
+
+				GameItem item = addItem(getNextItemId(), type, position);
+				if(generate_events) {
+					addEvent(new EventItemAdded(this, item));
+				}
+			}
+		}
+	}
+	
 	
 	private boolean m_is_game_ending = false;
 	private float m_game_ending_timeout;
@@ -326,6 +352,7 @@ public class GameServer extends GameBase implements Runnable {
 	}
 	
 	public void run() {
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		Looper.prepare();
 		m_looper = Looper.myLooper();
 		
@@ -342,7 +369,7 @@ public class GameServer extends GameBase implements Runnable {
 	
 	public void gameStartNow() {
 		super.gameStartNow();
-		addEvent(new EventGameStartNow(getNextSequenceNum()));
+		addEvent(new EventGameStartNow());
 		sendAllEvents();
 		m_is_game_ending=false;
 		IncomingHandler h = m_msg_handler;
@@ -361,7 +388,7 @@ public class GameServer extends GameBase implements Runnable {
 		}
 		m_settings.game_statistics.applyCurrentRoundStatistics();
 		
-		addEvent(new EventGameEnd(getNextSequenceNum(), m_settings.game_statistics));
+		addEvent(new EventGameEnd(m_settings.game_statistics));
 		//after here the game stopped & this thread is simply waiting 
 		//for next game initialization & game start (called from UIHandler)
 	}
@@ -389,10 +416,6 @@ public class GameServer extends GameBase implements Runnable {
 		}
 	}
 
-	public int getNextSequenceNum() {
-		return m_network_server.getSequenceNum();
-	}
-	
 	public String getUniqueNameFromPlayerId(short player_id) {
 		return m_network_server.getClientUniqueName(player_id);
 	}

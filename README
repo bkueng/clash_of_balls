@@ -1,0 +1,47 @@
+                               Clash of Balls
+                               ==============
+
+               Copyright 2012 Hans Hardmeier
+               Copyright 2012 Andrin Jenal
+               Copyright 2012 Beat Küng <beat-kueng@gmx.net>
+
+
+Clash of Balls is an Android multiplayer game. Each player controls a ball and
+tries to push the others down into the black nirvana.
+
+It uses the AllJoyn (Apache license) library for peer-to-peer communication. So
+no server is used, but each player needs to be in the same network to see each
+other. If the device supports it, Clash of Balls should also run via Bluetooth.
+
+
+Usage
+-----
+
+The game should be self-explanatory, there is a Help Menu. When the game starts
+and the countdown is shown, hold your device still in a desired position, where
+your ball should not move. During the game, tilt the device to move your player
+to a certain direction.
+
+
+Levels
+------
+
+The levels are in the folder res/raw/. The class GameLevel describes how to
+create a new level. This can then be added in LevelManager.loadLevels().
+
+
+Debugging & Settings
+--------------------
+
+To facilitate debugging, set GameSettings.debug to true. This allows the game to
+be startet on a single phone.
+In GameSettings also other settings can be set to control the behaviour of the
+game.
+
+
+Miscellaneous
+-------------
+
+If you have any improvements or suggestions you are welcome to implement them
+and/or contact us.
+

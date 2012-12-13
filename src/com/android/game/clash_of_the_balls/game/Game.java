@@ -39,8 +39,6 @@ public class Game extends GameBase implements UIBase {
 	
 	private NetworkClient m_network_client;
 	
-	private GamePlayer m_own_player;
-	
 	private float m_calibration_timeout=0.f; //[sec]
 	
 	
@@ -257,10 +255,6 @@ public class Game extends GameBase implements UIBase {
 		m_ui_change = UIHandler.UIChange.GAME_ROUND_END;
 	}
 	
-	public int getNextSequenceNum() {
-		return -1; //only the server generates sequence numbers
-	}
-
 	public UIHandler.UIChange UIChange() {
 		UIHandler.UIChange ret = m_ui_change;
 		m_ui_change = UIChange.NO_CHANGE;

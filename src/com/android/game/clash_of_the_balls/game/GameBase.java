@@ -14,6 +14,7 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
+import com.android.game.clash_of_the_balls.game.GameItem.ItemType;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventImpact;
@@ -45,6 +46,9 @@ public abstract class GameBase {
 	
 	protected boolean m_bIs_game_running = false;
 	public boolean isRunning() { return m_bIs_game_running; }
+	
+	protected GamePlayer m_own_player = null;
+	public GamePlayer ownPlayer() { return m_own_player; }
 	
 	public final boolean is_server;
 	
@@ -122,6 +126,50 @@ public abstract class GameBase {
 		}
 	}
 	
+	//add item to the game. does not generate an Event
+	public GameItem addItem(short id, ItemType type, Vector position) {
+		Texture texture=null;
+		if(m_texture_manager!=null) {
+			switch(type) {
+			case IncreaseMaxSpeed: texture=m_texture_manager.get(R.raw.texture_item_speed);
+				break;
+			case InvertControls: texture=m_texture_manager.get(R.raw.texture_item_control_change);
+				break;
+			case InvisibleToOthers: texture=m_texture_manager.get(R.raw.texture_item_invisible);
+				break;
+			case MassAndSize: texture=m_texture_manager.get(R.raw.texture_item_mass);
+				break;
+			}
+		}
+		GameItem item = new GameItem(this, id, position, texture, type);
+		m_game_objects.put(id, item);
+		return item;
+	}
+	
+	//get the middle of a random game field (tile) where no foreground object is
+	//and no moveable object is closer than min_object_dist (normally 1)
+	//to this position
+	//returns false if none is found
+	protected boolean getFreeRandomField(Vector pos_out, float min_object_dist) {
+		final int max_tries = 15;
+		boolean ret = false;
+		int empty_x[] = m_game_field.fgEmptyFieldIdxX();
+		int empty_y[] = m_game_field.fgEmptyFieldIdxY();
+		for(int i=0; i<max_tries && !ret; ++i) {
+			int idx = (int)(Math.random() * empty_x.length);
+			pos_out.x = (float)empty_x[idx] + 0.5f;
+			pos_out.y = (float)empty_y[idx] + 0.5f;
+			ret = true;
+			//check if no moveable object is too close
+			for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
+				if(entry.getValue().pos().distSquared(pos_out) < min_object_dist*min_object_dist) {
+					ret=false;
+				}
+			}
+		}
+		return ret;
+	}
+	
 	//this is the initial player count
 	public int initialPlayerCount() {
 		return m_initial_player_count;
@@ -135,8 +183,6 @@ public abstract class GameBase {
 		return m_next_object_id++;
 	}
 	
-	public abstract int getNextSequenceNum();
-
 	public void gameEnd() {
 		m_bIs_game_running = false;
 	}
@@ -159,7 +205,7 @@ public abstract class GameBase {
 	}
 	protected void handleObjectDied(DynamicGameObject obj) {
 		if(generate_events) {
-			addEvent(new EventItemRemoved(getNextSequenceNum(), obj.m_id));
+			addEvent(new EventItemRemoved(obj.m_id));
 		}
 		if(obj.type == Type.Player) --m_current_player_count;
 	}
@@ -651,8 +697,7 @@ public abstract class GameBase {
 		obja.handleImpact(objb);
 		objb.handleImpact(obja);
 		if (generate_events) {
-			addEvent(new EventImpact(getNextSequenceNum(), obja.m_id, pos_a,
-					objb.m_id, pos_b));
+			addEvent(new EventImpact(obja.m_id, pos_a, objb.m_id, pos_b));
 		}
 	}
 	

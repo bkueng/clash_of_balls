@@ -13,6 +13,9 @@ public class GameSettings {
 						//this allows us some special things for testing if true
 						//eg starting a game without any connected clients
 	
+	public static final boolean place_items = true; //whether there should be
+						//items placed randomly on the field from time to time
+	
 	public String user_name="";
 	
 	public boolean is_host=false;

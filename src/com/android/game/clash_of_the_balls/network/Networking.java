@@ -92,37 +92,22 @@ public class Networking {
 	/* public interface */
 	
 	/* sending messages */
-	public void sendSensorUpdate(int ack_seq_num, Vector pos) 
+	public void sendSensorUpdate(Vector pos) 
 			throws BusException {
 		try {
 			if (mJoinedToSelf) {
 				//this signal is: client --> server. so don't send to clients
 				//if (mHostChatInterface != null) 
-				//	mHostChatInterface.sensorUpdate(ack_seq_num, pos);
-				receivedSensorUpdate(mBus.getUniqueName(), ack_seq_num, pos.x, pos.y); //send to ourself
+				//	mHostChatInterface.sensorUpdate(pos);
+				receivedSensorUpdate(mBus.getUniqueName(), pos.x, pos.y); //send to ourself
 			} else {
-				if(mChatInterface!=null) mChatInterface.sensorUpdate(ack_seq_num, pos.x, pos.y);
+				if(mChatInterface!=null) mChatInterface.sensorUpdate(pos.x, pos.y);
 			}
 		} catch (BusException ex) {
     		alljoynError(Module.USE, AllJoynError.SEND_ERROR, 
     				"Bus exception while sending message: (" + ex + ")");
 		}
 	}
-    public void sendAck(int ack_seq_num) throws BusException {
-		try {
-			if (mJoinedToSelf) {
-				//this signal is: client --> server. so don't send to clients
-				//if (mHostChatInterface != null)
-				//	mHostChatInterface.ack(ack_seq_num);
-				receivedAck(mBus.getUniqueName(), ack_seq_num); //send to ourself
-			} else {
-				if(mChatInterface!=null) mChatInterface.ack(ack_seq_num);
-			}
-		} catch (BusException ex) {
-    		alljoynError(Module.USE, AllJoynError.SEND_ERROR, 
-    				"Bus exception while sending message: (" + ex + ")");
-		}
-    }
     public void sendGameCommand(byte[] data) throws BusException {
 		try {
 			if (mJoinedToSelf) {
@@ -143,9 +128,6 @@ public class Networking {
     //will return null if there are no messages left
     public NetworkData receiveSensorUpdate() {
     	return m_sensor_updates.poll();
-    }
-    public NetworkData receiveAck() {
-    	return m_acks.poll();
     }
     public NetworkData receiveGameCommand() {
     	return m_game_commands.poll();
@@ -294,14 +276,12 @@ public class Networking {
 	//incoming data
 	public static class NetworkData {
 		public Object arg1;
-		public int ack_num;
 		public byte[] data;
 		public String sender;
 		
 	}
 	private List<Handler> m_event_listeners = new ArrayList<Handler>();
 	private Queue<NetworkData> m_sensor_updates = new ConcurrentLinkedQueue<NetworkData>();
-	private Queue<NetworkData> m_acks = new ConcurrentLinkedQueue<NetworkData>();
 	private Queue<NetworkData> m_game_commands = new ConcurrentLinkedQueue<NetworkData>();
 	
 	private Queue<String> m_server_found = new ConcurrentLinkedQueue<String>();
@@ -1276,11 +1256,8 @@ public class Networking {
          * directly.
 	     */
 		@BusSignal
-		public void sensorUpdate(int ack_seq_num, double pos_x, double pos_y)
+		public void sensorUpdate(double pos_x, double pos_y)
 				throws BusException { }
-		
-		@BusSignal
-		public void ack(int ack_seq_num) throws BusException { }
 		
 		@BusSignal
 		public void gameCommand(byte[] data) throws BusException { }
@@ -1309,7 +1286,7 @@ public class Networking {
      * handler names.
      */
     @BusSignalHandler(iface = "com.android.game.clash_of_the_balls.alljoyn", signal = "sensorUpdate")
-    public void sensorUpdate(int ack_seq_num, double pos_x, double pos_y) {
+    public void sensorUpdate(double pos_x, double pos_y) {
     	
         /*
     	 * The only time we allow a signal from the hosted session ID to pass
@@ -1326,41 +1303,13 @@ public class Networking {
     		return;
     	}
         
-        receivedSensorUpdate(ctx.sender, ack_seq_num, pos_x, pos_y);
+        receivedSensorUpdate(ctx.sender, pos_x, pos_y);
     }
-    private void receivedSensorUpdate(String sender, int ack_seq_num, double pos_x, double pos_y) {
+    private void receivedSensorUpdate(String sender, double pos_x, double pos_y) {
         NetworkData data = new NetworkData();
-        data.ack_num = ack_seq_num;
         data.arg1 = new Vector((float)pos_x, (float)pos_y);
         data.sender = sender;
         m_sensor_updates.add(data);
-        sendEventToListeners(HANDLE_RECEIVED_SIGNAL);
-    }
-    @BusSignalHandler(iface = "com.android.game.clash_of_the_balls.alljoyn", signal = "ack")
-    public void ack(int ack_seq_num) {
-    	
-        /*
-    	 * The only time we allow a signal from the hosted session ID to pass
-    	 * through is if we are in mJoinedToSelf state.  If the source of the
-    	 * signal is us, we also filter out the signal since we are going to
-    	 * locally echo the signal.
-     	 */
-    	String uniqueName = mBus.getUniqueName();
-    	MessageContext ctx = mBus.getMessageContext();
-        
-         // Always drop our own signals which may be echoed back from the system.
-        if (ctx.sender.equals(uniqueName)) {
-            Log.i(TAG, "Chat(): dropped our own signal received on session " + ctx.sessionId);
-    		return;
-    	}
-        
-        receivedAck(ctx.sender, ack_seq_num);
-    }
-    private void receivedAck(String sender, int ack_seq_num) {
-        NetworkData data = new NetworkData();
-        data.ack_num = ack_seq_num;
-        data.sender = sender;
-        m_acks.add(data);
         sendEventToListeners(HANDLE_RECEIVED_SIGNAL);
     }
     @BusSignalHandler(iface = "com.android.game.clash_of_the_balls.alljoyn", signal = "gameCommand")
