@@ -38,8 +38,6 @@ public class StaticGameObject extends GameObject {
 	
 	protected float m_elastic_factor = 1.0f; //for object collisions
 	public float elasticFactor() { return m_elastic_factor; }
-	private float m_bounce_factor = 1.0f; //for object collisions
-	public float bounceFactor() { return m_bounce_factor; }
 	
 	protected Texture m_texture;
 	protected VertexBufferFloat m_color_data;
