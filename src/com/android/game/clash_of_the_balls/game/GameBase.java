@@ -763,15 +763,16 @@ public abstract class GameBase {
 		c += x1 * x1 + y1 * y1;
 		c -= 2.0f * (cx * x1 + cy * y1);
 		c -= circ_radius * circ_radius;
-		float D = b * b - 4.0f * a * c;
+		float D = b*b - 4.0f*a*c;
 
 		if (D < 0) { // Not intersecting
 			return false;
 		} else {
-			float mu = (-b + (float) Math.sqrt(b * b - 4.0f * a * c)) / (2.0f * a);
+			float square_root = FloatMath.sqrt(D);
+			float mu = (-b + square_root) / (2.f * a);
 			float ix1 = x1 + mu * (dx);
 			float iy1 = y1 + mu * (dy);
-			mu = (-b - (float) Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+			mu = (-b - square_root) / (2.f * a);
 			float ix2 = x1 + mu * (dx);
 			float iy2 = y1 + mu * (dy);
 
