@@ -36,7 +36,7 @@ public class StaticGameObject extends GameObject {
 		m_rotation_angle = angle_rad;
 	}
 	
-	private float m_elastic_factor = 1.0f; //for object collisions
+	protected float m_elastic_factor = 1.0f; //for object collisions
 	public float elasticFactor() { return m_elastic_factor; }
 	private float m_bounce_factor = 1.0f; //for object collisions
 	public float bounceFactor() { return m_bounce_factor; }
