@@ -57,5 +57,6 @@ public class GameWall extends StaticGameObject {
 		
 		m_wall_items= rects;
 		
+		m_elastic_factor = 0.5f;
 	}
 }
