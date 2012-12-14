@@ -53,7 +53,7 @@ public class SensorThread implements SensorEventListener {
         m_sensor_manager=(SensorManager)m_context.getSystemService(
     			Context.SENSOR_SERVICE);
 
-        Sensor sensor = m_sensor_manager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+        Sensor sensor = m_sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         m_sensor_manager.registerListener(this, sensor,
                             SensorManager.SENSOR_DELAY_GAME, handler);
         
