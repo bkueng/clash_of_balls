@@ -270,7 +270,7 @@ public abstract class GameBase {
 												/*
 												 * player intersects left edge
 												 */
-												if ((isect_p1.y >= ay && isect_p2.y <= ay) || (isect_p1.y >= ay && isect_p2.y <= ay)) {
+												if ((isect_p1.y >= ay && isect_p2.y <= ay) || (isect_p2.y >= ay && isect_p1.y <= ay)) {
 													
 													// check collision for lower left corner
 													Log.d(TAG, "hit lower left corner");
@@ -338,10 +338,6 @@ public abstract class GameBase {
 													// calculate and set new velocity and position of player
 													setSpeedAndPosition(player, wall, normal, isect_middle);
 												
-												} else {
-													// TODO: remove this case
-													// no collision
-													//Log.d(TAG, "no collision with rectangle");
 												}
 												
 											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
@@ -454,10 +450,6 @@ public abstract class GameBase {
 													// calculate and set new velocity and position of player
 													setSpeedAndPosition(player, wall, normal, isect_middle);
 													
-												} else {
-													// TODO: remove
-													// no collision
-													// Log.d(TAG, "no collision with rectangle");
 												}
 												
 											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
@@ -728,7 +720,7 @@ public abstract class GameBase {
 	private void setSpeedAndPosition(GamePlayer player, StaticGameObject obj_b,
 			Vector normal, Vector intersect_point) {
 		
-		Log.d(TAG, "speed before collision, x: " + player.speed().x + " y: " + player.speed().y);
+		//Log.d(TAG, "speed before collision, x: " + player.speed().x + " y: " + player.speed().y);
 
 		float epsilon = (player.elasticFactor() 
 				+ obj_b.elasticFactor()) / 2.0f;
@@ -745,7 +737,7 @@ public abstract class GameBase {
 		player_pos.mul(player.m_radius + EPS);
 		player.newPosition().add(player_pos);
 		
-		Log.d(TAG, "speed after collision, x: " + player.speed().x + " y: " + player.speed().y);
+		//Log.d(TAG, "speed after collision, x: " + player.speed().x + " y: " + player.speed().y);
 	
 	}
 
