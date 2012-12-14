@@ -2,7 +2,6 @@ package com.android.game.clash_of_the_balls.menu;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.R;

@@ -1,7 +1,6 @@
 package com.android.game.clash_of_the_balls.menu;
 
 import android.content.Context;
-
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
@@ -10,7 +9,6 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 import com.android.game.clash_of_the_balls.game.Vector;
-import com.android.game.clash_of_the_balls.network.Networking;
 
 public class MainMenu extends GameMenuBase {
 

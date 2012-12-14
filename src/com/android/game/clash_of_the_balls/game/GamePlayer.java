@@ -2,7 +2,6 @@ package com.android.game.clash_of_the_balls.game;
 
 import android.graphics.Color;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;

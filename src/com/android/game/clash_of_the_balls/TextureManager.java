@@ -1,7 +1,5 @@
 package com.android.game.clash_of_the_balls;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 

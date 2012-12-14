@@ -3,8 +3,6 @@ package com.android.game.clash_of_the_balls.menu;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.opengl.Matrix;
-
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;

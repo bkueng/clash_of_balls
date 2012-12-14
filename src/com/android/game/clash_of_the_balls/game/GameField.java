@@ -1,7 +1,5 @@
 package com.android.game.clash_of_the_balls.game;
 
-import android.util.Log;
-
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;

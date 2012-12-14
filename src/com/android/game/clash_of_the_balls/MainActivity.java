@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 

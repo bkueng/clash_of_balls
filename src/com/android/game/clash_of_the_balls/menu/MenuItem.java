@@ -2,7 +2,6 @@ package com.android.game.clash_of_the_balls.menu;
 
 import android.opengl.GLES20;
 
-import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.game.GameObject;

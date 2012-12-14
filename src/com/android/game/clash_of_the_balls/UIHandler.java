@@ -4,7 +4,6 @@ package com.android.game.clash_of_the_balls;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
@@ -15,7 +14,6 @@ import com.android.game.clash_of_the_balls.game.GameServer;
 import com.android.game.clash_of_the_balls.game.IDrawable;
 import com.android.game.clash_of_the_balls.game.IMoveable;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
-import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.menu.CreationMenu;
 import com.android.game.clash_of_the_balls.menu.HelpMenu;
 import com.android.game.clash_of_the_balls.menu.JoinMenu;

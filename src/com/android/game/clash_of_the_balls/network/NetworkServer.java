@@ -3,8 +3,6 @@ package com.android.game.clash_of_the_balls.network;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.alljoyn.bus.BusException;
 

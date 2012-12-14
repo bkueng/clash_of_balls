@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import android.util.Log;
-
 /**
  * holds the statistics of the currently running game.
  * each game round has its own statistics

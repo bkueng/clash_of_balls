@@ -1,7 +1,6 @@
 package com.android.game.clash_of_the_balls.game;
 
 import java.lang.ref.WeakReference;
-import java.util.Map;
 
 import org.alljoyn.bus.BusException;
 
@@ -22,7 +21,6 @@ import com.android.game.clash_of_the_balls.game.event.EventGameEnd;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo;
 import com.android.game.clash_of_the_balls.game.event.EventGameStartNow;
 import com.android.game.clash_of_the_balls.game.event.EventItemAdded;
-import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;

@@ -1,7 +1,6 @@
 package com.android.game.clash_of_the_balls.game;
 
 import android.util.FloatMath;
-import android.util.Log;
 
 
 public class Vector {

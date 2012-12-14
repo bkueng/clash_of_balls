@@ -13,7 +13,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.MotionEvent;
 
 
 public class GameRenderer implements GLSurfaceView.Renderer {

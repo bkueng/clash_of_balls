@@ -1,10 +1,6 @@
 package com.android.game.clash_of_the_balls.menu;
 
-import java.util.ArrayList;
-
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -14,7 +10,6 @@ import com.android.game.clash_of_the_balls.LevelManager;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
-import com.android.game.clash_of_the_balls.menu.MenuItemArrow.ArrowType;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;

@@ -9,7 +9,6 @@ import com.android.game.clash_of_the_balls.game.Vector;
 
 import android.content.Context;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 
 /**
  * base class for a popup menu as an overlay over a menu/game

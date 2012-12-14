@@ -23,8 +23,6 @@ import org.alljoyn.bus.BusException;
 import org.alljoyn.bus.annotation.BusInterface;
 import org.alljoyn.bus.annotation.BusSignal;
 
-import com.android.game.clash_of_the_balls.game.Vector;
-
 
 /*
  * see 

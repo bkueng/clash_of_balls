@@ -19,7 +19,6 @@ import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventImpact;
 import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
-import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 
 /**

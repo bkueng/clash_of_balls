@@ -1,11 +1,9 @@
 package com.android.game.clash_of_the_balls.network;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.alljoyn.bus.BusAttachment;
 import org.alljoyn.bus.BusException;

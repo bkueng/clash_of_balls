@@ -1,12 +1,9 @@
 package com.android.game.clash_of_the_balls.game;
 
 
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.GameLevel;

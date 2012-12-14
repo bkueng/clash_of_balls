@@ -2,8 +2,6 @@ package com.android.game.clash_of_the_balls;
 
 import com.android.game.clash_of_the_balls.game.RenderHelper;
 
-import android.content.Context;
-
 /**
  * OpenGL texture with coordinates for a sprite
  *
