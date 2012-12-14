@@ -311,7 +311,7 @@ public class GameServer extends GameBase implements Runnable {
 		if(!GameSettings.place_items) return;
 		
 		if(m_next_item_time <= 0.f) {
-			m_next_item_time = 10.f + (float)Math.random()*10.f; //10-20 sec
+			m_next_item_time = 5.f + (float)Math.random()*10.f; //5-15 sec
 		}
 		
 		if((m_next_item_time-=dsec) <= 0.f) {
