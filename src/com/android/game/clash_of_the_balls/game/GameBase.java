@@ -265,8 +265,8 @@ public abstract class GameBase {
 										float dx = rect_center.x - rect_half_width;
 										float dy = rect_center.y + rect_half_height;
 										
-										// Check players position before the collision
-										if (player.pos().x <= rect_center.x - rect_half_width) {
+										// check left side of rectangle (including corners)
+										if (player.pos().x <= rect_center.x + rect_half_width) {
 											// players pos is left to the wall
 
 											// check intersection with left edge of the wall
@@ -345,41 +345,12 @@ public abstract class GameBase {
 												
 												}
 												
-											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
-													
-												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p1.x <= bx && isect_p2.x <= bx) {
-													
-													// intersection with lower edge
-													Log.d(TAG, "player was on the left side but hit the lower edge");
-													
-													// middle point of intersection points
-													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
-													// normal vector for left edge (vertical)
-													normal.set(0.0f, -1.0f);
-													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
-												}
-												
-											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
-												
-												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p1.x <= cx && isect_p2.x <= cx) {
-													
-													// intersection with upper edge
-													Log.d(TAG, "player was on the left side but hit the upper edge");
-													
-													// middle point of intersection points
-													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
-													// normal vector for left edge (vertical)
-													normal.set(0.0f, 1.0f);
-													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
-												}
-												
-											} 
-
-											// No collision
+											}
 											
-										} else if (player.pos().x >= rect_center.x + rect_half_width) {
+										} 
+										
+										// check right side of rectangle (including corners)
+										if (player.pos().x >= rect_center.x - rect_half_width) {
 											// players pos is right to the wall
 											
 											if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
@@ -457,11 +428,20 @@ public abstract class GameBase {
 													
 												}
 												
-											} else if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
-												
-												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p1.x <= bx && isect_p2.x <= bx) {
-													// intersection with lower edge
-													Log.d(TAG, "player was on the right side but hit the lower edge");
+											}
+										}
+										
+										// check bottom side of rectangle (excluding corners, we already checked them)
+										if (player.pos().y <= rect_center.y) {
+											
+											if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+											
+												/*
+												 * player intersects lower edge
+												 */
+												if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x <= bx) {
+													
+													Log.d(TAG, "lower edge collision");
 													
 													// middle point of intersection points
 													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
@@ -469,82 +449,33 @@ public abstract class GameBase {
 													normal.set(0.0f, -1.0f);
 													// calculate and set new velocity and position of player
 													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
-												}
-												
-											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
-												
-												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p1.x <= cx && isect_p2.x <= cx) {
-													// intersection with upper edge
-													Log.d(TAG, "player was on the right side but hit the upper edge");
 													
+												}
+											}
+											
+										}
+										
+										// check top side of rectangle (excluding corners, we already checked them)
+										if (player.pos().y >= rect_center.y) {
+											// players pos is inbetween left and right edge and above the upper edge
+											
+											if (lineCircleIntersection(cx, cy, dx, dy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
+												
+												/*
+												 * player intersects upper edge
+												 */
+												if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x <= cx) {
+													
+													Log.d(TAG, "upper edge collision");
+
 													// middle point of intersection points
 													isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
 													// normal vector for left edge (vertical)
 													normal.set(0.0f, 1.0f);
 													// calculate and set new velocity and position of player
 													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
-												}
-												
-											}
-											
-											// No collision
-											
-										} else {
-
-											if (player.pos().y <= rect_center.y - rect_half_height) {
-												// players pos is inbetween left and right edge and below the lower edge
-												
-												if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
-												
-													/*
-													 * player intersects lower edge
-													 */
-													if (isect_p1.x >= ax && isect_p2.x >= ax && isect_p2.x <= bx && isect_p1.x <= bx) {
-														
-														Log.d(TAG, "lower edge collision");
-														
-														// middle point of intersection points
-														isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
-														// normal vector for left edge (vertical)
-														normal.set(0.0f, -1.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
-														
-													} else {
-														Log.d(TAG, "Error: should hit lower left or lower right corner");
-														// TODO: hit lower right or lower left corner
-													}
-												}
-												
-											} else if (player.pos().y >= rect_center.y + rect_half_height) {
-												// players pos is inbetween left and right edge and above the upper edge
-												
-												if (lineCircleIntersection(cx, cy, dx, dy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
 													
-													/*
-													 * player intersects upper edge
-													 */
-													if (isect_p1.x >= dx && isect_p2.x >= dx && isect_p2.x <= cx && isect_p1.x <= cx) {
-														
-														Log.d(TAG, "upper edge collision");
-	
-														// middle point of intersection points
-														isect_middle.set((isect_p1.x + isect_p2.x) / 2.0f, (isect_p1.y + isect_p2.y) / 2.0f);
-														// normal vector for left edge (vertical)
-														normal.set(0.0f, 1.0f);
-														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
-														
-													} else {
-														Log.d(TAG, "Error: should hit lower left or lower right corner");
-														// TODO: hit lower right or lower left corner
-													}
 												}
-												
-											} else {
-												// TODO: This should not be the case!!!
-												// if it should happen we have to split timesteps
-												Log.d(TAG, "Error: player is inside rectangle");
 											}
 										}
 									}
