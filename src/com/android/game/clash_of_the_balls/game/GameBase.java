@@ -96,6 +96,8 @@ public abstract class GameBase {
 		m_next_object_id = m_game_field.init(level, (short) 1);
 		m_level = level;
 		m_bIs_game_running = false;
+		
+		System.gc();
 	}
 	
 	public GameLevel level() { return m_level; }
