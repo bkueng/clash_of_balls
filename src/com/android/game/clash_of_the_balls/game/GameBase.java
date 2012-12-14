@@ -591,11 +591,11 @@ public abstract class GameBase {
 									float beta = player_a.newPosition().x - player_a.pos().x - player_b.newPosition().x + player_b.pos().x;
 									float delta = player_a.newPosition().y - player_a.pos().y - player_b.newPosition().y + player_b.pos().y;
 									
-									float rads = ((player_a.m_radius + player_b.m_radius + EPS) * (player_a.m_radius + player_b.m_radius + EPS));
+									float rads = player_a.m_radius + player_b.m_radius + EPS;
 
 									float a = (beta * beta + delta * delta);
 									float b = 2.f * (alpha * beta + gamma * delta);
-									float c = (gamma * gamma + alpha * alpha) - (rads * rads);
+									float c = (gamma * gamma + alpha * alpha) - rads*rads;
 									float D = FloatMath.sqrt((b*b) - (4.f * a * c));
 									
 									float t1 = (-b + D) / (2.f * a);
