@@ -105,8 +105,6 @@ public abstract class GameBase {
 	
 	public void addEvent(Event e) {
 		assert(generate_events); //don't add events if generate_events==false!
-		//TODO timestamp ?
-		
 		m_events.add(e);
 	}
 	
@@ -615,9 +613,6 @@ public abstract class GameBase {
 									new_position_b.mul(t);
 									new_position_b.add(player_b.pos());
 																		
-									Log.d(TAG, "Player a new position, x: " + player_a.newPosition().x + "y: " + player_a.newPosition().y);
-									Log.d(TAG, "Player b new position, x: " + player_b.newPosition().y + "y: " + player_b.newPosition().y);
-									
 									// Get new direction for player a
 									// Get new direction for player b
 									Vector dir_a_b = new Vector(player_b.newPosition());
@@ -639,7 +634,6 @@ public abstract class GameBase {
 									temp_a.add(temp_b);
 									temp_a.mul(1.f/(player_a.m_mass + player_b.m_mass));
 									temp_a.sub(dir_a_b);
-									Log.d(TAG, "new speed direction of a, x: " + temp_a.x + "y: " + temp_a.y);
 									player_a.speed().add(temp_a);
 									
 									temp_a.set(dir_a_b);
@@ -649,7 +643,6 @@ public abstract class GameBase {
 									temp_b.add(temp_a);
 									temp_b.mul(1.f/(player_b.m_mass + player_a.m_mass));
 									temp_b.sub(dir_b_a);
-									Log.d(TAG, "new speed direction of b, x: " + temp_b.x + "y: " + temp_b.y);
 									player_b.speed().add(temp_b);
 									
 									if(is_server) {
@@ -708,8 +701,6 @@ public abstract class GameBase {
 	//this is used for player collisions with static field objects
 	private void setSpeedAndPosition(GamePlayer player, StaticGameObject obj_b,
 			Vector normal, Vector intersect_point, Vector new_speed) {
-		
-		//Log.d(TAG, "speed before collision, x: " + player.speed().x + " y: " + player.speed().y);
 
 		float epsilon = (player.elasticFactor() 
 				+ obj_b.elasticFactor()) / 2.0f;
@@ -726,14 +717,10 @@ public abstract class GameBase {
 		// set new position of player
 		player_pos.mul(player.m_radius + EPS);
 		player.newPosition().add(player_pos);
-		
-		//Log.d(TAG, "speed after collision, x: " + player.speed().x + " y: " + player.speed().y);
 	
 	}
 
 	private boolean lineCircleIntersection(float x1, float y1, float x2, float y2, Vector circ_center, float circ_radius, Vector isect_point1, Vector isect_point2) {
-		
-		//Log.d(TAG, "vector of intersection: (" + x1 + "," + y1 + ", " + x2 + "," + y2 + ")");
 		
 		float cx = circ_center.x;
 		float cy = circ_center.y;
@@ -761,9 +748,6 @@ public abstract class GameBase {
 			// set new position of player to impact point
 			isect_point1.set(ix1, iy1);
 			isect_point2.set(ix2, iy2);
-			
-			//Log.d(TAG, "intersection point 1, x: " + ix1 + " y: " + iy1);
-			//Log.d(TAG, "intersection point 2, x: " + ix2 + " y: " + iy2);
 			
 			return true;
 		}
