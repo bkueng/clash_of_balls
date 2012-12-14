@@ -50,7 +50,7 @@ public class GameItem extends DynamicGameObject {
 		super.move(dsec);
 
 		if(m_bIs_dying) {
-			m_scaling -= 2.f * dsec;
+			m_scaling -= 3.f * dsec;
 			if(m_scaling < 0.01f) {
 				m_bIs_dying = false;
 				m_scaling = 0.01f;
