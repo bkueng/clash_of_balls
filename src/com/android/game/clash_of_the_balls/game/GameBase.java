@@ -196,6 +196,11 @@ public abstract class GameBase {
 				int y_end = y_start + 2;
 				if(y_end >= m_game_field.height()) y_end = m_game_field.height()-1;
 				
+				//there can be multiple collisions in a frame. we take only the 
+				//new speed from the last detected collisions (which is the closest
+				//one to the current position of obj)
+				Vector new_speed = new Vector(obj.speed());
+				
 				for(int x=x_start; x<=x_end; ++x) {
 					for(int y=y_start; y<=y_end; ++y) {
 						StaticGameObject field_obj = m_game_field.foreground(x, y);
@@ -295,7 +300,7 @@ public abstract class GameBase {
 														}
 														normal.normalize();
 														// Calculate new position and speed
-														setSpeedAndPosition(player, wall, normal, new Vector(ax, ay));
+														setSpeedAndPosition(player, wall, normal, new Vector(ax, ay), new_speed);
 													}
 													
 												} else if ((isect_p1.y >= dy && isect_p2.y <= dy) || (isect_p2.y >= dy && isect_p1.y <= dy)) {
@@ -323,7 +328,7 @@ public abstract class GameBase {
 														}
 														normal.normalize();
 														// Calculate new position and speed
-														setSpeedAndPosition(player, wall, normal, new Vector(dx, dy));
+														setSpeedAndPosition(player, wall, normal, new Vector(dx, dy), new_speed);
 													}
 													
 												} else if (isect_p1.y <= dy && isect_p2.y <= dy && isect_p1.y >= ay && isect_p2.y >= ay) {
@@ -336,7 +341,7 @@ public abstract class GameBase {
 													// normal vector for left edge (vertical)
 													normal.set(-1.0f, 0.0f);
 													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, normal, isect_middle);
+													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
 												
 												}
 												
@@ -352,7 +357,7 @@ public abstract class GameBase {
 													// normal vector for left edge (vertical)
 													normal.set(0.0f, -1.0f);
 													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, normal, isect_middle);
+													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
 												}
 												
 											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
@@ -367,7 +372,7 @@ public abstract class GameBase {
 													// normal vector for left edge (vertical)
 													normal.set(0.0f, 1.0f);
 													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, normal, isect_middle);
+													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
 												}
 												
 											} 
@@ -407,7 +412,7 @@ public abstract class GameBase {
 														}
 														normal.normalize();
 														// Calculate new position and speed
-														setSpeedAndPosition(player, wall, normal, new Vector(bx, by));
+														setSpeedAndPosition(player, wall, normal, new Vector(bx, by), new_speed);
 													}
 													
 												} else if ((isect_p1.y >= cy && isect_p2.y <= cy) || (isect_p2.y >= cy && isect_p1.y <= cy)) {
@@ -435,7 +440,7 @@ public abstract class GameBase {
 														}
 														normal.normalize();
 														// Calculate new position and speed
-														setSpeedAndPosition(player, wall, normal, new Vector(cx, cy));
+														setSpeedAndPosition(player, wall, normal, new Vector(cx, cy), new_speed);
 													}
 
 												} else if (isect_p1.y <= cy && isect_p2.y <= cy && isect_p1.y >= by && isect_p2.y >= by) {
@@ -448,7 +453,7 @@ public abstract class GameBase {
 													// normal vector for left edge (vertical)
 													normal.set(1.0f, 0.0f);
 													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, normal, isect_middle);
+													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
 													
 												}
 												
@@ -463,7 +468,7 @@ public abstract class GameBase {
 													// normal vector for left edge (vertical)
 													normal.set(0.0f, -1.0f);
 													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, normal, isect_middle);
+													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
 												}
 												
 											} else if (lineCircleIntersection(dx, dy, cx, cy, player.newPosition(), player.m_radius, isect_p1, isect_p2)) {
@@ -477,7 +482,7 @@ public abstract class GameBase {
 													// normal vector for left edge (vertical)
 													normal.set(0.0f, 1.0f);
 													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, normal, isect_middle);
+													setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
 												}
 												
 											}
@@ -503,7 +508,7 @@ public abstract class GameBase {
 														// normal vector for left edge (vertical)
 														normal.set(0.0f, -1.0f);
 														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, wall, normal, isect_middle);
+														setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
 														
 													} else {
 														Log.d(TAG, "Error: should hit lower left or lower right corner");
@@ -528,7 +533,7 @@ public abstract class GameBase {
 														// normal vector for left edge (vertical)
 														normal.set(0.0f, 1.0f);
 														// calculate and set new velocity and position of player
-														setSpeedAndPosition(player, wall, normal, isect_middle);
+														setSpeedAndPosition(player, wall, normal, isect_middle, new_speed);
 														
 													} else {
 														Log.d(TAG, "Error: should hit lower left or lower right corner");
@@ -563,6 +568,8 @@ public abstract class GameBase {
 						}
 					}
 				}
+				
+				obj.speed().set(new_speed);
 			}
 			
 		}
@@ -717,8 +724,9 @@ public abstract class GameBase {
 		}
 	}
 	
+	//this is used for player collisions with static field objects
 	private void setSpeedAndPosition(GamePlayer player, StaticGameObject obj_b,
-			Vector normal, Vector intersect_point) {
+			Vector normal, Vector intersect_point, Vector new_speed) {
 		
 		//Log.d(TAG, "speed before collision, x: " + player.speed().x + " y: " + player.speed().y);
 
@@ -727,7 +735,8 @@ public abstract class GameBase {
 		// calculate new velocity
 		Vector speed = new Vector(normal);
 		speed.mul(-2.f*epsilon*normal.dot(player.speed()));
-		player.speed().add(speed);
+		new_speed.set(player.speed());
+		new_speed.add(speed);
 		
 		// update player newPosition to intersection point between player and wall
 		player.newPosition().set(intersect_point);
