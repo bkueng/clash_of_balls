@@ -20,8 +20,10 @@ public class GamePlayer extends DynamicGameObject {
 	
 	public float m_radius_dest; //m_radius should change to this value
 	
-	private float m_max_speed = 3.f;
-	
+	private float m_max_speed = 5.f;
+	private float m_friction = 3.0f;
+	private Vector m_fric_dir = new Vector();
+
 	private int m_color; //ARGB
 	private VertexBufferFloat m_color_data_colored;
 	
@@ -37,7 +39,7 @@ public class GamePlayer extends DynamicGameObject {
 	private Vector m_acceleration = new Vector();
 	private float m_sensor_scaling = 5.f; //influences the acceleration
 	public Vector acceleration() { return m_acceleration; }
-	
+
 	public void applySensorVector(Vector v) {
 		if(!m_bIs_dead) {
 			m_acceleration.set(v);
@@ -89,6 +91,16 @@ public class GamePlayer extends DynamicGameObject {
 		if(m_owner.generate_events) {
 			m_speed.x += dsec * m_acceleration.x;
 			m_speed.y += dsec * m_acceleration.y;
+			
+			if (m_speed.length() > dsec * m_friction) {
+				m_fric_dir.set(m_speed);
+				m_fric_dir.mul(-1/m_speed.length());
+				m_fric_dir.mul(dsec);
+				m_speed.add(m_fric_dir);
+			} else {
+				m_speed.set(0,0);
+			}
+			
 			float speed = m_speed.length();
 			if(speed > m_max_speed) m_speed.mul(m_max_speed / speed);
 			

@@ -31,14 +31,17 @@ public class GameWall extends StaticGameObject {
 		Rectangle r4 = new Rectangle(0.22f,-0.11f,0.22f,0.22f);
 		Rectangle r5 = new Rectangle(-0.11f,-0.44f,0.22f,0.22f);
 		
+		Rectangle r6 = new Rectangle(-0.11f, -0.5f, 0.22f, 1.0f);
+		Rectangle r7 = new Rectangle(-0.5f, -0.11f, 1.0f, 0.22f);
+		
 		Rectangle[] rects = null;
 		
 		if (m_wall_type == WallType.Wall_vertical) {
 			// DO Nothing
-			rects = new Rectangle[]{r1,r3,r5};
+			rects = new Rectangle[]{r6};
 		} else if (m_wall_type ==WallType.Wall_horizontal) {
 			setRotation(angle);
-			rects = new Rectangle[]{r2,r3,r4};
+			rects = new Rectangle[]{r7};
 		} else if (m_wall_type ==WallType.Wall_Corner_up_right) {
 			rects = new Rectangle[]{r1,r3,r4};
 		} else if (m_wall_type ==WallType.Wall_Corner_up_left) {
@@ -54,5 +57,6 @@ public class GameWall extends StaticGameObject {
 		
 		m_wall_items= rects;
 		
+		m_elastic_factor = 0.5f;
 	}
 }
