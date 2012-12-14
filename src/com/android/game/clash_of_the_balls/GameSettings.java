@@ -9,7 +9,7 @@ import com.android.game.clash_of_the_balls.menu.PopupBase;
  *
  */
 public class GameSettings {
-	public static final boolean debug = true; //debugging variable
+	public static final boolean debug = false; //debugging variable
 						//this allows us some special things for testing if true
 						//eg starting a game without any connected clients
 	
