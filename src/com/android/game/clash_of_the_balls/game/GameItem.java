@@ -28,6 +28,8 @@ public class GameItem extends DynamicGameObject {
 		None
 	}
 	
+	public final Rectangle border; //for object intersection
+	
     public static ItemType getRandomType() {
         return ItemType.values()[(int) (Math.random() * (ItemType.values().length-1))];
     }
@@ -40,6 +42,8 @@ public class GameItem extends DynamicGameObject {
 			, Texture texture, ItemType item_type) {
 		super(owner, id, position, Type.Item, texture);
 		m_item_type = item_type;
+		
+		border = new Rectangle(-0.45f, -0.45f, 1.f-0.05f/2.f, 1.f-0.05f/2.f);
 	}
 
 	public void move(float dsec) {

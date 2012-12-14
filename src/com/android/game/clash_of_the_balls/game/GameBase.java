@@ -661,10 +661,13 @@ public abstract class GameBase {
 								break;
 							}
 							case Item:
-								Log.d(TAG, "Player - Item collision");
-
-								//TODO: take the item
-								
+								GameItem item = (GameItem) objb;
+								GamePlayer player = (GamePlayer) obja;
+								if(item.border.intersectCircle(item.pos(), player.newPosition()
+										, player.m_radius)) {
+									handleImpact(player, player.newPosition()
+											, item, item.pos());
+								}
 								break;
 							default: throw new RuntimeException("collision detection for type "+
 									objb.type+" not implemented!");
