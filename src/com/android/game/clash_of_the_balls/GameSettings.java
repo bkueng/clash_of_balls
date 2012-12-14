@@ -16,6 +16,13 @@ public class GameSettings {
 	public static final boolean place_items = true; //whether there should be
 						//items placed randomly on the field from time to time
 	
+	public static final boolean client_prediction = true;
+						//whether the client should predict the game
+						//between 2 server updates
+						//if false, the client will only apply the server updates
+						//and only call moveClient for local animation updates
+	
+	
 	public String user_name="";
 	
 	public boolean is_host=false;

@@ -1,7 +1,9 @@
 package com.android.game.clash_of_the_balls.game;
 
 
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -127,9 +129,11 @@ public class Game extends GameBase implements UIBase {
 	
 	private boolean m_bReceived_events = false; //send new sensor data if true
 	private float m_time_since_last_data_receive=0.f; //[sec]
+	private float m_last_rtt; //[sec] round time trip in sec
 	private static final float network_receive_timeout = 4.f; //[sec]
 	
 	private Vector m_sensor_vector=new Vector();
+	private Vector m_last_sensor_update=new Vector();
 
 	public void move(float dsec) {
 		if(m_error_popup != null) {
@@ -151,34 +155,68 @@ public class Game extends GameBase implements UIBase {
 
 				//get sensor values & send to server
 				m_sensor_thread.getCurrentVector(m_sensor_vector);
-				if(m_bReceived_events) 
+				if(m_bReceived_events) {
 					m_network_client.sensorUpdate(m_sensor_vector);
-				//TODO: apply sensor values to own player
-
+					m_last_sensor_update.set(m_sensor_vector);
+				}
+				
 				handleNetworkError(m_network_client.getNetworkError());
 
 				m_network_client.handleReceive();
-				if(m_network_client.hasEvents()) {
-					//TODO: undo prediction...
+				boolean has_network_events = m_network_client.hasEvents();
+				m_bReceived_events = has_network_events;
+				if(has_network_events) {
+					//undo events: simply discard them
+					while(m_events.poll() != null) { }
+					
+					m_last_rtt = m_time_since_last_data_receive;
+					m_time_since_last_data_receive = 0.f;
+					
+					//we have a synchronization update from the server
+					//we assume that all predicted events (game moves) 
+					//can simply be overwritten by the server update
+
+					Log.v(TAG_GAME, "Network incoming: RTT="+m_last_rtt);
 
 					generate_events = false;
+					
 					//apply the updates from the server
 					applyIncomingEvents();
+					//position updates are not applied in here
+					//so no object changes position and we do not have
+					//to do collision detection
 					
 					removeDeadObjects();
-					
-					m_bReceived_events = true;
-					m_time_since_last_data_receive = 0.f;
-				} else {
-					
-					m_bReceived_events = false;
 				}
 				
+				//do a predicted move
 				generate_events = true;
-				//TODO: do predicted move
 				
-				super.move(dsec);
-				//do not apply moves for now...
+				/* 
+				 * Undo Predicted Events
+				 * ---------------------
+				 * for the future if we want to be able to undo predicted events:
+				 * - add member boolean m_is_predicting
+				 * - use a separate Event queue & check in addEvent if m_is_predicting
+				 * - add an undo method in Event class
+				 * - before applying network events: undo all Events in the queue
+				 * - add here:
+					generate_events = true;
+					m_is_predicting = true;
+				 */
+				
+				//move the client stuff like animation
+				//this can be done in any case, because this does not to be
+				//strictly synchronized with the server
+				moveClient(dsec);
+				
+				if(GameSettings.client_prediction) { 
+					//even if we had network updates, we should move one step
+					//to apply the new positions smoothly
+					super.move(dsec);
+					doCollisionHandling();
+					super.applyMove();
+				}
 				
 				
 				m_game_field.move(dsec);
@@ -186,6 +224,14 @@ public class Game extends GameBase implements UIBase {
 
 				m_view.move(dsec);
 				m_game_field.move(dsec);
+				
+				//we expect the sensor update to be received by the server
+				//1/2 RTT after sending, so we try to apply the sensor update
+				//at the same time as the server
+				if(m_time_since_last_data_receive < m_last_rtt/2.f
+						&& m_time_since_last_data_receive+dsec >= m_last_rtt/2.f)
+					m_own_player.applySensorVector(m_last_sensor_update);
+				
 				
 				//check for receive timeout
 				if((m_time_since_last_data_receive+=dsec) > network_receive_timeout) {

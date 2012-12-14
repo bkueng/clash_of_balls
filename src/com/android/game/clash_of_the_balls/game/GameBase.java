@@ -217,6 +217,12 @@ public abstract class GameBase {
 			entry.getValue().move(dsec);
 		}
 	}
+	public void moveClient(float dsec) {
+		m_game_field.move(dsec);
+		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
+			entry.getValue().moveClient(dsec);
+		}
+	}
 	
 	public void applyMove() {
 		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {

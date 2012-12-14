@@ -1,5 +1,6 @@
 package com.android.game.clash_of_the_balls.game;
 
+import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 
@@ -49,17 +50,65 @@ public class DynamicGameObject extends StaticGameObject {
 			super.draw(renderer);
 		}
 	}
+	
+	private Vector m_server_translation = new Vector(0.f, 0.f);
+	private static final float SERVER_POS_SMOOTHING = 1.f/5.f;
+						//this defines how smoothly the server position update
+						//is applied. a bigger value means less smoothly but 
+						//more accruate with the server (1 means apply in one step)
+						//it takes ln(0.01)/ln(1-SERVER_POS_SMOOTHING) frames (steps)
+						//to get the error (distance of positions) below 0.01
+						//for SERVER_POS_SMOOTHING = 1/5 it's about 20 frames
+	
+	
 	public void applyVectorData(Vector new_pos, Vector new_speed) {
 		m_speed.set(new_speed);
 		
-		m_position.set(new_pos);
+		if(GameSettings.client_prediction) {
+			//apply position smoothly
+			//we cannot simply change m_position or m_new_pos because we would need
+			//to do collision handling
+			m_server_translation.set(new_pos.x - m_new_pos.x, new_pos.y - m_new_pos.y);
+		} else {
+			m_position.set(new_pos);
+		}
+		
 	}
 
+	//handle everything in here updated by the server. like position & speed
+	//all these operations must be undoable or overwritable by a server update!
+	//Note that dsec can be negative to move back in time!
 	@Override
 	public void move(float dsec) {
 		m_new_pos.set(m_position);
 		
+		if(m_owner.generate_events) {
+			//check for client-side smoothing of server position update
+			if(Math.abs(m_server_translation.x) > GameBase.EPS
+					|| Math.abs(m_server_translation.y) > GameBase.EPS) {
+				if(m_server_translation.length() < 0.02f) {
+					m_new_pos.add(m_server_translation);
+					m_server_translation.set(0.f, 0.f);
+				} else {
+					float dx = m_server_translation.x * SERVER_POS_SMOOTHING;
+					float dy = m_server_translation.y * SERVER_POS_SMOOTHING;
+					m_new_pos.add(dx, dy);
+					m_server_translation.sub(dx, dy);
+				}
+				m_has_moved = true;
+			}
+		}
+		
 		//-> set m_has_moved & m_new_pos
+	}
+	
+	//every change that does not need to be updated by the server can be handled
+	//in here
+	//this can also be called by the server & is used to move less important
+	//stuff like animation or item timeout's
+	//do NOT generate Events in here
+	public void moveClient(float dsec) {
+		
 	}
 	
 	public void handleImpact(StaticGameObject other) {

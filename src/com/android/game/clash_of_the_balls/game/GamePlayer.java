@@ -118,6 +118,11 @@ public class GamePlayer extends DynamicGameObject {
 		
 		m_has_moved = true;
 		
+	}
+	
+	public void moveClient(float dsec) {
+		super.moveClient(dsec);
+		
 		if(m_bIs_dying) {
 			m_scaling -= (m_scaling_speed + 1.5f*dsec) * dsec;
 			m_scaling_speed += dsec * 2.f*1.5f;
@@ -193,6 +198,7 @@ public class GamePlayer extends DynamicGameObject {
 			m_item_timeout = 0.f;
 			m_item_type = ItemType.None;
 		}
+		
 	}
 	private boolean isInvisible() {
 		return m_item_type == ItemType.InvisibleToOthers
