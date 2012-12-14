@@ -79,7 +79,7 @@ public class SensorThread implements SensorEventListener {
     private Vector3D m_tmp_vec_get1=new Vector3D();
     private Vector3D m_tmp_vec_get2=new Vector3D();
     
-    public Vector getCurrentVector() {
+    public void getCurrentVector(Vector result) {
     	//rotate & project vector to xy plane
     	float angle = m_calib_vec.angle(m_z_axis);
     	Vector3D v_n = m_tmp_vec_get1;
@@ -91,7 +91,7 @@ public class SensorThread implements SensorEventListener {
     	v.rotate(v_n, angle);
     	
     	//rotate because we use portrait format, and another coord system
-    	return new Vector(-v.y * output_scaling, v.x * output_scaling);
+    	result.set(-v.y * output_scaling, v.x * output_scaling);
     }
     
     

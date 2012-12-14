@@ -34,7 +34,7 @@ public class NetworkClient {
 	
 	private final Networking m_networking;
 	private boolean m_bHas_sensor_update=false;
-	private Vector m_sensor_update;
+	private Vector m_sensor_update=new Vector();
 	
 	private List<String> m_available_servers=new ArrayList<String>();
 	
@@ -151,7 +151,7 @@ public class NetworkClient {
 	}
 	
 	public void sensorUpdate(Vector new_data) {
-		m_sensor_update = new_data;
+		m_sensor_update.set(new_data);
 		m_bHas_sensor_update=true;
 	}
 	

@@ -128,6 +128,8 @@ public class Game extends GameBase implements UIBase {
 	private boolean m_bReceived_events = false; //send new sensor data if true
 	private float m_time_since_last_data_receive=0.f; //[sec]
 	private static final float network_receive_timeout = 4.f; //[sec]
+	
+	private Vector m_sensor_vector=new Vector();
 
 	public void move(float dsec) {
 		if(m_error_popup != null) {
@@ -148,9 +150,9 @@ public class Game extends GameBase implements UIBase {
 			if(m_bIs_game_running) {
 
 				//get sensor values & send to server
-				Vector sensor_vec = m_sensor_thread.getCurrentVector();
+				m_sensor_thread.getCurrentVector(m_sensor_vector);
 				if(m_bReceived_events) 
-					m_network_client.sensorUpdate(sensor_vec);
+					m_network_client.sensorUpdate(m_sensor_vector);
 				//TODO: apply sensor values to own player
 
 				handleNetworkError(m_network_client.getNetworkError());
