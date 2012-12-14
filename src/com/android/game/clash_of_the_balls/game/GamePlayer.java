@@ -159,6 +159,7 @@ public class GamePlayer extends DynamicGameObject {
 		switch(item.itemType()) {
 		case IncreaseMaxSpeed: 
 			m_max_speed *= 2.f;
+			m_friction /= 2.f;
 			break;
 		case InvertControls:
 			break;
@@ -175,7 +176,9 @@ public class GamePlayer extends DynamicGameObject {
 	private void disableItem() {
 		if(m_item_type != ItemType.None) {
 			switch(m_item_type) {
-			case IncreaseMaxSpeed: m_max_speed /= 2.f;
+			case IncreaseMaxSpeed: 
+				m_max_speed /= 2.f;
+				m_friction *= 2.f;
 				break;
 			case InvertControls:
 				break;
