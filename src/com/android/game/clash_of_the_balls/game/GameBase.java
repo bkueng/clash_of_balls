@@ -266,7 +266,7 @@ public abstract class GameBase {
 											handleImpact(obj, obj.newPosition()
 													, field_obj, field_obj.pos());
 											//apply speed
-											obj.speed().set(n);
+											new_speed.set(n);
 
 											obj.die();
 											
