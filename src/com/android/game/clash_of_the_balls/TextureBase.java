@@ -15,17 +15,20 @@ public class TextureBase {
 	protected int m_tex_handle;
 	private Context m_activity_context;
 	private int m_raw_res_id;
+	private boolean m_use_mipmapping;
 	
 	public int textureHandle() { return m_tex_handle; }
 	
-	public TextureBase(Context activity_context, int raw_res_id) {
+	public TextureBase(Context activity_context, int raw_res_id, boolean use_mipmapping) {
 		m_activity_context = activity_context;
+		m_use_mipmapping = use_mipmapping;
 		m_tex_handle = loadTexture(raw_res_id);
 		m_raw_res_id = raw_res_id;
 	}
 	
-	public TextureBase(Bitmap bitmap) {
-		m_tex_handle = TextureHelper.loadTextureFromBitmap(bitmap);
+	public TextureBase(Bitmap bitmap, boolean use_mipmapping) {
+		m_use_mipmapping = use_mipmapping;
+		m_tex_handle = TextureHelper.loadTextureFromBitmap(bitmap, use_mipmapping);
 	}
 	
 	public void reloadTexture() {
@@ -33,7 +36,7 @@ public class TextureBase {
 	}
 	
 	private int loadTexture(int raw_res_id) {
-        return TextureHelper.loadTexture(m_activity_context, raw_res_id);
+        return TextureHelper.loadTexture(m_activity_context, raw_res_id, m_use_mipmapping);
 	}
 	
 	public void useTexture(RenderHelper renderer) {

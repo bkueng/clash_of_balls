@@ -33,9 +33,9 @@ public class MenuItemButton extends MenuItem {
 		m_item_font.setString(font_string);
 		
 		m_texture_pressed=tex_manager
-				.get(R.raw.texture_main_menu_pressed_button);
+				.get(R.raw.texture_main_menu_pressed_button, false);
 		m_texture_unpressed=tex_manager
-				.get(R.raw.texture_main_menu_unpressed_button);
+				.get(R.raw.texture_main_menu_unpressed_button, false);
 		
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);

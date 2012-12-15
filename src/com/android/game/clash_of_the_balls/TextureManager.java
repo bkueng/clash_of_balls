@@ -10,6 +10,9 @@ import android.graphics.Bitmap;
  * manages all textures: new textures are all generated here
  * same textures are only loaded once
  *
+ * if a texture is loaded using mipmapping, the following loadings of the same
+ * textures will always use mipmapping, no matter what the argument is
+ * the same holds for the other case
  */
 public class TextureManager {
 	
@@ -33,13 +36,17 @@ public class TextureManager {
 	
 	// this will return a texture with default tex coords (for a sprite)
 	public Texture get(int raw_res_id) {
-		return get(raw_res_id, null);
+		return get(raw_res_id, null, true);
+	}
+	public Texture get(int raw_res_id, boolean use_mipmapping) {
+		return get(raw_res_id, null, use_mipmapping);
 	}
 	
-	public Texture get(int raw_res_id, float[] tex_coords) {
+	public Texture get(int raw_res_id, float[] tex_coords, boolean use_mipmapping) {
 		TextureBase texture=m_textures.get(raw_res_id);
 		if(texture == null) {
-			TextureBase tex = new TextureBase(m_activity_context, raw_res_id);
+			TextureBase tex = new TextureBase(m_activity_context, raw_res_id
+					, use_mipmapping);
 			Texture ret = new Texture(tex, tex_coords);
 			m_textures.put(raw_res_id, tex);
 			return ret;
@@ -47,8 +54,8 @@ public class TextureManager {
 		return new Texture(texture, tex_coords);
 	}
 	
-	public Texture get(Bitmap bitmap, float[] tex_coords) {
-		TextureBase tex = new TextureBase(bitmap);
+	public Texture get(Bitmap bitmap, float[] tex_coords, boolean use_mipmapping) {
+		TextureBase tex = new TextureBase(bitmap, use_mipmapping);
 		Texture ret = new Texture(tex, tex_coords);
 		return ret;
 	}

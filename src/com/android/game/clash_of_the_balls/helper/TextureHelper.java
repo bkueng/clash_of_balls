@@ -10,7 +10,8 @@ import android.opengl.GLUtils;
 public class TextureHelper
 {
 		
-	public static int loadTexture(final Context context, final int resourceId)
+	public static int loadTexture(final Context context, final int resourceId
+			, boolean use_mipmapping)
 	{
 		final int textureHandle;
 		
@@ -21,7 +22,7 @@ public class TextureHelper
 		final Bitmap loaded_bitmap = BitmapFactory.decodeResource(
 				context.getResources(), resourceId, options);
 
-		textureHandle = loadTextureFromBitmap(loaded_bitmap);
+		textureHandle = loadTextureFromBitmap(loaded_bitmap, use_mipmapping);
 
 		// Recycle the bitmap, since its data has been loaded into OpenGL.
 		loaded_bitmap.recycle();
@@ -29,7 +30,7 @@ public class TextureHelper
 		return textureHandle;
 	}
 	
-	public static int loadTextureFromBitmap(Bitmap bitmap) {
+	public static int loadTextureFromBitmap(Bitmap bitmap, boolean use_mipmapping) {
 
 		final int[] textureHandle = new int[1];
 		
@@ -48,19 +49,25 @@ public class TextureHelper
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
 			
 			// Set filtering
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_NEAREST);
-			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 			
 			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
 			GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 			
-			GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_TRUE);
-			
+			if(use_mipmapping) {
+				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_NEAREST);
+				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+				GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_TRUE);
+			} else {
+				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+				GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FALSE);
+			}
 			
 			// Load the bitmap into the bound texture.
 			GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap_final, 0);
 			
-			GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+			if(use_mipmapping)
+				GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
 						
 			// Recycle the bitmap, since its data has been loaded into OpenGL.
 			bitmap_final.recycle();

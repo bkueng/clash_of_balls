@@ -122,7 +122,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		//Main Menu
 		m_main_menu_background = new MenuBackground(
-				m_tex_manager.get(R.raw.texture_main_menu_bg),1600.f/960.f);
+				m_tex_manager.get(R.raw.texture_main_menu_bg, false),1600.f/960.f);
 		m_main_menu = new MainMenu(m_main_menu_background
 				, screen_width, screen_height,m_tex_manager,m_activity_context
 				, m_font_settings, m_settings);
@@ -131,7 +131,7 @@ public class UIHandler implements IDrawable, IMoveable, ITouchInput {
 		
 		//Creation Menu
 		m_normal_menu_background = new MenuBackground(
-				m_tex_manager.get(R.raw.texture_bg_normal),1600.f/960.f);
+				m_tex_manager.get(R.raw.texture_bg_normal, false),1600.f/960.f);
 		m_creation_menu_ui = new CreationMenu(m_normal_menu_background
 				, screen_width, screen_height, m_tex_manager, m_settings
 				, m_activity_context, m_font_settings, label_font_color
