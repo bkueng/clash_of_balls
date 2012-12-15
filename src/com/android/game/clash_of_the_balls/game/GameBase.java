@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import android.util.FloatMath;
 import android.util.Log;
 
+import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.R;
@@ -48,6 +49,7 @@ public abstract class GameBase {
 	
 	protected GamePlayer m_own_player = null;
 	public GamePlayer ownPlayer() { return m_own_player; }
+	protected Font2D m_overlay_times[] = null;
 	
 	public final boolean is_server;
 	
@@ -118,7 +120,8 @@ public abstract class GameBase {
 				texture = m_texture_manager.get(R.raw.texture_ball_base);
 				texture_overlay = m_texture_manager.get(R.raw.texture_ball_up);
 			}
-			GamePlayer p = new GamePlayer(players[i], this, texture, texture_overlay);
+			GamePlayer p = new GamePlayer(players[i], this, texture
+					, texture_overlay, m_overlay_times);
 			m_game_objects.put(players[i].id, p);
 			if(players[i].id >= m_next_object_id)
 				m_next_object_id = (short) (players[i].id + 1);
@@ -127,6 +130,13 @@ public abstract class GameBase {
 	
 	//add item to the game. does not generate an Event
 	public GameItem addItem(short id, ItemType type, Vector position) {
+		GameItem item=createItem(id, type, position);
+		m_game_objects.put(id, item);
+		return item;
+	}
+	
+	//only creates an item, does not add it to the game objects
+	public GameItem createItem(short id, ItemType type, Vector position) {
 		Texture texture=null;
 		if(m_texture_manager!=null) {
 			switch(type) {
@@ -140,9 +150,7 @@ public abstract class GameBase {
 				break;
 			}
 		}
-		GameItem item = new GameItem(this, id, position, texture, type);
-		m_game_objects.put(id, item);
-		return item;
+		return new GameItem(this, id, position, texture, type);
 	}
 	
 	//get the middle of a random game field (tile) where no foreground object is

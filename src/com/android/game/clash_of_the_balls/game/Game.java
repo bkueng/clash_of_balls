@@ -6,12 +6,14 @@ import java.util.Map;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
 import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
+import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
@@ -51,6 +53,22 @@ public class Game extends GameBase implements UIBase {
 		m_sensor_thread.startThread();
 		m_network_client = network_client;
 		m_ui_change = UIHandler.UIChange.NO_CHANGE;
+		initOverlayTimeFonts();
+	}
+	
+	private void initOverlayTimeFonts() {
+		m_overlay_times = new Font2D[(int)GameItem.item_effect_duration+1];
+		Font2DSettings font_settings = new Font2DSettings(m_font_settings.m_typeface
+				, TextAlign.LEFT, m_font_settings.m_color);
+		Vector text_field_size = new Vector((float)m_settings.m_screen_width,
+				((float)m_settings.m_screen_height)*
+				GamePlayer.overlay_item_height);
+		
+		for(int i=0; i<m_overlay_times.length; ++i) {
+			m_overlay_times[i] = new Font2D(m_texture_manager, text_field_size
+					, font_settings, (int)(text_field_size.y*0.8f));
+			m_overlay_times[i].setString(""+i);
+		}
 	}
 	
 	public void initGame(GameLevel level) {
@@ -285,6 +303,9 @@ public class Game extends GameBase implements UIBase {
 			}
 
 			m_view.resetView(renderer);
+			
+			if(m_own_player != null)
+				m_own_player.drawOverlay(renderer);
 		}
 	}
 	

@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls.game;
 import android.graphics.Color;
 import android.opengl.GLES20;
 
+import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.game.GameItem.ItemType;
@@ -32,6 +33,9 @@ public class GamePlayer extends DynamicGameObject {
 	//item
 	private float m_item_timeout;
 	private ItemType m_item_type = ItemType.None;
+	private GameItem m_overlay_item = null;
+	public static final float overlay_item_height = 0.09f;
+	private Font2D m_overlay_times[];
 	
 	public int color() { return m_color; }
 	
@@ -51,22 +55,25 @@ public class GamePlayer extends DynamicGameObject {
 	protected Texture m_overlay_texture;
 
 	public GamePlayer(GameBase owner, short id, Vector position
-			, int color, Texture texture, Texture texture_overlay) {
+			, int color, Texture texture, Texture texture_overlay
+			, Font2D overlay_times[]) {
 		super(owner, id, position, Type.Player, texture);
 		m_overlay_texture = texture_overlay;
 		m_color = color;
 		initColorData(m_color);
 		m_radius_dest = m_radius;
+		m_overlay_times = overlay_times;
 	}
 	
 	public GamePlayer(PlayerInfo info, GameBase owner, Texture texture_base
-			, Texture texture_overlay) {
+			, Texture texture_overlay, Font2D overlay_times[]) {
 		super(owner, info.id, new Vector(info.pos_x, info.pos_y), Type.Player
 				, texture_base);
 		m_overlay_texture = texture_overlay;
 		m_color = info.color;
 		initColorData(m_color);
 		m_radius_dest = m_radius;
+		m_overlay_times = overlay_times;
 	}
 	
 	private void initColorData(int color) {
@@ -175,6 +182,8 @@ public class GamePlayer extends DynamicGameObject {
 			break;
 		}
 		m_item_timeout = GameItem.item_effect_duration;
+		Vector position=new Vector(0.f, 0.f);
+		m_overlay_item = m_owner.createItem((short)-1, item.itemType(), position);
 	}
 	
 	private void disableItem() {
@@ -196,6 +205,7 @@ public class GamePlayer extends DynamicGameObject {
 			
 			m_item_timeout = 0.f;
 			m_item_type = ItemType.None;
+			m_overlay_item=null;
 		}
 		
 	}
@@ -214,6 +224,34 @@ public class GamePlayer extends DynamicGameObject {
 			m_bIs_dead = true;
 			m_bIs_dying = true;
 			m_owner.handleObjectDied(this);
+		}
+	}
+	
+	//draw game overlay information
+	//this is called using screen coordinates
+	public void drawOverlay(RenderHelper renderer) {
+		if(m_overlay_item!=null) {
+			final float offset = renderer.screenHeight()*0.02f;
+			final float item_size = renderer.screenHeight()*overlay_item_height;
+			
+			renderer.pushModelMat();
+			renderer.modelMatTranslate(offset+item_size*0.5f, offset+item_size*0.5f, 0.f);
+			renderer.modelMatScale(item_size, item_size, 0.f);
+			m_overlay_item.draw(renderer);
+			renderer.popModelMat();
+			
+			if(m_overlay_times!=null) {
+				int time_idx = (int)m_item_timeout + 1;
+				if(time_idx < 0) time_idx=0;
+				if(time_idx >= m_overlay_times.length) 
+					time_idx = m_overlay_times.length-1;
+
+				renderer.pushModelMat();
+				renderer.modelMatTranslate(offset*2.f + item_size, offset, 0.f);
+				renderer.modelMatScale(renderer.screenWidth(), item_size, 0.f);
+				m_overlay_times[time_idx].draw(renderer);
+				renderer.popModelMat();
+			}
 		}
 	}
 	
