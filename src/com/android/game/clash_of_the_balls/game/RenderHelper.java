@@ -14,6 +14,8 @@ import com.android.game.clash_of_the_balls.ShaderManager;
  * it is used for drawing calls
  * 
  * Model view matrix: apply the transformations in reversed order!
+ * 
+ * apply projection view before doing ANY model transformations!
  *
  */
 public class RenderHelper {
@@ -26,7 +28,6 @@ public class RenderHelper {
 	
 	private static final int mat_size = 16; // = 4x4
 	
-	private float[] m_tmp_mat = new float[mat_size];
 	private float[] m_projection_mat = new float[mat_size];
 	
 	//model view matrix stack
@@ -62,6 +63,7 @@ public class RenderHelper {
 	public void useOrthoProjection() {
 		Matrix.orthoM(m_projection_mat, 0, 0.f, m_screen_width, 0.f
 				, m_screen_height, 0.f, 1.f);
+		modelMatSetIdentity();
 	}
 	
 	
@@ -106,7 +108,10 @@ public class RenderHelper {
         popModelMat();
 	}
 	public void modelMatSetIdentity() {
-		Matrix.setIdentityM(m_model_mat, m_cur_model_mat_pos);
+		//we can directly set the projection matrix here because
+		// proj mat * Identity = proj mat
+		for(int i=0; i<mat_size; ++i) 
+			m_model_mat[m_cur_model_mat_pos+i] = m_projection_mat[i];
 	}
 	
 	
@@ -127,12 +132,8 @@ public class RenderHelper {
 	//& model matrices
 	public void apply() {
 		
-		// output matrix = projection * model view
-		Matrix.multiplyMM(m_tmp_mat, 0, m_projection_mat, 0
-				, m_model_mat, m_cur_model_mat_pos);
-		
         // Pass in the matrix to the shader.
         GLES20.glUniformMatrix4fv(m_shader_manager.u_MVPMatrix_handle, 1, false
-        		, m_tmp_mat, 0);
+        		, m_model_mat, m_cur_model_mat_pos);
 	}
 }
