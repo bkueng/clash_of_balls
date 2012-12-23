@@ -266,11 +266,6 @@ public class GamePlayer extends DynamicGameObject {
 				renderer.shaderManager().activateTexture(0);
 				m_texture.useTexture(renderer);
 				
-				//position data
-				int position_handle = renderer.shaderManager().a_Position_handle;
-				if(position_handle != -1)
-					m_position_data.apply(position_handle);
-				
 		        // color
 				int color_handle = renderer.shaderManager().a_Color_handle;
 				if(color_handle != -1)
@@ -287,18 +282,10 @@ public class GamePlayer extends DynamicGameObject {
 			//overlay texture
 			
 			if(m_overlay_texture != null) {
+				Game.applyDefaultPosAndColor(renderer);
+				
 				renderer.shaderManager().activateTexture(0);
 				m_overlay_texture.useTexture(renderer);
-				
-				//position data
-				int position_handle = renderer.shaderManager().a_Position_handle;
-				if(position_handle != -1)
-					m_position_data.apply(position_handle);
-				
-		        // color
-				int color_handle = renderer.shaderManager().a_Color_handle;
-				if(color_handle != -1)
-					m_color_data.apply(color_handle);
 				
 				renderer.apply();
 				

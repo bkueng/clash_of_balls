@@ -12,6 +12,7 @@ import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.UIBase;
 import com.android.game.clash_of_the_balls.UIHandler;
+import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
@@ -41,6 +42,12 @@ public class Game extends GameBase implements UIBase {
 	private NetworkClient m_network_client;
 	
 	private float m_calibration_timeout=0.f; //[sec]
+	
+	
+	protected static final VertexBufferFloat m_default_position_data=new VertexBufferFloat(
+			VertexBufferFloat.sprite_position_data, 3); //for all game objects (for drawing)
+	protected static final VertexBufferFloat m_default_color_data=new VertexBufferFloat(
+			VertexBufferFloat.sprite_color_data_white, 4);
 	
 	
 	public Game(Context c, GameSettings s, TextureManager texture_manager, 
@@ -295,6 +302,8 @@ public class Game extends GameBase implements UIBase {
 	public void draw(RenderHelper renderer) {
 		
 		if(m_view != null && m_game_field != null) {
+			applyDefaultPosAndColor(renderer);
+			
 			m_view.applyView(renderer);
 
 			m_game_field.draw(renderer);
@@ -307,6 +316,19 @@ public class Game extends GameBase implements UIBase {
 			if(m_own_player != null)
 				m_own_player.drawOverlay(renderer);
 		}
+	}
+	
+	//call this before drawing StaticGameObjects or when the shader changes
+	public static void applyDefaultPosAndColor(RenderHelper renderer) {
+		//position
+		int position_handle = renderer.shaderManager().a_Position_handle;
+		if(position_handle != -1)
+			m_default_position_data.apply(position_handle);
+		
+        // color
+		int color_handle = renderer.shaderManager().a_Color_handle;
+		if(color_handle != -1)
+			m_default_color_data.apply(color_handle);
 	}
 	
 	public void gameStartNow() {

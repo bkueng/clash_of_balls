@@ -188,6 +188,7 @@ public class GameField extends GameObject {
 	}
 	
 	public void draw(RenderHelper renderer) {
+		Game.applyDefaultPosAndColor(renderer);
 		//draw back- & foreground
 		if(m_bg_objects != null) drawArray(m_bg_objects, renderer);
 		drawArray(m_fg_objects, renderer);

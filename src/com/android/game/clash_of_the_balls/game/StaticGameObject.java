@@ -38,8 +38,6 @@ public class StaticGameObject extends GameObject {
 	public float elasticFactor() { return m_elastic_factor; }
 	
 	protected Texture m_texture;
-	protected VertexBufferFloat m_color_data;
-	protected VertexBufferFloat m_position_data;
 	
 	StaticGameObject(final short id, Vector position, Type type
 			, Texture texture) {
@@ -47,9 +45,6 @@ public class StaticGameObject extends GameObject {
 		this.type = type;
 		m_id = id;
 		m_texture = texture;
-		
-		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
 	}
 	
@@ -64,14 +59,12 @@ public class StaticGameObject extends GameObject {
 		doModelTransformation(renderer);
 		
 		//position data
-		int position_handle = renderer.shaderManager().a_Position_handle;
-		if(position_handle != -1)
-			m_position_data.apply(position_handle);
+		//we assume it's already set to [0,0], [1,1]
+		// (VertexBufferFloat.sprite_position_data)
 		
         // color
-		int color_handle = renderer.shaderManager().a_Color_handle;
-		if(color_handle != -1)
-			m_color_data.apply(color_handle);
+		//we assume it's already set to 0xffffff
+		// (VertexBufferFloat.sprite_color_data_white)
 		
 		renderer.apply();
 		
