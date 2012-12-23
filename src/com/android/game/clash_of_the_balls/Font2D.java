@@ -75,7 +75,7 @@ public class Font2D implements IDrawable {
 		m_reference = new WeakReference<Font2D>(this);
 		m_weakFont2D.add(m_reference);
 		
-		Log.d(LOG_TAG, "Font succesfully created");
+		Log.v(LOG_TAG, "Font succesfully created");
 	}
 	
 	public VertexBufferFloat colorData() { return m_color_data; }
