@@ -1,7 +1,15 @@
 package com.android.game.clash_of_the_balls.game;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.World;
+
 import android.graphics.Color;
 import android.opengl.GLES20;
+import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.Texture;
@@ -15,20 +23,22 @@ import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
  */
 public class GamePlayer extends DynamicGameObject {
 	
-	public float m_radius = 0.5f;
-	public float m_mass = 10.f;
-	
-	public float m_radius_dest; //m_radius should change to this value
-	
 	private float m_max_speed = 5.f;
-	private float m_friction = 3.0f;
-	private Vector m_fric_dir = new Vector();
 
 	private int m_color; //ARGB
 	private VertexBufferFloat m_color_data_colored;
 	
 	private float m_scaling=1.f; //for drawing, used for dying effect
 	private float m_scaling_speed;
+	
+	
+	public float m_radius;
+	public float m_radius_dest; //m_radius should change to this value
+	private FixtureDef m_normal_radius_fixture;
+	private static final float m_normal_radius = 0.5f;
+	private FixtureDef m_small_radius_fixture;
+	private static final float m_small_radius = m_normal_radius / 2.f;
+	private Fixture m_cur_fixture;
 	
 	//item
 	private float m_item_timeout;
@@ -56,24 +66,55 @@ public class GamePlayer extends DynamicGameObject {
 
 	public GamePlayer(GameBase owner, short id, Vector position
 			, int color, Texture texture, Texture texture_overlay
-			, Font2D overlay_times[]) {
-		super(owner, id, position, Type.Player, texture);
+			, Font2D overlay_times[], World world, BodyDef body_def) {
+		super(owner, id, Type.Player, texture);
 		m_overlay_texture = texture_overlay;
 		m_color = color;
 		initColorData(m_color);
-		m_radius_dest = m_radius;
 		m_overlay_times = overlay_times;
+		initPlayerBody(world, position, body_def);
 	}
 	
 	public GamePlayer(PlayerInfo info, GameBase owner, Texture texture_base
-			, Texture texture_overlay, Font2D overlay_times[]) {
-		super(owner, info.id, new Vector(info.pos_x, info.pos_y), Type.Player
-				, texture_base);
+			, Texture texture_overlay, Font2D overlay_times[], World world
+			, BodyDef body_def) {
+		super(owner, info.id, Type.Player, texture_base);
 		m_overlay_texture = texture_overlay;
 		m_color = info.color;
 		initColorData(m_color);
-		m_radius_dest = m_radius;
 		m_overlay_times = overlay_times;
+		initPlayerBody(world, new Vector(info.pos_x, info.pos_y), body_def);
+	}
+	
+	private void initPlayerBody(World world, Vector position, BodyDef body_def) {
+		body_def.type = BodyType.DYNAMIC;
+		body_def.position.set(position.x, position.y);
+		body_def.fixedRotation = true;
+		body_def.linearDamping = 2.0f; //speed friction
+		body_def.angle = 0.f;
+		body_def.userData = this;
+		m_body = world.createBody(body_def);
+		
+		m_normal_radius_fixture = createCircleFixtureDef(1.0f, 0.0f, 0.0f, 
+				0.f, 0.f, m_normal_radius);
+		m_normal_radius_fixture.filter.categoryBits = COLLISION_GROUP_NORMAL;
+		m_normal_radius_fixture.filter.maskBits = COLLISION_GROUP_NORMAL;
+		
+		m_small_radius_fixture = createCircleFixtureDef(1.0f, 0.0f, 0.0f, 
+				0.f, 0.f, m_small_radius);
+		m_small_radius_fixture.filter.categoryBits = COLLISION_GROUP_NORMAL;
+		m_small_radius_fixture.filter.maskBits = COLLISION_GROUP_NORMAL;
+		
+		//apply normal radius
+		m_cur_fixture = m_body.createFixture(m_normal_radius_fixture);
+		m_radius = m_radius_dest = m_normal_radius;
+		
+		//hole collisions: use a point fixture (really small circle)
+		FixtureDef fixture_def = createCircleFixtureDef(1.0f, 0.0f, 0.0f, 
+				0.f, 0.f, 0.001f);
+		fixture_def.filter.categoryBits = COLLISION_GROUP_NORMAL;
+		fixture_def.filter.maskBits = COLLISION_GROUP_HOLE;
+		m_body.createFixture(fixture_def);
 	}
 	
 	private void initColorData(int color) {
@@ -87,44 +128,35 @@ public class GamePlayer extends DynamicGameObject {
 		m_color_data_colored = new VertexBufferFloat(color_data, 4);
 	}
 	
+	private Vector m_tmp_speed = new Vector();
+	
 	public void move(float dsec) {
 		super.move(dsec);
 		
-		//update position
-		m_new_pos.x += m_speed.x * dsec;
-		m_new_pos.y += m_speed.y * dsec;
+		
 		//update speed
-		if(m_owner.generate_events) {
-			m_speed.x += dsec * m_acceleration.x;
-			m_speed.y += dsec * m_acceleration.y;
-			
-			if (m_speed.length() > dsec * m_friction) {
-				m_fric_dir.set(m_speed);
-				m_fric_dir.mul(-1/m_speed.length());
-				m_fric_dir.mul(dsec);
-				m_speed.add(m_fric_dir);
+		m_tmp_speed.set(m_body.getLinearVelocity().x, m_body.getLinearVelocity().y);
+		
+		m_tmp_speed.x += dsec * m_acceleration.x;
+		m_tmp_speed.y += dsec * m_acceleration.y;
+		
+		float speed = m_tmp_speed.length();
+		if(speed > m_max_speed) m_tmp_speed.mul(m_max_speed / speed);
+		
+		m_body.setLinearVelocity(new Vec2(m_tmp_speed.x, m_tmp_speed.y));
+		
+		//current item
+		if(m_item_type != ItemType.None) {
+			if(m_item_timeout - dsec <= 0.f) {
+				disableItem();
 			} else {
-				m_speed.set(0,0);
-			}
-			
-			float speed = m_speed.length();
-			if(speed > m_max_speed) m_speed.mul(m_max_speed / speed);
-			
-			//current item
-			if(m_item_type != ItemType.None) {
-				if(m_item_timeout - dsec <= 0.f) {
-					disableItem();
-				} else {
-					//move item if needed ...
-					
-					m_item_timeout-=dsec;
-				}
+				//move item if needed ...
+				
+				m_item_timeout-=dsec;
 			}
 		}
-		
-		m_has_moved = true;
-		
 	}
+	
 	
 	public void moveClient(float dsec) {
 		super.moveClient(dsec);
@@ -151,10 +183,13 @@ public class GamePlayer extends DynamicGameObject {
 		
 	}
 	
-	public void handleImpact(StaticGameObject other) {
-		super.handleImpact(other);
+	public void handleImpact(StaticGameObject other, Vector normal) {
+		super.handleImpact(other, normal);
 		switch(other.type) {
-		case Hole: die();
+		case Hole:
+			die();
+			m_body.setLinearDamping(0.5f);
+			m_body.setLinearVelocity(new Vec2(normal.x, normal.y));
 			break;
 		case Item: applyItem((GameItem) other);
 			break;
@@ -170,15 +205,14 @@ public class GamePlayer extends DynamicGameObject {
 		switch(item.itemType()) {
 		case IncreaseMaxSpeed: 
 			m_max_speed *= 2.f;
-			m_friction /= 2.f;
+			m_body.setLinearDamping(m_body.getLinearDamping() / 2.f);
 			break;
 		case InvertControls:
 			break;
 		case InvisibleToOthers:
 			break;
 		case MassAndSize:
-			m_mass /= 2.f;
-			m_radius_dest = 0.5f / 2.f;
+			setSmallRadius();
 			break;
 		}
 		m_item_timeout = GameItem.item_effect_duration;
@@ -191,15 +225,14 @@ public class GamePlayer extends DynamicGameObject {
 			switch(m_item_type) {
 			case IncreaseMaxSpeed: 
 				m_max_speed /= 2.f;
-				m_friction *= 2.f;
+				m_body.setLinearDamping(m_body.getLinearDamping() * 2.f);
 				break;
 			case InvertControls:
 				break;
 			case InvisibleToOthers:
 				break;
 			case MassAndSize:
-				m_mass *= 2.f;
-				m_radius_dest = 0.5f;
+				setNormalRadius();
 				break;
 			}
 			
@@ -209,6 +242,20 @@ public class GamePlayer extends DynamicGameObject {
 		}
 		
 	}
+	
+	private void setNormalRadius() {
+		m_radius_dest = m_normal_radius;
+		m_body.destroyFixture(m_cur_fixture);
+		if(!m_bIs_dead)
+			m_cur_fixture = m_body.createFixture(m_normal_radius_fixture);
+	}
+	private void setSmallRadius() {
+		m_radius_dest = m_small_radius;
+		m_body.destroyFixture(m_cur_fixture);
+		if(!m_bIs_dead)
+			m_cur_fixture = m_body.createFixture(m_small_radius_fixture);
+	}
+	
 	private boolean isInvisible() {
 		return m_item_type == ItemType.InvisibleToOthers
 				&& m_owner.ownPlayer()!=this;
@@ -301,7 +348,7 @@ public class GamePlayer extends DynamicGameObject {
 	protected void doModelTransformation(RenderHelper renderer) {
 		//scale & translate
 		renderer.pushModelMat();
-		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+		renderer.modelMatTranslate(m_body.getPosition().x, m_body.getPosition().y, 0.f);
 		renderer.modelMatScale(m_scaling*m_radius*2.f
 				, m_scaling*m_radius*2.f, 0.f);
 		renderer.modelMatTranslate(-0.5f, -0.5f, 0.f);

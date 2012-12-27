@@ -6,12 +6,25 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.collision.Collision;
+import org.jbox2d.collision.Collision.PointState;
+import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.WorldManifold;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.Contact;
+
 import android.util.FloatMath;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
+import com.android.game.clash_of_the_balls.Maths;
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
@@ -21,13 +34,14 @@ import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventImpact;
 import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
+import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 
 /**
  * GameBase
  * base class for client & server game class
  * most of the game logic is implemented here
  */
-public abstract class GameBase {
+public abstract class GameBase implements ContactListener {
 	private static final String TAG = "GameBase";
 	
 	public static final float EPS = 0.00001f;
@@ -43,6 +57,15 @@ public abstract class GameBase {
 	protected int m_initial_player_count;
 	protected int m_current_player_count;
 	protected GameLevel m_level;
+	
+	/* box 2d */
+	public World m_world;
+	private float m_time_accumulator;
+	private static final float step_in_seconds = 30.f / 1000.0f;
+	private static final int velocityIterations = 10;
+	private static final int positionIterations = 5;
+	protected BodyDef m_body_def = new BodyDef();
+	
 	
 	protected boolean m_bIs_game_running = false;
 	public boolean isRunning() { return m_bIs_game_running; }
@@ -86,17 +109,27 @@ public abstract class GameBase {
 		m_settings = s;
 		m_texture_manager = texture_manager;
 		m_game_objects = new TreeMap<Short, DynamicGameObject>();
+		
+		for(int i=0; i<m_impacts.length; ++i) 
+			m_impacts[i] = new Impact();
 	}
 	
 	public void initGame(GameLevel level) {
 		if(m_bIs_game_running)
 			Log.e(TAG, "initGame called while game is running! this must NOT happend");
 		
+		
+		Vec2 gravity = new Vec2(0.0f, 0.0f);
+		boolean doSleep = true;
+		m_world = new World(gravity, doSleep);
+		m_world.setContactListener(this);
+		
 		m_game_objects = new TreeMap<Short, DynamicGameObject>();
-		m_game_field = new GameField(m_texture_manager);
-		m_next_object_id = m_game_field.init(level, (short) 1);
+		m_game_field = new GameField(this, m_texture_manager);
+		m_next_object_id = m_game_field.init(level, (short) 1, m_world);
 		m_level = level;
 		m_bIs_game_running = false;
+		m_time_accumulator = 0.f;
 		
 		System.gc();
 	}
@@ -121,7 +154,7 @@ public abstract class GameBase {
 				texture_overlay = m_texture_manager.get(R.raw.texture_ball_up);
 			}
 			GamePlayer p = new GamePlayer(players[i], this, texture
-					, texture_overlay, m_overlay_times);
+					, texture_overlay, m_overlay_times, m_world, m_body_def);
 			m_game_objects.put(players[i].id, p);
 			if(players[i].id >= m_next_object_id)
 				m_next_object_id = (short) (players[i].id + 1);
@@ -150,7 +183,7 @@ public abstract class GameBase {
 				break;
 			}
 		}
-		return new GameItem(this, id, position, texture, type);
+		return new GameItem(this, id, position, texture, type, m_world, m_body_def);
 	}
 	
 	//get the middle of a random game field (tile) where no foreground object is
@@ -169,7 +202,7 @@ public abstract class GameBase {
 			ret = true;
 			//check if no moveable object is too close
 			for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
-				if(entry.getValue().pos().distSquared(pos_out) < min_object_dist*min_object_dist) {
+				if(Maths.distSquared(new Vector(entry.getValue().pos()), pos_out) < min_object_dist*min_object_dist) {
 					ret=false;
 				}
 			}
@@ -206,8 +239,10 @@ public abstract class GameBase {
 			
 		    Map.Entry<Short, DynamicGameObject> entry = i.next();  
 		    if (entry.getValue().isReallyDead()) {
+		    	m_world.destroyBody(entry.getValue().m_body);
+		    	entry.getValue().m_body = null;
 		        i.remove();  
-		    }  
+		    }
 		}  
 	}
 	protected void handleObjectDied(DynamicGameObject obj) {
@@ -215,566 +250,118 @@ public abstract class GameBase {
 			addEvent(new EventItemRemoved(obj.m_id));
 		}
 		if(obj.type == Type.Player) --m_current_player_count;
+		if(obj.m_body!=null) {
+			while(obj.m_body.getFixtureList() != null) {
+				obj.m_body.destroyFixture(obj.m_body.getFixtureList());
+			}
+		}
+		
 	}
 	
 	
 	public void move(float dsec) {
 		m_game_field.move(dsec);
-		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
-			entry.getValue().move(dsec);
+		for (DynamicGameObject obj : m_game_objects.values()) {
+			obj.move(dsec);
 		}
+		//box2d
+		m_time_accumulator += dsec;
+		while (m_time_accumulator >= step_in_seconds) {
+			m_world.step(step_in_seconds, velocityIterations, positionIterations);
+			m_time_accumulator -= step_in_seconds;
+		}
+		//position event updates
+		if(generate_events) {
+			for (DynamicGameObject obj : m_game_objects.values()) {
+				if(obj.hasMoved()) {
+					addEvent(new EventItemUpdate(obj));
+				}
+			}
+		}
+		//collision handling
+		for(int i=0; i<m_impact_count; ++i) {
+			handleImpact(m_impacts[i].obja, m_impacts[i].objb, 
+					m_impacts[i].impact_point, m_impacts[i].normal);
+		}
+		m_impact_count = 0;
 	}
+	
 	public void moveClient(float dsec) {
 		m_game_field.move(dsec);
 		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
 			entry.getValue().moveClient(dsec);
 		}
 	}
-	
-	public void applyMove() {
-		for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
-			entry.getValue().applyMove();
-		}
+
+	//normal points from obja to objb
+	protected void handleImpact(StaticGameObject obja,
+			StaticGameObject objb, Vector impact_point, Vector normal) {
 	}
 	
-	// temporary Vectors used for collision handling: reuse objects
-	private Vector m_coll_new_speed=new Vector();
-	private Vector m_coll_normal = new Vector();
-	private Vector m_coll_isect1 = new Vector();
-	private Vector m_coll_isect2 = new Vector();
-	private Vector m_coll_isect_middle = new Vector();
-	private Vector m_coll_rect_center = new Vector();
-	private Vector m_coll_tmp_pos = new Vector();
-	
-	protected void doCollisionHandling() {
+	/* box2d */
+	private static class Impact {
+		public StaticGameObject obja;
+		public StaticGameObject objb;
+		public Vector impact_point = new Vector();
+		public Vector normal = new Vector(); //points from obja to objb, normalized
 		
-		//dynamic objects <--> static game objects
-		for(DynamicGameObject obj : m_game_objects.values()) {
+		public void copyTo(Impact dest) {
+			dest.obja = obja;
+			dest.objb = objb;
+			dest.impact_point.set(impact_point);
+			dest.normal.set(normal);
+		}
+	}
+	private Impact[] m_impacts=new Impact[10];
+	private int m_impact_count = 0;
+	
+	public void beginContact(Contact contact) {
+		//do not change world inside here (add/remove objects)
+	}
+	
+	public void endContact(Contact contact) {
+	}
+	
+	private WorldManifold m_tmp_world_manifold = new WorldManifold();
+	private PointState m_tmp_state1[]=new PointState[2];
+	private PointState m_tmp_state2[]=new PointState[2];
+	
+	public void preSolve(Contact contact, Manifold oldManifold) {
+		//do not change world inside here (add/remove objects)
+		
+		StaticGameObject obja =(StaticGameObject)contact.m_fixtureA.m_body.m_userData;
+		StaticGameObject objb =(StaticGameObject)contact.m_fixtureB.m_body.m_userData;
+		
+		if(obja.type == Type.Hole || objb.type == Type.Hole
+				|| obja.type == Type.Item || objb.type == Type.Item) {
+			//holes or items should never create an impact response
+			contact.setEnabled(false);
+		}
+		
+		contact.getWorldManifold(m_tmp_world_manifold);
+		Collision.getPointStates(m_tmp_state1, m_tmp_state2, oldManifold, contact.m_manifold);
+		if (m_tmp_state2[0] == PointState.ADD_STATE) {
 			
-			//assume that the game objects are not larger than 1.0 (one sprite)
-			
-			if(obj.hasMoved() && !obj.isDead()) {
-				int x_start = (int)(obj.newPosition().x) - 1;
-				if(x_start < 0) x_start = 0;
-				int x_end = x_start + 2;
-				if(x_end >= m_game_field.width()) x_end = m_game_field.width()-1;
-				
-				int y_start = (int)(obj.newPosition().y) - 1;
-				if(y_start < 0) y_start = 0;
-				int y_end = y_start + 2;
-				if(y_end >= m_game_field.height()) y_end = m_game_field.height()-1;
-				
-				//there can be multiple collisions in a frame. we take only the 
-				//new speed from the last detected collisions (which is the closest
-				//one to the current position of obj)
-				m_coll_new_speed.set(obj.speed());
-				
-				for(int x=x_start; x<=x_end; ++x) {
-					for(int y=y_start; y<=y_end; ++y) {
-						StaticGameObject field_obj = m_game_field.foreground(x, y);
-						if(field_obj != null) {
-							//check intersection between field_obj & obj
-							switch(obj.type) {
-							case Player:
-								
-								switch(field_obj.type) {
-								case Hole:
-									GameHole hole = (GameHole) field_obj;
-									if(hole.isInside(obj.pos(), obj.newPosition(), m_coll_normal)) {
-										//obj falls down
-										if(is_server) { 
-											//the client will receive the update from server
-											handleImpact(obj, obj.newPosition()
-													, field_obj, field_obj.pos());
-											//apply speed
-											m_coll_new_speed.set(m_coll_normal);
-
-											obj.die();
-											
-										}
-									}
-									
-									break;
-
-								case Wall:
-								{
-									GamePlayer player = ((GamePlayer) obj);
-									GameWall wall = ((GameWall) field_obj);  
-									
-									for (Rectangle rect : wall.m_wall_items) {
-										
-										// rectangle center of current rectangle
-										m_coll_rect_center.set(wall.m_position.x + rect.pos.x + rect.size.x/2.0f
-												, wall.m_position.y + rect.pos.y + rect.size.y/2.0f);
-										
-										/*
-										 *  d----c
-										 *  |    |
-										 *  |    |
-										 *  a----b
-										 */
-										
-										// absolute positions of rectangle corners
-										float rect_half_width = rect.width()/2.0f;
-										float rect_half_height = rect.height()/2.0f;
-										
-										float ax = m_coll_rect_center.x - rect_half_width;
-										float ay = m_coll_rect_center.y - rect_half_height;
-										float bx = m_coll_rect_center.x + rect_half_width;
-										float by = m_coll_rect_center.y - rect_half_height;
-										float cx = m_coll_rect_center.x + rect_half_width;
-										float cy = m_coll_rect_center.y + rect_half_height;
-										float dx = m_coll_rect_center.x - rect_half_width;
-										float dy = m_coll_rect_center.y + rect_half_height;
-										
-										// check left side of rectangle (including corners)
-										if (player.pos().x <= m_coll_rect_center.x + rect_half_width) {
-											// players pos is left to the wall
-
-											// check intersection with left edge of the wall
-											if (lineCircleIntersection(ax, ay, dx, dy, player.newPosition(), player.m_radius, m_coll_isect1, m_coll_isect2)) {
-												
-												/*
-												 * player intersects left edge
-												 */
-												if ((m_coll_isect1.y >= ay && m_coll_isect2.y <= ay) || (m_coll_isect2.y >= ay && m_coll_isect1.y <= ay)) {
-													
-													// check collision for lower left corner
-													Log.d(TAG, "hit lower left corner");
-													
-													/* calculate the intersection between corner circle with radius: player.m_radius
-													 * and the direction vector of newPosition() - pos() to find the position of intersection
-													 * of the player and the corner
-													 */
-													m_coll_tmp_pos.set(ax, ay);
-													if (lineCircleIntersection(player.pos().x, player.pos().y, player.newPosition().x, player.newPosition().y
-															, m_coll_tmp_pos, player.m_radius, m_coll_isect1, m_coll_isect2)) {
-														
-														/* 
-														 * take the point of intersection which lies close to the player.pos() and
-														 * compute normal vector which is the vector pointing from the corner to 
-														 * the intersection point isect_p
-														 */
-														if (m_coll_isect1.distSquared(player.pos()) < m_coll_isect2.distSquared(player.pos())) {															
-															m_coll_isect1.sub(ax, ay);
-															m_coll_normal.set(m_coll_isect1);
-														} else {
-															m_coll_isect2.sub(ax, ay);
-															m_coll_normal.set(m_coll_isect2);
-														}
-														m_coll_normal.normalize();
-														// Calculate new position and speed
-														setSpeedAndPosition(player, wall, m_coll_normal, m_coll_tmp_pos, m_coll_new_speed);
-													}
-													
-												} else if ((m_coll_isect1.y >= dy && m_coll_isect2.y <= dy) || (m_coll_isect2.y >= dy && m_coll_isect1.y <= dy)) {
-													
-													// check collision for upper left corner
-													Log.d(TAG, "hit upper left corner");
-													
-													/* calculate the intersection between corner circle with radius: player.m_radius
-													 * and the direction vector of newPosition() - pos() to find the position of intersection
-													 * of the player and the corner
-													 */
-													m_coll_tmp_pos.set(dx, dy);
-													if (lineCircleIntersection(player.pos().x, player.pos().y, player.newPosition().x, player.newPosition().y
-															, m_coll_tmp_pos, player.m_radius, m_coll_isect1, m_coll_isect2)) {
-														
-														/* 
-														 * take the point of intersection which lies close to the player.pos() and
-														 * compute normal vector which is the vector pointing from the corner to 
-														 * the intersection point isect_p
-														 */
-														if (m_coll_isect1.distSquared(player.pos()) < m_coll_isect2.distSquared(player.pos())) {															
-															m_coll_isect1.sub(dx, dy);
-															m_coll_normal.set(m_coll_isect1);
-														} else {
-															m_coll_isect2.sub(dx, dy);
-															m_coll_normal.set(m_coll_isect2);
-														}
-														m_coll_normal.normalize();
-														// Calculate new position and speed
-														setSpeedAndPosition(player, wall, m_coll_normal, m_coll_tmp_pos, m_coll_new_speed);
-													}
-													
-												} else if (m_coll_isect1.y <= dy && m_coll_isect2.y <= dy && m_coll_isect1.y >= ay && m_coll_isect2.y >= ay) {
-												
-													// intersection point lies inbetween corners
-													Log.d(TAG, "left edge collision");
-													
-													// middle point of intersection points
-													m_coll_isect_middle.set((m_coll_isect1.x + m_coll_isect2.x) / 2.0f, (m_coll_isect1.y + m_coll_isect2.y) / 2.0f);
-													// normal vector for left edge (vertical)
-													m_coll_normal.set(-1.0f, 0.0f);
-													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, m_coll_normal, m_coll_isect_middle, m_coll_new_speed);
-												
-												}
-												
-											}
-											
-										} 
-										
-										// check right side of rectangle (including corners)
-										if (player.pos().x >= m_coll_rect_center.x - rect_half_width) {
-											// players pos is right to the wall
-											
-											if (lineCircleIntersection(bx, by, cx, cy, player.newPosition(), player.m_radius, m_coll_isect1, m_coll_isect2)) {
-												
-												/*
-												 * player intersects right edge
-												 */
-												if ((m_coll_isect1.y >= by && m_coll_isect2.y <= by) || (m_coll_isect2.y >= by && m_coll_isect1.y <= by)) {
-													
-													// check collision for lower right corner
-													Log.d(TAG, "hit lower right corner");
-													
-													/* calculate the intersection between corner circle with radius: player.m_radius
-													 * and the direction vector of newPosition() - pos() to find the position of intersection
-													 * of the player and the corner
-													 */
-													m_coll_tmp_pos.set(bx, by);
-													if (lineCircleIntersection(player.pos().x, player.pos().y, player.newPosition().x, player.newPosition().y
-															, m_coll_tmp_pos, player.m_radius, m_coll_isect1, m_coll_isect2)) {
-														
-														/* 
-														 * take the point of intersection which lies close to the player.pos() and
-														 * compute normal vector which is the vector pointing from the corner to 
-														 * the intersection point isect_p
-														 */
-														if (m_coll_isect1.distSquared(player.pos()) < m_coll_isect2.distSquared(player.pos())) {															
-															m_coll_isect1.sub(bx, by);
-															m_coll_normal.set(m_coll_isect1);
-														} else {
-															m_coll_isect2.sub(bx, by);
-															m_coll_normal.set(m_coll_isect2);
-														}
-														m_coll_normal.normalize();
-														// Calculate new position and speed
-														setSpeedAndPosition(player, wall, m_coll_normal, m_coll_tmp_pos, m_coll_new_speed);
-													}
-													
-												} else if ((m_coll_isect1.y >= cy && m_coll_isect2.y <= cy) || (m_coll_isect2.y >= cy && m_coll_isect1.y <= cy)) {
-													
-													// check collision for upper right corner
-													Log.d(TAG, "hit upper right corner");
-													
-													/* calculate the intersection between corner circle with radius: player.m_radius
-													 * and the direction vector of newPosition() - pos() to find the position of intersection
-													 * of the player and the corner
-													 */
-													m_coll_tmp_pos.set(cx, cy);
-													if (lineCircleIntersection(player.pos().x, player.pos().y, player.newPosition().x, player.newPosition().y
-															, m_coll_tmp_pos, player.m_radius, m_coll_isect1, m_coll_isect2)) {
-														
-														/* 
-														 * take the point of intersection which lies close to the player.pos() and
-														 * compute normal vector which is the vector pointing from the corner to 
-														 * the intersection point isect_p
-														 */
-														if (m_coll_isect1.distSquared(player.pos()) < m_coll_isect2.distSquared(player.pos())) {															
-															m_coll_isect1.sub(cx, cy);
-															m_coll_normal.set(m_coll_isect1);
-														} else {
-															m_coll_isect2.sub(cx, cy);
-															m_coll_normal.set(m_coll_isect2);
-														}
-														m_coll_normal.normalize();
-														// Calculate new position and speed
-														setSpeedAndPosition(player, wall, m_coll_normal, m_coll_tmp_pos, m_coll_new_speed);
-													}
-
-												} else if (m_coll_isect1.y <= cy && m_coll_isect2.y <= cy && m_coll_isect1.y >= by && m_coll_isect2.y >= by) {
-													
-													// intersection point lies inbetween corners
-													Log.d(TAG, "right edge collision");
-
-													// middle point of intersection points
-													m_coll_isect_middle.set((m_coll_isect1.x + m_coll_isect2.x) / 2.0f, (m_coll_isect1.y + m_coll_isect2.y) / 2.0f);
-													// normal vector for left edge (vertical)
-													m_coll_normal.set(1.0f, 0.0f);
-													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, m_coll_normal, m_coll_isect_middle, m_coll_new_speed);
-													
-												}
-												
-											}
-										}
-										
-										// check bottom side of rectangle (excluding corners, we already checked them)
-										if (player.pos().y <= m_coll_rect_center.y) {
-											
-											if (lineCircleIntersection(ax, ay, bx, by, player.newPosition(), player.m_radius, m_coll_isect1, m_coll_isect2)) {
-											
-												/*
-												 * player intersects lower edge
-												 */
-												if (m_coll_isect1.x >= ax && m_coll_isect2.x >= ax && m_coll_isect2.x <= bx && m_coll_isect1.x <= bx) {
-													
-													Log.d(TAG, "lower edge collision");
-													
-													// middle point of intersection points
-													m_coll_isect_middle.set((m_coll_isect1.x + m_coll_isect2.x) / 2.0f, (m_coll_isect1.y + m_coll_isect2.y) / 2.0f);
-													// normal vector for left edge (vertical)
-													m_coll_normal.set(0.0f, -1.0f);
-													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, m_coll_normal, m_coll_isect_middle, m_coll_new_speed);
-													
-												}
-											}
-											
-										}
-										
-										// check top side of rectangle (excluding corners, we already checked them)
-										if (player.pos().y >= m_coll_rect_center.y) {
-											// players pos is inbetween left and right edge and above the upper edge
-											
-											if (lineCircleIntersection(cx, cy, dx, dy, player.newPosition(), player.m_radius, m_coll_isect1, m_coll_isect2)) {
-												
-												/*
-												 * player intersects upper edge
-												 */
-												if (m_coll_isect1.x >= dx && m_coll_isect2.x >= dx && m_coll_isect2.x <= cx && m_coll_isect1.x <= cx) {
-													
-													Log.d(TAG, "upper edge collision");
-
-													// middle point of intersection points
-													m_coll_isect_middle.set((m_coll_isect1.x + m_coll_isect2.x) / 2.0f, (m_coll_isect1.y + m_coll_isect2.y) / 2.0f);
-													// normal vector for left edge (vertical)
-													m_coll_normal.set(0.0f, 1.0f);
-													// calculate and set new velocity and position of player
-													setSpeedAndPosition(player, wall, m_coll_normal, m_coll_isect_middle, m_coll_new_speed);
-													
-												}
-											}
-										}
-									}
-									
-									break;
-								}
-								default: throw new RuntimeException("collision detection for type "+
-										field_obj.type+" not implemented!");
-								}
-								
-								break;
-								
-							case Item:
-								
-								//an item does not move (or does it??)
-								
-								break;
-								default: throw new RuntimeException("collision detection for type "+
-										obj.type+" not implemented!");
-							}
-						}
-					}
-				}
-				
-				obj.speed().set(m_coll_new_speed);
+			if(m_impact_count >= m_impacts.length) { //need to resize
+				Impact[] new_impacts = new Impact[m_impacts.length*2];
+				for(int i=0; i<new_impacts.length; ++i) 
+					new_impacts[i] = new Impact();
+				for(int i=0; i<m_impact_count; ++i)
+					m_impacts[i].copyTo(new_impacts[i]);
+				m_impacts = new_impacts;
 			}
+
+			Vec2 impact_point = m_tmp_world_manifold.points[0];
+			Vec2 normal = m_tmp_world_manifold.normal;
+			
+			m_impacts[m_impact_count].obja =(StaticGameObject)contact.m_fixtureA.m_body.m_userData;
+			m_impacts[m_impact_count].objb =(StaticGameObject)contact.m_fixtureB.m_body.m_userData;
+			m_impacts[m_impact_count].impact_point.set(impact_point.x, impact_point.y);
+			m_impacts[m_impact_count].normal.set(normal.x, normal.y);
+			++m_impact_count;
 			
 		}
-		
-		//dynamic objects <--> dynamic objects
-		for(DynamicGameObject obja : m_game_objects.values()) {
-			if(!obja.isDead()) {
-				Iterator<DynamicGameObject> iter = m_game_objects.values().iterator();
-				//stupid java forces us to do stupid things...
-				while(iter.hasNext() && iter.next() != obja) { }
-				
-				while(iter.hasNext()) {
-					DynamicGameObject objb = iter.next();
-					if(!objb.isDead() && (obja.hasMoved() || objb.hasMoved())) {
-						//check intersection between obja & objb
-						if(objb.type.ordinal() < objb.type.ordinal()) {
-							DynamicGameObject tmp = obja;
-							obja = objb;
-							objb = tmp;
-						}
-						//now: obja.type <= objb.type
-						
-						switch(obja.type) {
-						case Player:
-							
-							switch(objb.type) {
-							case Player:
-							{								
-								GamePlayer player_a = ((GamePlayer) obja);
-								GamePlayer player_b = ((GamePlayer) objb);
-								
-								if ( obja.newPosition().dist(objb.newPosition()) <= (player_a.m_radius + player_b.m_radius) ) {
-									
-									Log.d(TAG, "Players collide");
-									
-									// Players collide
-									
-									float alpha = player_a.pos().x - player_b.pos().x;
-									float gamma = player_a.pos().y - player_b.pos().y;
-									float beta = player_a.newPosition().x - player_a.pos().x - player_b.newPosition().x + player_b.pos().x;
-									float delta = player_a.newPosition().y - player_a.pos().y - player_b.newPosition().y + player_b.pos().y;
-									
-									float rads = player_a.m_radius + player_b.m_radius + EPS;
-
-									float a = (beta * beta + delta * delta);
-									float b = 2.f * (alpha * beta + gamma * delta);
-									float c = (gamma * gamma + alpha * alpha) - rads*rads;
-									float D = FloatMath.sqrt((b*b) - (4.f * a * c));
-									
-									float t1 = (-b + D) / (2.f * a);
-									float t2 = (-b - D) / (2.f * a);
-									float t = t1;
-									if (t2 < t1) t = t2;
-									
-									// Set the new position of player a
-									Vector new_position_a = player_a.newPosition();
-									new_position_a.sub(player_a.pos());
-									new_position_a.mul(t);
-									new_position_a.add(player_a.pos());
-									
-									// Set the new position of player b
-									Vector new_position_b = player_b.newPosition();
-									new_position_b.sub(player_b.pos());
-									new_position_b.mul(t);
-									new_position_b.add(player_b.pos());
-																		
-									// Get new direction for player a
-									// Get new direction for player b
-									Vector dir_a_b = new Vector(player_b.newPosition());
-									dir_a_b.sub(player_a.newPosition());
-									dir_a_b.normalize();
-									Vector dir_b_a = new Vector(dir_a_b);
-									
-									dir_a_b.mul(dir_a_b.dot(player_a.speed()));
-									dir_b_a.mul(dir_b_a.dot(player_b.speed()));
-									
-									// Calculate epsilon (elasticity factor)
-									float epsilon = (player_a.elasticFactor() 
-											+ player_b.elasticFactor()) / 2.0f;
-									
-									Vector temp_a = new Vector(dir_a_b);
-									Vector temp_b = new Vector(dir_b_a);
-									temp_a.mul(player_a.m_mass - epsilon * player_b.m_mass);
-									temp_b.mul(player_b.m_mass * (1.0f + epsilon));
-									temp_a.add(temp_b);
-									temp_a.mul(1.f/(player_a.m_mass + player_b.m_mass));
-									temp_a.sub(dir_a_b);
-									player_a.speed().add(temp_a);
-									
-									temp_a.set(dir_a_b);
-									temp_b.set(dir_b_a);
-									temp_b.mul(player_b.m_mass - epsilon * player_a.m_mass);
-									temp_a.mul(player_a.m_mass * (1.0f + epsilon));
-									temp_b.add(temp_a);
-									temp_b.mul(1.f/(player_b.m_mass + player_a.m_mass));
-									temp_b.sub(dir_b_a);
-									player_b.speed().add(temp_b);
-									
-									if(is_server) {
-										//the client will receive the update from server
-										handleImpact(player_a, player_a.newPosition()
-												, player_b, player_b.newPosition());
-									}
-									
-								}
-								
-								break;
-							}
-							case Item:
-								GameItem item = (GameItem) objb;
-								GamePlayer player = (GamePlayer) obja;
-								if(item.border.intersectCircle(item.pos(), player.newPosition()
-										, player.m_radius)) {
-									handleImpact(player, player.newPosition()
-											, item, item.pos());
-								}
-								break;
-							default: throw new RuntimeException("collision detection for type "+
-									objb.type+" not implemented!");
-							}
-							
-							break;
-						case Item:
-							
-							//an item does not move (or does it??)
-							switch(objb.type) {
-							case Item:
-								//nothing to do if items cannot move
-								break;
-							}
-							
-							
-							break;
-							default: throw new RuntimeException("collision detection for type "+
-									obja.type+" not implemented!");
-						}
-					}
-				}
-			}
-		}
 	}
-
-	private void handleImpact(StaticGameObject obja, Vector pos_a,
-			StaticGameObject objb, Vector pos_b) {
-		obja.handleImpact(objb);
-		objb.handleImpact(obja);
-		if (generate_events) {
-			addEvent(new EventImpact(obja.m_id, pos_a, objb.m_id, pos_b));
-		}
-	}
-	
-	//this is used for player collisions with static field objects
-	private void setSpeedAndPosition(GamePlayer player, StaticGameObject obj_b,
-			Vector normal, Vector intersect_point, Vector new_speed) {
-
-		float epsilon = (player.elasticFactor() 
-				+ obj_b.elasticFactor()) / 2.0f;
-		// calculate new velocity
-		Vector speed = new Vector(normal);
-		speed.mul(-2.f*epsilon*normal.dot(player.speed()));
-		new_speed.set(player.speed());
-		new_speed.add(speed);
-		
-		// update player newPosition to intersection point between player and wall
-		player.newPosition().set(intersect_point);
-		// prepare position of player regarding distance to wall
-		Vector player_pos = new Vector(normal);		
-		// set new position of player
-		player_pos.mul(player.m_radius + EPS);
-		player.newPosition().add(player_pos);
-	
-	}
-
-	private boolean lineCircleIntersection(float x1, float y1, float x2, float y2, Vector circ_center, float circ_radius, Vector isect_point1, Vector isect_point2) {
-		
-		float cx = circ_center.x;
-		float cy = circ_center.y;
-		float dx = x2 - x1;
-		float dy = y2 - y1;
-		float a = dx * dx + dy * dy;
-		float b = 2.0f * (dx * (x1 - cx) + dy * (y1 - cy));
-		float c = cx * cx + cy * cy;
-		c += x1 * x1 + y1 * y1;
-		c -= 2.0f * (cx * x1 + cy * y1);
-		c -= circ_radius * circ_radius;
-		float D = b*b - 4.0f*a*c;
-
-		if (D < 0) { // Not intersecting
-			return false;
-		} else {
-			float square_root = FloatMath.sqrt(D);
-			float mu = (-b + square_root) / (2.f * a);
-			float ix1 = x1 + mu * (dx);
-			float iy1 = y1 + mu * (dy);
-			mu = (-b - square_root) / (2.f * a);
-			float ix2 = x1 + mu * (dx);
-			float iy2 = y1 + mu * (dy);
-
-			// set new position of player to impact point
-			isect_point1.set(ix1, iy1);
-			isect_point2.set(ix2, iy2);
-			
-			return true;
-		}
-
+	public void postSolve(Contact contact, ContactImpulse impulse) {
 	}
 }

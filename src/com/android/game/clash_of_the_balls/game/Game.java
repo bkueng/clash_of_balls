@@ -3,6 +3,8 @@ package com.android.game.clash_of_the_balls.game;
 
 import java.util.Map;
 
+import org.jbox2d.common.Vec2;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -17,6 +19,7 @@ import com.android.game.clash_of_the_balls.Font2D.Font2DSettings;
 import com.android.game.clash_of_the_balls.Font2D.TextAlign;
 import com.android.game.clash_of_the_balls.UIHandler.UIChange;
 import com.android.game.clash_of_the_balls.game.event.Event;
+import com.android.game.clash_of_the_balls.game.event.EventImpact;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 import com.android.game.clash_of_the_balls.menu.PopupBase;
 import com.android.game.clash_of_the_balls.menu.PopupGameStart;
@@ -135,7 +138,7 @@ public class Game extends GameBase implements UIBase {
 			m_settings.popup_menu = new PopupGameStart(m_activity_context
 					, m_texture_manager, m_settings.m_screen_width, m_settings.m_screen_height
 					, (float)wait_to_start_game, m_own_player.color()
-					, m_font_settings.m_typeface);
+					, m_font_settings.m_typeface, m_world);
 			m_ui_change = UIChange.POPUP_SHOW;
 		}
 	}
@@ -202,11 +205,12 @@ public class Game extends GameBase implements UIBase {
 
 					generate_events = false;
 					
+					if(!GameSettings.client_prediction) {
+						super.move(m_last_rtt);
+					}
+					
 					//apply the updates from the server
 					applyIncomingEvents();
-					//position updates are not applied in here
-					//so no object changes position and we do not have
-					//to do collision detection
 					
 					removeDeadObjects();
 				}
@@ -236,8 +240,6 @@ public class Game extends GameBase implements UIBase {
 					//even if we had network updates, we should move one step
 					//to apply the new positions smoothly
 					super.move(dsec);
-					doCollisionHandling();
-					super.applyMove();
 				}
 				
 				

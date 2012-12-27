@@ -1,5 +1,8 @@
 package com.android.game.clash_of_the_balls.menu;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
+
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.R;
@@ -43,8 +46,9 @@ public class MenuItemLevel extends MenuItem {
 				"max. "+level.player_count+"\nPlayers", texture_manager);
 		
 		m_level = level;
-		m_game_field = new GameField(texture_manager);
-		m_game_field.init(m_level, (short)1);
+		m_game_field = new GameField(null, texture_manager);
+		World world = new World(new Vec2(0.f, 0.f), true);
+		m_game_field.init(m_level, (short)1, world);
 		m_game_view = new GameView(size.x - m_player.size().x, size.y, null
 				, m_level.width, m_level.height);
 		

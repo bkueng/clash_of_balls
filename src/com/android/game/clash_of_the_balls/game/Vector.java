@@ -1,5 +1,7 @@
 package com.android.game.clash_of_the_balls.game;
 
+import org.jbox2d.common.Vec2;
+
 import android.util.FloatMath;
 
 
@@ -12,6 +14,10 @@ public class Vector {
 	public Vector() {
 		x = 0.0f;
 		y = 0.0f;
+	}
+	public Vector(Vec2 v) {
+		x = v.x;
+		y = v.y;
 	}
 
 	public Vector(float fx, float fy) {

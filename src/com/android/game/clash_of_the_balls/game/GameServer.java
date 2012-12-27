@@ -3,6 +3,7 @@ package com.android.game.clash_of_the_balls.game;
 import java.lang.ref.WeakReference;
 
 import org.alljoyn.bus.BusException;
+import org.jbox2d.common.Vec2;
 
 import android.graphics.Color;
 import android.os.Handler;
@@ -20,7 +21,9 @@ import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventGameEnd;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo;
 import com.android.game.clash_of_the_balls.game.event.EventGameStartNow;
+import com.android.game.clash_of_the_balls.game.event.EventImpact;
 import com.android.game.clash_of_the_balls.game.event.EventItemAdded;
+import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
@@ -155,7 +158,7 @@ public class GameServer extends GameBase implements Runnable {
 			if(client!=null) client.id = id;
 			//create the player (without textures)
 			GamePlayer p = new GamePlayer(this, id, player_pos[indexes[i]]
-					, colors[i], null, null, null);
+					, colors[i], null, null, null, m_world, m_body_def);
 			m_game_objects.put(id, p);
 		}
 	}
@@ -292,8 +295,6 @@ public class GameServer extends GameBase implements Runnable {
 		generate_events = true;
 		moveClient(elapsed_time);
 		move(elapsed_time);
-		doCollisionHandling();
-		applyMove();
 		handleGenerateItems(elapsed_time);
 		removeDeadObjects();
 		checkGameEnd(elapsed_time);
@@ -398,6 +399,18 @@ public class GameServer extends GameBase implements Runnable {
 			Statistic stat = m_settings.game_statistics.currentRoundStatistics();
 			stat.setPlayerPoints(obj.m_id, initialPlayerCount() - currentPlayerCount()-1);
 		}
+	}
+	
+	protected void handleImpact(StaticGameObject obja,
+			StaticGameObject objb, Vector impact_point, Vector normal) {
+		
+		if (generate_events) {
+			//the client will call handleImpact when he receives this event
+			addEvent(new EventImpact(obja.m_id, objb.m_id, normal));
+		}
+		obja.handleImpact(objb, normal);
+		normal.mul(-1.f);
+		objb.handleImpact(obja, normal);
 	}
 	
 	//this also deletes all events from the queue

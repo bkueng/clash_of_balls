@@ -1,5 +1,10 @@
 package com.android.game.clash_of_the_balls.game;
 
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.World;
+
 import com.android.game.clash_of_the_balls.Texture;
 
 /**
@@ -28,8 +33,6 @@ public class GameItem extends DynamicGameObject {
 		None
 	}
 	
-	public final Rectangle border; //for object intersection
-	
     public static ItemType getRandomType() {
         return ItemType.values()[(int) (Math.random() * (ItemType.values().length-1))];
     }
@@ -39,11 +42,19 @@ public class GameItem extends DynamicGameObject {
 	
 
 	public GameItem(GameBase owner, short id, Vector position
-			, Texture texture, ItemType item_type) {
-		super(owner, id, position, Type.Item, texture);
+			, Texture texture, ItemType item_type, World world, BodyDef body_def) {
+		super(owner, id, Type.Item, texture);
 		m_item_type = item_type;
 		
-		border = new Rectangle(-0.45f, -0.45f, 1.f-0.05f/2.f, 1.f-0.05f/2.f);
+		body_def.type = BodyType.STATIC;
+		body_def.position.set(position.x, position.y);
+		body_def.userData = this;
+		m_body = world.createBody(body_def);
+		FixtureDef fixture_def = createRectFixtureDef(1.0f, 0.0f, 0.0f, 
+				-0.45f, -0.45f, 1.f-0.05f/2.f, 1.f-0.05f/2.f, 0.0f);
+		fixture_def.filter.categoryBits = COLLISION_GROUP_NORMAL;
+		fixture_def.filter.maskBits = COLLISION_GROUP_NORMAL;
+		m_body.createFixture(fixture_def);
 	}
 
 	public void move(float dsec) {
@@ -58,8 +69,8 @@ public class GameItem extends DynamicGameObject {
 		}
 	}
 	
-	public void handleImpact(StaticGameObject other) {
-		super.handleImpact(other);
+	public void handleImpact(StaticGameObject other, Vector normal) {
+		super.handleImpact(other, normal);
 		switch(other.type) {
 		case Player: die(); //player will apply the item
 			break;
@@ -79,7 +90,7 @@ public class GameItem extends DynamicGameObject {
 	protected void doModelTransformation(RenderHelper renderer) {
 		//scale & translate
 		renderer.pushModelMat();
-		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
+		renderer.modelMatTranslate(m_body.getPosition().x, m_body.getPosition().y, 0.f);
 		renderer.modelMatScale(m_scaling, m_scaling, 0.f);
 		renderer.modelMatTranslate(-0.5f, -0.5f, 0.f);
 	}

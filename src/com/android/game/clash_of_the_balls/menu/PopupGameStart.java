@@ -1,5 +1,8 @@
 package com.android.game.clash_of_the_balls.menu;
 
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.World;
+
 import android.content.Context;
 import android.graphics.Typeface;
 
@@ -38,7 +41,7 @@ public class PopupGameStart extends PopupBase {
 	
 	public PopupGameStart(Context context, TextureManager tex_manager
 			, float screen_width, float screen_height
-			, float timeout, int player_color, Typeface font_typeface) {
+			, float timeout, int player_color, Typeface font_typeface, World world) {
 		super(context, tex_manager, screen_width, screen_height);
 		
 		final float border_offset = 0.03f;
@@ -49,7 +52,8 @@ public class PopupGameStart extends PopupBase {
 		Texture texture = tex_manager.get(R.raw.texture_ball_base);
 		Texture texture_overlay = tex_manager.get(R.raw.texture_ball_up);
 		m_player = new GamePlayer(null, (short)0
-				, new Vector(), player_color, texture, texture_overlay, null);
+				, new Vector(), player_color, texture, texture_overlay, null
+				, world, new BodyDef());
 		m_player_size = new Vector(m_size.x * 0.3f, m_size.x * 0.3f);
 		m_player_pos = new Vector(m_position.x + m_size.x*(0.1f+border_offset)
 				, m_position.y + m_size.y*(1.f - 0.1f - border_offset) - m_player_size.y);

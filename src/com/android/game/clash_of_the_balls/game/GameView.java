@@ -25,10 +25,10 @@ public class GameView extends GameObject {
 	private float m_scaling; //game_pos * m_scaling = output pos
 	// m_position is in output coordinates
 	
-	private GameObject m_object_to_track;
+	private StaticGameObject m_object_to_track;
 	
 	public GameView(float output_width, float output_height
-			, GameObject object_to_track, float level_width, float level_height) {
+			, StaticGameObject object_to_track, float level_width, float level_height) {
 		m_object_to_track = object_to_track;
 		m_output_size = new Vector(output_width, output_height);
 		m_level_width = level_width;
@@ -36,7 +36,7 @@ public class GameView extends GameObject {
 		fitLevelToOutputView();
 	}
 	
-	public void setObjectToTrack(GameObject object_to_track) {
+	public void setObjectToTrack(StaticGameObject object_to_track) {
 		m_object_to_track = object_to_track;
 		checkObjectWithinBoundary();
 		checkLevelWithinOutputView();
@@ -113,8 +113,9 @@ public class GameView extends GameObject {
 	//moves the view if the object is out of boundary
 	private void checkObjectWithinBoundary() {
 		
-		if(m_object_to_track != null) {
-			Vector pos = m_object_to_track.pos();
+		if(m_object_to_track != null && m_object_to_track.m_body!=null) {
+			Vector pos = new Vector(m_object_to_track.pos().x
+					, m_object_to_track.pos().y);
 			float scale_x = m_scaling;
 			if(pos.x*scale_x < m_position.x + boundary_size*m_output_size.x) {
 				m_position.x = pos.x*scale_x - boundary_size*m_output_size.x;

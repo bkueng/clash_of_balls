@@ -1,5 +1,8 @@
 package com.android.game.clash_of_the_balls.game;
 
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.World;
+
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
@@ -35,8 +38,10 @@ public class GameField extends GameObject {
 	private int[] m_fg_empty_idx_x=null;
 	private int[] m_fg_empty_idx_y=null;
 	
+	private final GameBase m_owner;
 	
-	public GameField(TextureManager texture_manager) {
+	public GameField(GameBase owner, TextureManager texture_manager) {
+		m_owner = owner;
 		m_texture_manager = texture_manager;
 	}
 	
@@ -69,10 +74,12 @@ public class GameField extends GameObject {
 	
 	//returns the next object id to be used
 	//for the first game call set next_object_id to 1
-	public short init(GameLevel level, short next_object_id) {
+	public short init(GameLevel level, short next_object_id, World world) {
 		m_width = level.width;
 		m_height = level.height;
 		m_fg_empty_idx_x = m_fg_empty_idx_y = null;
+		
+		BodyDef body_def = new BodyDef();
 		
 		//background
 		if(m_texture_manager != null) {
@@ -82,7 +89,7 @@ public class GameField extends GameObject {
 					int type = level.background(x, y);
 					int raw_res_id = GameLevel.rawResTexIdFromBackground(type);
 					if(raw_res_id != -1) {
-						m_bg_objects[y*m_width+x] = new StaticGameObject((short)-1,
+						m_bg_objects[y*m_width+x] = new StaticGameObjectNoInteraction((short)-1,
 								new Vector((float)x+0.5f, (float)y+0.5f),
 								Type.Background,
 								m_texture_manager.get(raw_res_id));
@@ -107,76 +114,100 @@ public class GameField extends GameObject {
 						texture = m_texture_manager.get(raw_res_id);
 					switch(type) {
 					case GameLevel.TYPE_BOARDER_DOWN:
-						obj=new GameHole(object_id++, pos,HoleType.Boarder_down, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Boarder_down, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_BOARDER_UP: 
-						obj=new GameHole(object_id++, pos,HoleType.Boarder_up, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Boarder_up, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_BOARDER_LEFT: 
-						obj=new GameHole(object_id++, pos,HoleType.Boarder_left, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Boarder_left, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_BOARDER_RIGHT:
-						obj=new GameHole(object_id++, pos,HoleType.Boarder_right, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Boarder_right, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_CORNER_DOWN_LEFT:
-						obj=new GameHole(object_id++, pos,HoleType.Corner_down_left, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Corner_down_left, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_CORNER_DOWN_RIGHT:
-						obj=new GameHole(object_id++, pos,HoleType.Corner_down_right, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Corner_down_right, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_CORNER_UP_LEFT:
-						obj=new GameHole(object_id++, pos,HoleType.Corner_up_left, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Corner_up_left, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_CORNER_UP_RIGHT:
-						obj=new GameHole(object_id++, pos,HoleType.Corner_up_right, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Corner_up_right, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_single, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_single, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_FULL:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Full, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Full, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_CORNER_UP_RIGHT:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Corner_up_right, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Corner_up_right, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_CORNER_UP_LEFT:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Corner_up_left, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Corner_up_left, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_CORNER_DOWN_RIGHT:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Corner_down_right, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Corner_down_right, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_CORNER_DOWN_LEFT:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Corner_down_left, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Corner_down_left, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_HEAD_DOWN:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Down, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Head_Down, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_HEAD_UP:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Up, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Head_Up, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_HEAD_LEFT:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Left, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Head_Left, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_HOLE_HEAD_RIGHT:
-						obj=new GameHole(object_id++, pos,HoleType.Hole_Head_Right, texture);
+						obj=new GameHole(m_owner, object_id++, pos
+								,HoleType.Hole_Head_Right, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_WALL_HOR:
-						obj=new GameWall(object_id++, pos,WallType.Wall_horizontal, texture);
+						obj=new GameWall(m_owner, object_id++, pos
+								,WallType.Wall_horizontal, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_WALL_VERT:
-						obj=new GameWall(object_id++, pos,WallType.Wall_vertical, texture);
+						obj=new GameWall(m_owner, object_id++, pos
+								,WallType.Wall_vertical, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_WALL_CORNER_UP_RIGHT:
-						obj=new GameWall(object_id++, pos,WallType.Wall_Corner_up_right, texture);
+						obj=new GameWall(m_owner, object_id++, pos
+								,WallType.Wall_Corner_up_right, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_WALL_CORNER_UP_LEFT:
-						obj=new GameWall(object_id++, pos,WallType.Wall_Corner_up_left, texture);
+						obj=new GameWall(m_owner, object_id++, pos
+								,WallType.Wall_Corner_up_left, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_WALL_CORNER_DOWN_RIGHT:
-						obj=new GameWall(object_id++, pos,WallType.Wall_Corner_down_right, texture);
+						obj=new GameWall(m_owner, object_id++, pos
+								,WallType.Wall_Corner_down_right, texture, world, body_def);
 						break;
 					case GameLevel.TYPE_WALL_CORNER_DOWN_LEFT:
-						obj=new GameWall(object_id++, pos,WallType.Wall_Corner_down_left, texture);
+						obj=new GameWall(m_owner, object_id++, pos
+								,WallType.Wall_Corner_down_left, texture, world, body_def);
 						break;
 						
 					} 

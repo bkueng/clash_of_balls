@@ -1,8 +1,9 @@
 package com.android.game.clash_of_the_balls.game;
 
+import org.jbox2d.common.Vec2;
+
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.Texture;
-import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 
 /**
  * all game objects that can be dynamically added or removed must inherit from
@@ -25,22 +26,13 @@ public class DynamicGameObject extends StaticGameObject {
 	protected boolean m_bIs_dying = false;
 	public boolean isReallyDead() { return m_bIs_dead && !m_bIs_dying; }
 	
-	protected Vector m_new_pos=new Vector();
-	protected boolean m_has_moved = false;
-	
-	public Vector newPosition() { return m_new_pos; }
-	public boolean hasMoved() { return m_has_moved; }
-	
-	protected Vector m_speed = new Vector();
-	public Vector speed() { return m_speed; }
-	
 	private int m_impact_count = 0;
 	
 	protected GameBase m_owner;
 	
-	DynamicGameObject(GameBase owner, final short id, Vector position, Type type
+	DynamicGameObject(GameBase owner, final short id, Type type
 			, Texture texture) {
-		super(id, position, type, texture);
+		super(id, type, texture);
 		m_owner = owner;
 	}
 
@@ -62,44 +54,44 @@ public class DynamicGameObject extends StaticGameObject {
 	
 	
 	public void applyVectorData(Vector new_pos, Vector new_speed) {
-		m_speed.set(new_speed);
+		m_body.setLinearVelocity(new Vec2(new_speed.x, new_speed.y));
 		
 		if(GameSettings.client_prediction) {
 			//apply position smoothly
 			//we cannot simply change m_position or m_new_pos because we would need
 			//to do collision handling
-			m_server_translation.set(new_pos.x - m_new_pos.x, new_pos.y - m_new_pos.y);
+			m_server_translation.set(new_pos.x - m_body.getPosition().x
+					, new_pos.y - m_body.getPosition().y);
 		} else {
-			m_position.set(new_pos);
+			m_body.setTransform(new Vec2(new_pos.x, new_pos.y), m_body.getAngle());
 		}
 		
 	}
 
 	//handle everything in here updated by the server. like position & speed
 	//all these operations must be undoable or overwritable by a server update!
-	//Note that dsec can be negative to move back in time!
 	@Override
 	public void move(float dsec) {
-		m_new_pos.set(m_position);
-		
-		if(m_owner.generate_events) {
-			//check for client-side smoothing of server position update
-			if(Math.abs(m_server_translation.x) > GameBase.EPS
-					|| Math.abs(m_server_translation.y) > GameBase.EPS) {
-				if(m_server_translation.length() < 0.02f) {
-					m_new_pos.add(m_server_translation);
-					m_server_translation.set(0.f, 0.f);
-				} else {
-					float dx = m_server_translation.x * SERVER_POS_SMOOTHING;
-					float dy = m_server_translation.y * SERVER_POS_SMOOTHING;
-					m_new_pos.add(dx, dy);
-					m_server_translation.sub(dx, dy);
-				}
-				m_has_moved = true;
+		//check for client-side smoothing of server position update
+		if(Math.abs(m_server_translation.x) > GameBase.EPS
+				|| Math.abs(m_server_translation.y) > GameBase.EPS) {
+			if(m_server_translation.length() < 0.02f) {
+				m_body.setTransform(new Vec2(m_body.getPosition().x + m_server_translation.x
+						, m_body.getPosition().y + m_server_translation.y)
+					, m_body.getAngle());
+				
+				m_server_translation.set(0.f, 0.f);
+			} else {
+				float dx = m_server_translation.x * SERVER_POS_SMOOTHING;
+				float dy = m_server_translation.y * SERVER_POS_SMOOTHING;
+				
+				m_body.setTransform(new Vec2(m_body.getPosition().x + dx
+						, m_body.getPosition().y + dy)
+					, m_body.getAngle());
+				
+				m_server_translation.sub(dx, dy);
 			}
 		}
-		
-		//-> set m_has_moved & m_new_pos
 	}
 	
 	//every change that does not need to be updated by the server can be handled
@@ -111,7 +103,7 @@ public class DynamicGameObject extends StaticGameObject {
 		
 	}
 	
-	public void handleImpact(StaticGameObject other) {
+	public void handleImpact(StaticGameObject other, Vector normal) {
 		++m_impact_count;
 	}
 	public int impactCount() { return m_impact_count; }
@@ -122,17 +114,6 @@ public class DynamicGameObject extends StaticGameObject {
 			m_bIs_dead = true;
 			m_bIs_dying = false;
 			m_owner.handleObjectDied(this);
-		}
-	}
-	
-	
-	public void applyMove() {
-		if(m_has_moved) {
-			m_position.set(m_new_pos);
-			m_has_moved = false;
-			if(m_owner.generate_events) {
-				m_owner.addEvent(new EventItemUpdate(this));
-			}
 		}
 	}
 	
