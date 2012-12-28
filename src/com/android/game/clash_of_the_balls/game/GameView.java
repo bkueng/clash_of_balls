@@ -111,26 +111,27 @@ public class GameView extends GameObject {
 	}
 	
 	//moves the view if the object is out of boundary
+	private Vector m_tmp_pos = new Vector();
 	private void checkObjectWithinBoundary() {
 		
 		if(m_object_to_track != null && m_object_to_track.m_body!=null) {
-			Vector pos = new Vector(m_object_to_track.pos().x
+			m_tmp_pos.set(m_object_to_track.pos().x
 					, m_object_to_track.pos().y);
 			float scale_x = m_scaling;
-			if(pos.x*scale_x < m_position.x + boundary_size*m_output_size.x) {
-				m_position.x = pos.x*scale_x - boundary_size*m_output_size.x;
-			} else if(pos.x*scale_x > m_position.x + m_scaling*m_level_width
+			if(m_tmp_pos.x*scale_x < m_position.x + boundary_size*m_output_size.x) {
+				m_position.x = m_tmp_pos.x*scale_x - boundary_size*m_output_size.x;
+			} else if(m_tmp_pos.x*scale_x > m_position.x + m_scaling*m_level_width
 					- boundary_size*m_output_size.x) {
-				m_position.x = pos.x*scale_x - 
+				m_position.x = m_tmp_pos.x*scale_x - 
 					(m_position.x + m_scaling*m_level_width
 					- boundary_size*m_output_size.x);
 			}
 			float scale_y = m_scaling;
-			if(pos.y*scale_y < m_position.y + boundary_size*m_output_size.y) {
-				m_position.y = pos.y*scale_y - boundary_size*m_output_size.y;
-			} else if(pos.y*scale_y > m_position.y + m_scaling*m_level_height 
+			if(m_tmp_pos.y*scale_y < m_position.y + boundary_size*m_output_size.y) {
+				m_position.y = m_tmp_pos.y*scale_y - boundary_size*m_output_size.y;
+			} else if(m_tmp_pos.y*scale_y > m_position.y + m_scaling*m_level_height 
 					- boundary_size*m_output_size.y) {
-				m_position.y = pos.y*scale_y - 
+				m_position.y = m_tmp_pos.y*scale_y - 
 					(m_position.y + m_scaling*m_level_height
 					- boundary_size*m_output_size.y);
 			}

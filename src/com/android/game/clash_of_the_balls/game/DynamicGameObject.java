@@ -52,9 +52,11 @@ public class DynamicGameObject extends StaticGameObject {
 						//to get the error (distance of positions) below 0.01
 						//for SERVER_POS_SMOOTHING = 1/5 it's about 20 frames
 	
+	private Vec2 m_tmp_vec = new Vec2();
 	
 	public void applyVectorData(Vector new_pos, Vector new_speed) {
-		m_body.setLinearVelocity(new Vec2(new_speed.x, new_speed.y));
+		m_tmp_vec.set(new_speed.x, new_speed.y);
+		m_body.setLinearVelocity(m_tmp_vec);
 		
 		if(GameSettings.client_prediction) {
 			//apply position smoothly
@@ -63,7 +65,8 @@ public class DynamicGameObject extends StaticGameObject {
 			m_server_translation.set(new_pos.x - m_body.getPosition().x
 					, new_pos.y - m_body.getPosition().y);
 		} else {
-			m_body.setTransform(new Vec2(new_pos.x, new_pos.y), m_body.getAngle());
+			m_tmp_vec.set(new_pos.x, new_pos.y);
+			m_body.setTransform(m_tmp_vec, m_body.getAngle());
 		}
 		
 	}
@@ -76,18 +79,18 @@ public class DynamicGameObject extends StaticGameObject {
 		if(Math.abs(m_server_translation.x) > GameBase.EPS
 				|| Math.abs(m_server_translation.y) > GameBase.EPS) {
 			if(m_server_translation.length() < 0.02f) {
-				m_body.setTransform(new Vec2(m_body.getPosition().x + m_server_translation.x
-						, m_body.getPosition().y + m_server_translation.y)
-					, m_body.getAngle());
+				m_tmp_vec.set(m_body.getPosition().x + m_server_translation.x
+						, m_body.getPosition().y + m_server_translation.y);
+				m_body.setTransform(m_tmp_vec, m_body.getAngle());
 				
 				m_server_translation.set(0.f, 0.f);
 			} else {
 				float dx = m_server_translation.x * SERVER_POS_SMOOTHING;
 				float dy = m_server_translation.y * SERVER_POS_SMOOTHING;
 				
-				m_body.setTransform(new Vec2(m_body.getPosition().x + dx
-						, m_body.getPosition().y + dy)
-					, m_body.getAngle());
+				m_tmp_vec.set(m_body.getPosition().x + dx
+						, m_body.getPosition().y + dy);
+				m_body.setTransform(m_tmp_vec, m_body.getAngle());
 				
 				m_server_translation.sub(dx, dy);
 			}

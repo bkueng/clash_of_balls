@@ -129,6 +129,7 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	private Vector m_tmp_speed = new Vector();
+	private Vec2 m_tmp_vec = new Vec2();
 	
 	public void move(float dsec) {
 		super.move(dsec);
@@ -143,7 +144,8 @@ public class GamePlayer extends DynamicGameObject {
 		float speed = m_tmp_speed.length();
 		if(speed > m_max_speed) m_tmp_speed.mul(m_max_speed / speed);
 		
-		m_body.setLinearVelocity(new Vec2(m_tmp_speed.x, m_tmp_speed.y));
+		m_tmp_vec.set(m_tmp_speed.x, m_tmp_speed.y);
+		m_body.setLinearVelocity(m_tmp_vec);
 		
 		//current item
 		if(m_item_type != ItemType.None) {
@@ -189,7 +191,8 @@ public class GamePlayer extends DynamicGameObject {
 		case Hole:
 			die();
 			m_body.setLinearDamping(0.5f);
-			m_body.setLinearVelocity(new Vec2(normal.x, normal.y));
+			m_tmp_vec.set(normal.x, normal.y);
+			m_body.setLinearVelocity(m_tmp_vec);
 			break;
 		case Item: applyItem((GameItem) other);
 			break;
