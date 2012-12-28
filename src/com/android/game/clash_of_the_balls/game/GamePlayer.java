@@ -94,13 +94,14 @@ public class GamePlayer extends DynamicGameObject {
 		body_def.angle = 0.f;
 		body_def.userData = this;
 		m_body = world.createBody(body_def);
+		final float restitution = 1.0f;
 		
-		m_normal_radius_fixture = createCircleFixtureDef(1.0f, 0.0f, 0.0f, 
+		m_normal_radius_fixture = createCircleFixtureDef(1.0f, 0.0f, restitution, 
 				0.f, 0.f, m_normal_radius);
 		m_normal_radius_fixture.filter.categoryBits = COLLISION_GROUP_NORMAL;
 		m_normal_radius_fixture.filter.maskBits = COLLISION_GROUP_NORMAL;
 		
-		m_small_radius_fixture = createCircleFixtureDef(1.0f, 0.0f, 0.0f, 
+		m_small_radius_fixture = createCircleFixtureDef(1.0f, 0.0f, restitution, 
 				0.f, 0.f, m_small_radius);
 		m_small_radius_fixture.filter.categoryBits = COLLISION_GROUP_NORMAL;
 		m_small_radius_fixture.filter.maskBits = COLLISION_GROUP_NORMAL;
