@@ -261,12 +261,12 @@ public abstract class GameBase implements ContactListener {
 	
 	public void move(float dsec) {
 		m_game_field.move(dsec);
-		for (DynamicGameObject obj : m_game_objects.values()) {
-			obj.move(dsec);
-		}
 		//box2d
 		m_time_accumulator += dsec;
 		while (m_time_accumulator >= step_in_seconds) {
+			for (DynamicGameObject obj : m_game_objects.values()) {
+				obj.move(step_in_seconds);
+			}
 			m_world.step(step_in_seconds, velocityIterations, positionIterations);
 			m_time_accumulator -= step_in_seconds;
 		}
