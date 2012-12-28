@@ -17,7 +17,9 @@ import com.android.game.clash_of_the_balls.Texture;
 
 public class GameItem extends DynamicGameObject {
 
-	public static final float item_effect_duration = 20.f; //[sec]
+	public static final float item_effect_duration = 15.f; //[sec]
+	
+	private static final float item_timeout = 15.f; //item disapears after this timeout
 
 	private float m_scaling; //for drawing, used for dying effect
 	private boolean m_is_appearing;
@@ -92,6 +94,7 @@ public class GameItem extends DynamicGameObject {
 			m_time_accumulator += dsec;
 			float d = 1.f-FloatMath.sin(FloatMath.cos(m_time_accumulator*4.f)+1.f);
 			m_scaling = 1.f + d*d*0.15f;
+			if(m_time_accumulator > item_timeout) die();
 		}
 
 	}
@@ -108,7 +111,6 @@ public class GameItem extends DynamicGameObject {
 	public void die() {
 		if(!m_bIs_dead) {
 			m_is_appearing = false;
-			m_scaling = 1.f;
 			m_bIs_dead = true;
 			m_bIs_dying = true;
 			m_owner.handleObjectDied(this);
