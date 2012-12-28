@@ -222,6 +222,7 @@ public class GamePlayer extends DynamicGameObject {
 		m_item_timeout = GameItem.item_effect_duration;
 		Vector position=new Vector(0.f, 0.f);
 		m_overlay_item = m_owner.createItem((short)-1, item.itemType(), position);
+		m_overlay_item.setIsStatic(true);
 	}
 	
 	private void disableItem() {
