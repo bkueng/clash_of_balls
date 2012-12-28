@@ -50,12 +50,17 @@ public abstract class GameBase implements ContactListener {
 					//time between press of play and actual game start
 					//in the last second of this, the sensor calibration will be done
 	
+	protected final static int max_items_count = 8;
+					//how many items there should be maximally on the game
+					//field at once
+	
 	protected GameSettings m_settings;
 	protected final TextureManager m_texture_manager;
 	
 	protected GameField m_game_field;
 	protected int m_initial_player_count;
 	protected int m_current_player_count;
+	protected int m_items_count;
 	protected GameLevel m_level;
 	
 	/* box 2d */
@@ -130,6 +135,7 @@ public abstract class GameBase implements ContactListener {
 		m_level = level;
 		m_bIs_game_running = false;
 		m_time_accumulator = 0.f;
+		m_items_count = 0;
 		
 		System.gc();
 	}
@@ -165,6 +171,7 @@ public abstract class GameBase implements ContactListener {
 	public GameItem addItem(short id, ItemType type, Vector position) {
 		GameItem item=createItem(id, type, position);
 		m_game_objects.put(id, item);
+		++m_items_count;
 		return item;
 	}
 	
@@ -250,6 +257,7 @@ public abstract class GameBase implements ContactListener {
 			addEvent(new EventItemRemoved(obj.m_id));
 		}
 		if(obj.type == Type.Player) --m_current_player_count;
+		else if(obj.type == Type.Item) --m_items_count;
 		if(obj.m_body!=null) {
 			while(obj.m_body.getFixtureList() != null) {
 				obj.m_body.destroyFixture(obj.m_body.getFixtureList());
