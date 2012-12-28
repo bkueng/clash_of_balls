@@ -309,10 +309,10 @@ public class GameServer extends GameBase implements Runnable {
 		if(!GameSettings.place_items) return;
 		
 		if(m_next_item_time <= 0.f) {
-			m_next_item_time = 5.f + (float)Math.random()*10.f; //5-15 sec
+			m_next_item_time = 3.f + (float)Math.random()*5.f; //3-8 sec
 		}
 		
-		if((m_next_item_time-=dsec) <= 0.f) {
+		if((m_next_item_time-=dsec) <= 0.f && m_items_count < max_items_count) {
 			Log.d(TAG_SERVER, "trying to put an Item on the field");
 			
 			ItemType type = GameItem.getRandomType();
