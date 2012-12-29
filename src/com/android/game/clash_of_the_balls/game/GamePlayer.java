@@ -12,6 +12,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.ShaderManager.ShaderType;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
 import com.android.game.clash_of_the_balls.game.GameItem.ItemType;
@@ -45,8 +46,8 @@ public class GamePlayer extends DynamicGameObject {
 	private Fixture m_cur_fixture;
 	
 	//item
-	private float m_item_timeout;
-	private ItemType m_item_type = ItemType.None;
+	private float m_item_timeout = 0.f;
+	public ItemType m_item_type = ItemType.None;
 	private GameItem m_overlay_item = null;
 	public static final float overlay_item_height = 0.09f;
 	private Font2D m_overlay_times[];
@@ -67,12 +68,16 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	protected Texture m_overlay_texture;
+	protected Texture m_glow_texture;
+	private float m_texture_scaling = 1.f;
 
 	public GamePlayer(GameBase owner, short id, Vector position
 			, int color, Texture texture, Texture texture_overlay
+			, Texture texture_glow
 			, Font2D overlay_times[], World world, BodyDef body_def) {
 		super(owner, id, Type.Player, texture);
 		m_overlay_texture = texture_overlay;
+		m_glow_texture = texture_glow;
 		m_color = color;
 		initColorData(m_color);
 		m_overlay_times = overlay_times;
@@ -80,10 +85,12 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	public GamePlayer(PlayerInfo info, GameBase owner, Texture texture_base
-			, Texture texture_overlay, Font2D overlay_times[], World world
+			, Texture texture_overlay, Texture texture_glow
+			, Font2D overlay_times[], World world
 			, BodyDef body_def) {
 		super(owner, info.id, Type.Player, texture_base);
 		m_overlay_texture = texture_overlay;
+		m_glow_texture = texture_glow;
 		m_color = info.color;
 		initColorData(m_color);
 		m_overlay_times = overlay_times;
@@ -113,7 +120,7 @@ public class GamePlayer extends DynamicGameObject {
 		
 		//hole collisions: use a point fixture (really small circle)
 		FixtureDef fixture_def = createCircleFixtureDef(1.0f, 0.0f, 0.0f, 
-				0.f, 0.f, 0.001f);
+				0.f, 0.f, 0.01f);
 		fixture_def.filter.categoryBits = COLLISION_GROUP_NORMAL;
 		fixture_def.filter.maskBits = COLLISION_GROUP_HOLE;
 		m_body.createFixture(fixture_def);
@@ -191,10 +198,12 @@ public class GamePlayer extends DynamicGameObject {
 		super.handleImpact(other, normal);
 		switch(other.type) {
 		case Hole:
-			die();
-			m_body.setLinearDamping(0.5f);
-			m_tmp_vec.set(normal.x, normal.y);
-			m_body.setLinearVelocity(m_tmp_vec);
+			if(m_owner.is_server && m_item_type != ItemType.DontFall) {
+				die();
+				m_body.setLinearDamping(0.5f);
+				m_tmp_vec.set(normal.x, normal.y);
+				m_body.setLinearVelocity(m_tmp_vec);
+			}
 			break;
 		case Item: applyItem((GameItem) other);
 			break;
@@ -219,6 +228,8 @@ public class GamePlayer extends DynamicGameObject {
 		case MassAndSize:
 			setRadius(SMALL_RADIUS);
 			break;
+		case DontFall:
+			break;
 		}
 		m_item_timeout = GameItem.item_effect_duration;
 		Vector position=new Vector(0.f, 0.f);
@@ -239,6 +250,8 @@ public class GamePlayer extends DynamicGameObject {
 				break;
 			case MassAndSize:
 				setRadius(NORMAL_RADIUS);
+				break;
+			case DontFall:
 				break;
 			}
 			
@@ -313,6 +326,27 @@ public class GamePlayer extends DynamicGameObject {
 	public void draw(RenderHelper renderer) {
 		if(!isReallyDead() && !isInvisible()) {
 			
+			if(m_glow_texture!=null && m_item_type == ItemType.DontFall) {
+				m_texture_scaling = 1.5f;
+				doModelTransformation(renderer);
+				
+				renderer.shaderManager().useShader(ShaderType.TypeWarp);
+				Game.applyDefaultPosAndColor(renderer);
+				
+				renderer.shaderManager().activateTexture(0);
+				m_glow_texture.useTexture(renderer);
+				
+				renderer.apply();
+				
+		        // Draw
+		        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+				
+				undoModelTransformation(renderer);
+				renderer.shaderManager().useShader(ShaderType.TypeDefault);
+				Game.applyDefaultPosAndColor(renderer);
+				m_texture_scaling = 1.f;
+			}
+			
 			doModelTransformation(renderer);
 			
 			//colored texture: m_texture
@@ -357,8 +391,8 @@ public class GamePlayer extends DynamicGameObject {
 		//scale & translate
 		renderer.pushModelMat();
 		renderer.modelMatTranslate(m_body.getPosition().x, m_body.getPosition().y, 0.f);
-		renderer.modelMatScale(m_scaling*m_radius*2.f
-				, m_scaling*m_radius*2.f, 0.f);
+		renderer.modelMatScale(m_texture_scaling * m_scaling*m_radius*2.f
+				, m_texture_scaling * m_scaling*m_radius*2.f, 0.f);
 		renderer.modelMatTranslate(-0.5f, -0.5f, 0.f);
 	}
 	protected void undoModelTransformation(RenderHelper renderer) {

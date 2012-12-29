@@ -52,7 +52,7 @@ public class PopupGameStart extends PopupBase {
 		Texture texture = tex_manager.get(R.raw.texture_ball_base);
 		Texture texture_overlay = tex_manager.get(R.raw.texture_ball_up);
 		m_player = new GamePlayer(null, (short)0
-				, new Vector(), player_color, texture, texture_overlay, null
+				, new Vector(), player_color, texture, texture_overlay, null, null
 				, world, new BodyDef());
 		m_player_size = new Vector(m_size.x * 0.3f, m_size.x * 0.3f);
 		m_player_pos = new Vector(m_position.x + m_size.x*(0.1f+border_offset)

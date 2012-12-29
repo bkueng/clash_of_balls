@@ -121,14 +121,14 @@ public class GameHole extends StaticGameObject {
 	}
 	
 	private void addHoleRectFixture(float x, float y, float w, float h) {
-		FixtureDef fixture_def = createRectFixtureDef(1.0f, 0.0f, 0.0f, 
+		FixtureDef fixture_def = createRectFixtureDef(0.0f, 0.0f, 0.0f, 
 				x, y, w, h, 0.0f);
 		fixture_def.filter.categoryBits = COLLISION_GROUP_HOLE;
 		fixture_def.filter.maskBits = COLLISION_GROUP_NORMAL;
 		m_body.createFixture(fixture_def);
 	}
 	private void addHoleCircleFixture(float x, float y, float radius) {
-		FixtureDef fixture_def = createCircleFixtureDef(1.0f, 0.0f, 0.0f, 
+		FixtureDef fixture_def = createCircleFixtureDef(0.0f, 0.0f, 0.0f, 
 				x, y, radius);
 		fixture_def.filter.categoryBits = COLLISION_GROUP_HOLE;
 		fixture_def.filter.maskBits = COLLISION_GROUP_NORMAL;

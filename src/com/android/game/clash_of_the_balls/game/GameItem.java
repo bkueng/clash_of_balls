@@ -30,12 +30,14 @@ public class GameItem extends DynamicGameObject {
 		//positive items
 		InvisibleToOthers,
 		IncreaseMaxSpeed,
+		DontFall, //do not fall into holes
 		
 		//negative items
 		MassAndSize, //decrease player mass & size
 		InvertControls, //invert input controls
 		
 		//the logic of applying an item is in GamePlayer.applyItem
+		//texture is in GameBase.createItem
 		
 		None
 	}

@@ -155,12 +155,15 @@ public abstract class GameBase implements ContactListener {
 		for(int i=0; i<players.length; ++i) {
 			Texture texture=null;
 			Texture texture_overlay=null;
+			Texture texture_glow = null;
 			if(m_texture_manager != null) {
 				texture = m_texture_manager.get(R.raw.texture_ball_base);
 				texture_overlay = m_texture_manager.get(R.raw.texture_ball_up);
+				texture_glow = m_texture_manager.get(R.raw.texture_ball_hover);
 			}
 			GamePlayer p = new GamePlayer(players[i], this, texture
-					, texture_overlay, m_overlay_times, m_world, m_body_def);
+					, texture_overlay, texture_glow, m_overlay_times
+					, m_world, m_body_def);
 			m_game_objects.put(players[i].id, p);
 			if(players[i].id >= m_next_object_id)
 				m_next_object_id = (short) (players[i].id + 1);
@@ -187,6 +190,8 @@ public abstract class GameBase implements ContactListener {
 			case InvisibleToOthers: texture=m_texture_manager.get(R.raw.texture_item_invisible);
 				break;
 			case MassAndSize: texture=m_texture_manager.get(R.raw.texture_item_mass);
+				break;
+			case DontFall: texture=m_texture_manager.get(R.raw.texture_item_dont_fall);
 				break;
 			}
 		}
@@ -340,9 +345,16 @@ public abstract class GameBase implements ContactListener {
 		StaticGameObject obja =(StaticGameObject)contact.m_fixtureA.m_body.m_userData;
 		StaticGameObject objb =(StaticGameObject)contact.m_fixtureB.m_body.m_userData;
 		
-		if(obja.type == Type.Hole || objb.type == Type.Hole
-				|| obja.type == Type.Item || objb.type == Type.Item) {
-			//holes or items should never create an impact response
+		if(obja.type == Type.Hole || objb.type == Type.Hole) {
+			GamePlayer player = null;
+			if(obja.type == Type.Player) {
+				player = (GamePlayer) obja;
+			} else if(objb.type == Type.Player) {
+				player = (GamePlayer) objb;
+			}
+			if(player == null || player.m_item_type != ItemType.DontFall)
+				contact.setEnabled(false);
+		} else if(obja.type == Type.Item || objb.type == Type.Item) {
 			contact.setEnabled(false);
 		}
 		
