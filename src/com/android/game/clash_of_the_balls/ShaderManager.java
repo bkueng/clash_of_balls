@@ -56,8 +56,8 @@ public class ShaderManager {
 			case TypeDefault:
 				Log.i(LOG_TAG, "Loading Default Shader");
 				m_programs[which.ordinal()] = loadShader(
-					R.raw.per_pixel_vertex_shader, 
-					R.raw.per_pixel_fragment_shader,
+					R.raw.shader_default_vert, 
+					R.raw.shader_default_frag,
 					new String[] {"a_Position",  "a_Color", "a_TexCoordinate"});
 			default:
 			}
