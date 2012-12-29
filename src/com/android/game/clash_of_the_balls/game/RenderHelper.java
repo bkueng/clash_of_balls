@@ -26,6 +26,8 @@ public class RenderHelper {
 	private float m_screen_width;
 	private float m_screen_height;
 	
+	private float m_time_accumulator = 0.f;
+	
 	private static final int mat_size = 16; // = 4x4
 	
 	private float[] m_projection_mat = new float[mat_size];
@@ -56,6 +58,10 @@ public class RenderHelper {
 	public void onSurfaceChanged(float screen_width, float screen_height) {
 		m_screen_width = screen_width;
 		m_screen_height = screen_height;
+	}
+	
+	public void move(float dsec) {
+		m_time_accumulator += dsec;
 	}
 	
 	
@@ -131,6 +137,9 @@ public class RenderHelper {
 	//call this right before rendering the object to apply the projection 
 	//& model matrices
 	public void apply() {
+		
+		if(m_shader_manager.u_time_handle != -1)
+			GLES20.glUniform1f(m_shader_manager.u_time_handle, m_time_accumulator);
 		
         // Pass in the matrix to the shader.
         GLES20.glUniformMatrix4fv(m_shader_manager.u_MVPMatrix_handle, 1, false

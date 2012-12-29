@@ -20,6 +20,7 @@ public class ShaderManager {
 	
 	public enum ShaderType {
 		TypeDefault,
+		TypeWarp,
 		
 		TypeN
 	}
@@ -33,6 +34,7 @@ public class ShaderManager {
 	public int a_Position_handle;
 	public int a_Color_handle;
 	public int a_TexCoordinate_handle;
+	public int u_time_handle;
 	
 	
 	public ShaderManager(Context activity_context) {
@@ -59,6 +61,14 @@ public class ShaderManager {
 					R.raw.shader_default_vert, 
 					R.raw.shader_default_frag,
 					new String[] {"a_Position",  "a_Color", "a_TexCoordinate"});
+				break;
+			case TypeWarp:
+				Log.i(LOG_TAG, "Loading Warp Shader");
+				m_programs[which.ordinal()] = loadShader(
+					R.raw.shader_warp_vert,
+					R.raw.shader_warp_frag,
+					new String[] {"a_Position",  "a_Color", "a_TexCoordinate"});
+				break;
 			default:
 			}
 		}
@@ -75,6 +85,16 @@ public class ShaderManager {
 			a_Position_handle = GLES20.glGetAttribLocation(program_handle, "a_Position");
 			a_Color_handle = GLES20.glGetAttribLocation(program_handle, "a_Color");
 			a_TexCoordinate_handle = GLES20.glGetAttribLocation(program_handle, "a_TexCoordinate");
+			u_time_handle = -1;
+			break;
+		case TypeWarp:
+			u_MVPMatrix_handle = GLES20.glGetUniformLocation(program_handle, "u_MVPMatrix");
+			u_Texture_handle = GLES20.glGetUniformLocation(program_handle, "u_Texture");
+			a_Position_handle = GLES20.glGetAttribLocation(program_handle, "a_Position");
+			a_Color_handle = GLES20.glGetAttribLocation(program_handle, "a_Color");
+			a_TexCoordinate_handle = GLES20.glGetAttribLocation(program_handle, "a_TexCoordinate");
+			u_time_handle = GLES20.glGetUniformLocation(program_handle, "time");
+			break;
 		default:
 		}
 	}

@@ -95,6 +95,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     		long time = SystemClock.elapsedRealtime(); //or: nanoTime()
     		float elapsed_time = (float)(time - m_last_time) / 1000.f; 
     		m_ui_handler.move(elapsed_time);
+    		m_renderer.move(elapsed_time);
     		m_last_time = time;
 
 
