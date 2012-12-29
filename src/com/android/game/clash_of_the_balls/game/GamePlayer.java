@@ -34,10 +34,14 @@ public class GamePlayer extends DynamicGameObject {
 	
 	public float m_radius;
 	public float m_radius_dest; //m_radius should change to this value
-	private FixtureDef m_normal_radius_fixture;
+	private static final int SMALL_RADIUS = 0;
+	private static final int NORMAL_RADIUS = 1;
+	private static final int LARGE_RADIUS = 2;
 	private static final float m_normal_radius = 0.5f;
-	private FixtureDef m_small_radius_fixture;
-	private static final float m_small_radius = m_normal_radius / 2.f;
+	private static final float m_radiuses[] = new float[] {
+		m_normal_radius / 2.f, m_normal_radius, m_normal_radius*1.3f 
+		};
+	private FixtureDef m_radius_fixtures[]=new FixtureDef[m_radiuses.length];
 	private Fixture m_cur_fixture;
 	
 	//item
@@ -96,19 +100,16 @@ public class GamePlayer extends DynamicGameObject {
 		m_body = world.createBody(body_def);
 		final float restitution = 1.0f;
 		
-		m_normal_radius_fixture = createCircleFixtureDef(1.0f, 0.0f, restitution, 
-				0.f, 0.f, m_normal_radius);
-		m_normal_radius_fixture.filter.categoryBits = COLLISION_GROUP_NORMAL;
-		m_normal_radius_fixture.filter.maskBits = COLLISION_GROUP_NORMAL;
-		
-		m_small_radius_fixture = createCircleFixtureDef(1.0f, 0.0f, restitution, 
-				0.f, 0.f, m_small_radius);
-		m_small_radius_fixture.filter.categoryBits = COLLISION_GROUP_NORMAL;
-		m_small_radius_fixture.filter.maskBits = COLLISION_GROUP_NORMAL;
+		for(int i=0; i<m_radiuses.length; ++i) {
+			m_radius_fixtures[i] = createCircleFixtureDef(1.0f, 0.0f, restitution, 
+					0.f, 0.f, m_radiuses[i]);
+			m_radius_fixtures[i].filter.categoryBits = COLLISION_GROUP_NORMAL;
+			m_radius_fixtures[i].filter.maskBits = COLLISION_GROUP_NORMAL;
+		}
 		
 		//apply normal radius
-		m_cur_fixture = m_body.createFixture(m_normal_radius_fixture);
-		m_radius = m_radius_dest = m_normal_radius;
+		m_cur_fixture = m_body.createFixture(m_radius_fixtures[NORMAL_RADIUS]);
+		m_radius = m_radius_dest = m_radiuses[NORMAL_RADIUS];
 		
 		//hole collisions: use a point fixture (really small circle)
 		FixtureDef fixture_def = createCircleFixtureDef(1.0f, 0.0f, 0.0f, 
@@ -216,7 +217,7 @@ public class GamePlayer extends DynamicGameObject {
 		case InvisibleToOthers:
 			break;
 		case MassAndSize:
-			setSmallRadius();
+			setRadius(SMALL_RADIUS);
 			break;
 		}
 		m_item_timeout = GameItem.item_effect_duration;
@@ -237,7 +238,7 @@ public class GamePlayer extends DynamicGameObject {
 			case InvisibleToOthers:
 				break;
 			case MassAndSize:
-				setNormalRadius();
+				setRadius(NORMAL_RADIUS);
 				break;
 			}
 			
@@ -248,18 +249,20 @@ public class GamePlayer extends DynamicGameObject {
 		
 	}
 	
-	private void setNormalRadius() {
-		m_radius_dest = m_normal_radius;
-		m_body.destroyFixture(m_cur_fixture);
-		if(!m_bIs_dead)
-			m_cur_fixture = m_body.createFixture(m_normal_radius_fixture);
+	private void setRestitution(float restitution) {
+		m_cur_fixture.setRestitution(restitution);
 	}
-	private void setSmallRadius() {
-		m_radius_dest = m_small_radius;
+	
+	private void setRadius(int which_radius) {
+		m_radius_dest = m_radiuses[which_radius];
+		final float restitution = m_cur_fixture.getRestitution();
 		m_body.destroyFixture(m_cur_fixture);
-		if(!m_bIs_dead)
-			m_cur_fixture = m_body.createFixture(m_small_radius_fixture);
+		if(!m_bIs_dead) {
+			m_cur_fixture = m_body.createFixture(m_radius_fixtures[which_radius]);
+			m_cur_fixture.setRestitution(restitution);
+		}
 	}
+	
 	
 	private boolean isInvisible() {
 		return m_item_type == ItemType.InvisibleToOthers
