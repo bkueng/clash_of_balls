@@ -68,6 +68,9 @@ public class GamePlayer extends DynamicGameObject {
 	
 	protected Texture m_overlay_texture;
 	protected Texture m_glow_texture;
+	private static final float min_glow_scaling = 0.8f;
+	private static final float max_glow_scaling = 1.5f;
+	private float m_glow_scaling=min_glow_scaling;
 	private float m_texture_scaling = 1.f;
 
 	public GamePlayer(GameBase owner, short id, Vector position
@@ -147,9 +150,21 @@ public class GamePlayer extends DynamicGameObject {
 			if(m_item_timeout - dsec <= 0.f) {
 				disableItem();
 			} else {
-				//move item if needed ...
-				
 				m_item_timeout-=dsec;
+			}
+		}
+		//move item if needed ...
+		if(m_item_type == ItemType.DontFall) {
+			if(m_glow_scaling < max_glow_scaling) {
+				m_glow_scaling += dsec * 0.5f;
+				if(m_glow_scaling > max_glow_scaling)
+					m_glow_scaling = max_glow_scaling;
+			}
+		} else {
+			if(m_glow_scaling > min_glow_scaling) {
+				m_glow_scaling -= dsec * 0.5f;
+				if(m_glow_scaling < min_glow_scaling) 
+					m_glow_scaling = min_glow_scaling;
 			}
 		}
 	}
@@ -312,8 +327,10 @@ public class GamePlayer extends DynamicGameObject {
 	public void draw(RenderHelper renderer) {
 		if(!isReallyDead() && !isInvisible()) {
 			
-			if(m_glow_texture!=null && m_item_type == ItemType.DontFall) {
-				m_texture_scaling = 1.5f;
+			if(m_glow_texture!=null && (m_item_type == ItemType.DontFall 
+					|| m_glow_scaling > min_glow_scaling)) {
+				
+				m_texture_scaling = m_glow_scaling;
 				doModelTransformation(renderer);
 				
 				renderer.shaderManager().useShader(ShaderType.TypeWarp);
