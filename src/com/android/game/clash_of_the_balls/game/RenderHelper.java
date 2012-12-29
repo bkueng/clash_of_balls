@@ -64,6 +64,22 @@ public class RenderHelper {
 		m_time_accumulator += dsec;
 	}
 	
+	//use an ARGB int value to init float array of 4 values (RGBA)
+	public static void initColorArray(int color, float[] out_color) {
+		out_color[0] = (float)((color >> 16) & 0xFF) / 255.f;
+		out_color[1] = (float)((color >> 8) & 0xFF) / 255.f;
+		out_color[2] = (float)(color & 0xFF) / 255.f;
+		out_color[3] = (float)(color >>> 24) / 255.f;
+	}
+	//convert from float RGBA to int ARGB
+	public static int getColor(float[] color) {
+		int r = (int)(color[0]*255.f);
+		int g = (int)(color[1]*255.f);
+		int b = (int)(color[2]*255.f);
+		int a = (int)(color[3]*255.f);
+		return (a<<24) | (r<<16) | (g<<8) | b;
+	}
+	
 	
 	/* projection matrix */
 	public void useOrthoProjection() {

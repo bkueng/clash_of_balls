@@ -15,7 +15,7 @@ import com.android.game.clash_of_the_balls.game.Vector;
  */
 public class MenuItem extends GameObject {
 
-	protected VertexBufferFloat m_color_data;
+	protected float m_color[] = new float[4];
 	protected VertexBufferFloat m_position_data;
 	
 	protected Vector m_size = new Vector();
@@ -46,9 +46,10 @@ public class MenuItem extends GameObject {
 		if(position_handle != -1)
 			m_position_data.apply(position_handle);
         // color
-		int color_handle = renderer.shaderManager().a_Color_handle;
+		int color_handle = renderer.shaderManager().u_Color_handle;
 		if(color_handle != -1)
-			m_color_data.apply(color_handle);      
+			GLES20.glUniform4fv(color_handle, 1, m_color, 0);
+		
 		renderer.apply();
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);

@@ -30,8 +30,7 @@ public class MenuItemGreyButton extends MenuItem {
 				.get(R.raw.texture_grey_unpressed_button);
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat
-				(VertexBufferFloat.sprite_color_data_white, 4);
+		RenderHelper.initColorArray(0xffffffff, m_color);
 		
 		m_label = new MenuItemStringMultiline(
 				m_position, m_size,

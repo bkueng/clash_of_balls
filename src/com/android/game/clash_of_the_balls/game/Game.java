@@ -6,6 +6,7 @@ import java.util.Map;
 import org.jbox2d.common.Vec2;
 
 import android.content.Context;
+import android.opengl.GLES20;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
@@ -49,8 +50,7 @@ public class Game extends GameBase implements UIBase {
 	
 	protected static final VertexBufferFloat m_default_position_data=new VertexBufferFloat(
 			VertexBufferFloat.sprite_position_data, 3); //for all game objects (for drawing)
-	protected static final VertexBufferFloat m_default_color_data=new VertexBufferFloat(
-			VertexBufferFloat.sprite_color_data_white, 4);
+	protected static final float m_default_color[]=new float[]{ 1.f, 1.f, 1.f, 1.f };
 	
 	
 	public Game(Context c, GameSettings s, TextureManager texture_manager, 
@@ -137,7 +137,7 @@ public class Game extends GameBase implements UIBase {
 		if(m_error_popup == null) {
 			m_settings.popup_menu = new PopupGameStart(m_activity_context
 					, m_texture_manager, m_settings.m_screen_width, m_settings.m_screen_height
-					, (float)wait_to_start_game, m_own_player.color()
+					, (float)wait_to_start_game, RenderHelper.getColor(m_own_player.color())
 					, m_font_settings.m_typeface, m_world);
 			m_ui_change = UIChange.POPUP_SHOW;
 		}
@@ -328,9 +328,9 @@ public class Game extends GameBase implements UIBase {
 			m_default_position_data.apply(position_handle);
 		
         // color
-		int color_handle = renderer.shaderManager().a_Color_handle;
+		int color_handle = renderer.shaderManager().u_Color_handle;
 		if(color_handle != -1)
-			m_default_color_data.apply(color_handle);
+			GLES20.glUniform4fv(color_handle, 1, m_default_color, 0);
 	}
 	
 	public void gameStartNow() {

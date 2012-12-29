@@ -9,6 +9,7 @@ import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.game.DynamicGameObject;
 import com.android.game.clash_of_the_balls.game.GameBase;
 import com.android.game.clash_of_the_balls.game.GamePlayer;
+import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 
 public class EventGameInfo extends Event {
@@ -63,7 +64,7 @@ public class EventGameInfo extends Event {
 				m_players[i]=new PlayerInfo();
 				m_players[i].pos_x = player.pos().x;
 				m_players[i].pos_y = player.pos().y;
-				m_players[i].color = player.color();
+				m_players[i].color = RenderHelper.getColor(player.color());
 				m_players[i].id = player.m_id;
 				m_players[i].unique_name = game.getUniqueNameFromPlayerId(player.m_id);
 				

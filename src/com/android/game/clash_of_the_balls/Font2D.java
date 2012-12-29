@@ -30,7 +30,8 @@ public class Font2D implements IDrawable {
 	private String m_string;
 	private int m_font_size;
 	private TextAlign m_align;
-	private int m_color;
+	private float m_color_arr[] = new float[4]; //RGBA
+	private int m_color; //ARGB
 	
 	private float m_font_height;
 	private float m_x_offset;
@@ -38,7 +39,6 @@ public class Font2D implements IDrawable {
 
 	private TextureManager m_texture_manager;
 	private VertexBufferFloat m_position_data;
-	private VertexBufferFloat m_color_data;
 	
 	private static ArrayList<WeakReference<Font2D>> m_weakFont2D
 		= new ArrayList<WeakReference<Font2D>>();
@@ -64,13 +64,13 @@ public class Font2D implements IDrawable {
 		
 		m_texture_manager = texture_manager;
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
 		
 		m_text_field_size = text_field_size;
 		m_font_size = font_size;
 		m_typeface = font_settings.m_typeface;
 		m_align = font_settings.m_align;
 		m_color = font_settings.m_color;
+		RenderHelper.initColorArray(0xffffffff, m_color_arr);
 
 		m_reference = new WeakReference<Font2D>(this);
 		m_weakFont2D.add(m_reference);
@@ -78,9 +78,6 @@ public class Font2D implements IDrawable {
 		Log.v(LOG_TAG, "Font succesfully created");
 	}
 	
-	public VertexBufferFloat colorData() { return m_color_data; }
-	public void setColorData(VertexBufferFloat color_data) { m_color_data = color_data; }
-
 	private void doInit(String string) {
 		
 		m_string = string;
@@ -101,6 +98,11 @@ public class Font2D implements IDrawable {
 		bitmap.recycle();
 		
 	}
+	
+	public void setColor(float[] color) {
+		for(int i=0; i<4; ++i) m_color_arr[i] = color[i];
+	}
+	public float[] getColor() { return m_color_arr; }
 	
 	private Paint.Align getAlignment(TextAlign align) {
 		switch(align) {
@@ -183,9 +185,9 @@ public class Font2D implements IDrawable {
 			m_position_data.apply(position_handle);
 		
 		// color
-		int color_handle = renderer.shaderManager().a_Color_handle;
+		int color_handle = renderer.shaderManager().u_Color_handle;
 		if(color_handle != -1)
-			m_color_data.apply(color_handle);
+			GLES20.glUniform4fv(color_handle, 1, m_color_arr, 0);
 		
 		renderer.apply();
 		

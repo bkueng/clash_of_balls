@@ -30,8 +30,7 @@ public class MenuItemStringMultiline extends MenuItem {
 		
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat
-				(VertexBufferFloat.sprite_color_data_white, 4);
+		RenderHelper.initColorArray(0xffffffff, m_color);
 		
 		m_font_settings = font_settings;
 		m_tex_manager = tex_manager;

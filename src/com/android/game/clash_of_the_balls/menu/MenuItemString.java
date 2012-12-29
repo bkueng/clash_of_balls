@@ -34,8 +34,7 @@ public class MenuItemString extends MenuItem {
 		
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat
-				(VertexBufferFloat.sprite_color_data_white, 4);
+		RenderHelper.initColorArray(0xffffffff, m_color);
 		
 		m_normal_texture = tex_manager.get(R.raw.texture_grey_unpressed_button);
 		m_selected_texture = tex_manager.get(R.raw.texture_grey_pressed_button);

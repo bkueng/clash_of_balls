@@ -1,5 +1,7 @@
 package com.android.game.clash_of_the_balls.menu;
 
+import android.opengl.GLES20;
+
 import com.android.game.clash_of_the_balls.R;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.TextureManager;
@@ -27,8 +29,7 @@ public class MenuItemArrow extends MenuItem {
 
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat
-				(VertexBufferFloat.sprite_color_data_white, 4);
+		RenderHelper.initColorArray(0xffffffff, m_color);
 		switch(type){
 		case RIGHT:
 			m_texture_pressed=m_tex_manager

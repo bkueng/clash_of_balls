@@ -26,8 +26,7 @@ public class GamePlayer extends DynamicGameObject {
 	
 	private float m_max_speed = 5.f;
 
-	private int m_color; //ARGB
-	private VertexBufferFloat m_color_data_colored;
+	private float m_color[]=new float[4]; //RGBA
 	
 	private float m_scaling=1.f; //for drawing, used for dying effect
 	private float m_scaling_speed;
@@ -52,7 +51,7 @@ public class GamePlayer extends DynamicGameObject {
 	public static final float overlay_item_height = 0.09f;
 	private Font2D m_overlay_times[];
 	
-	public int color() { return m_color; }
+	public float[] color() { return m_color; }
 	
 	private Vector m_acceleration = new Vector();
 	private float m_sensor_scaling = 5.f; //influences the acceleration
@@ -78,8 +77,7 @@ public class GamePlayer extends DynamicGameObject {
 		super(owner, id, Type.Player, texture);
 		m_overlay_texture = texture_overlay;
 		m_glow_texture = texture_glow;
-		m_color = color;
-		initColorData(m_color);
+		RenderHelper.initColorArray(color, m_color);
 		m_overlay_times = overlay_times;
 		initPlayerBody(world, position, body_def);
 	}
@@ -91,8 +89,7 @@ public class GamePlayer extends DynamicGameObject {
 		super(owner, info.id, Type.Player, texture_base);
 		m_overlay_texture = texture_overlay;
 		m_glow_texture = texture_glow;
-		m_color = info.color;
-		initColorData(m_color);
+		RenderHelper.initColorArray(info.color, m_color);
 		m_overlay_times = overlay_times;
 		initPlayerBody(world, new Vector(info.pos_x, info.pos_y), body_def);
 	}
@@ -124,17 +121,6 @@ public class GamePlayer extends DynamicGameObject {
 		fixture_def.filter.categoryBits = COLLISION_GROUP_NORMAL;
 		fixture_def.filter.maskBits = COLLISION_GROUP_HOLE;
 		m_body.createFixture(fixture_def);
-	}
-	
-	private void initColorData(int color) {
-		float color_data[] = new float[4*4];
-		for(int i=0; i<4; ++i) {
-			color_data[i*4 + 0] = (float)Color.red(color) / 255.f;
-			color_data[i*4 + 1] = (float)Color.green(color) / 255.f;
-			color_data[i*4 + 2] = (float)Color.blue(color) / 255.f;
-			color_data[i*4 + 3] = (float)Color.alpha(color) / 255.f;
-		}
-		m_color_data_colored = new VertexBufferFloat(color_data, 4);
 	}
 	
 	private Vector m_tmp_speed = new Vector();
@@ -356,9 +342,9 @@ public class GamePlayer extends DynamicGameObject {
 				m_texture.useTexture(renderer);
 				
 		        // color
-				int color_handle = renderer.shaderManager().a_Color_handle;
+				int color_handle = renderer.shaderManager().u_Color_handle;
 				if(color_handle != -1)
-					m_color_data_colored.apply(color_handle);
+					GLES20.glUniform4fv(color_handle, 1, m_color, 0);
 				
 				renderer.apply();
 				

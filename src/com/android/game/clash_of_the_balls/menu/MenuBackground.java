@@ -21,7 +21,7 @@ public class MenuBackground extends GameObject {
 	public void setAspect(float aspect) { m_aspect_ratio = aspect; }
 	public float aspect() { return m_aspect_ratio; }
 	
-	private VertexBufferFloat m_color_data;
+	private float m_color[] = new float[4];
 	private VertexBufferFloat m_position_data;
 	
 	//aspect_ratio is texture width/height
@@ -30,7 +30,7 @@ public class MenuBackground extends GameObject {
 		m_aspect_ratio = aspect_ratio;
 		
 		m_position_data = new VertexBufferFloat(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat(VertexBufferFloat.sprite_color_data_white, 4);
+		RenderHelper.initColorArray(0xffffffff, m_color);
 	}
 
 	public void draw(RenderHelper renderer) {
@@ -54,9 +54,9 @@ public class MenuBackground extends GameObject {
 		
         
         // color
-		int color_handle = renderer.shaderManager().a_Color_handle;
+		int color_handle = renderer.shaderManager().u_Color_handle;
 		if(color_handle != -1)
-			m_color_data.apply(color_handle);      
+			GLES20.glUniform4fv(color_handle, 1, m_color, 0);
         
 		
 		renderer.apply();

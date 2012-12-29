@@ -24,8 +24,7 @@ public class MenuItemImg extends MenuItem {
 
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat
-				(VertexBufferFloat.sprite_color_data_white, 4);
+		RenderHelper.initColorArray(0xffffffff, m_color);
 	}
 
 	public void draw(RenderHelper renderer) {		

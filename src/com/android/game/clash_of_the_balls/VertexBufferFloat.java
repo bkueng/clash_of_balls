@@ -16,15 +16,6 @@ public class VertexBufferFloat {
 	private static final int bytes_per_float = 4;
 	private final int m_num_components_per_item;
 	
-	
-	public static final float[] sprite_color_data_white = new float[] 
-			{
-			1.0f, 1.0f, 1.0f, 1.0f, //RGBA (!)
-			1.0f, 1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f, 1.0f
-			};
-	
 	public static final float[] sprite_position_data = new float[] 
 			{
 			0.0f, 0.0f, 0.0f, // triangle strip: bottom left start, clockwise

@@ -24,7 +24,7 @@ public class PopupBase extends GameMenuBase {
 	public static final float width_scaling = 0.8f; //output width = scaling * screen width
 	public static final float aspect_ratio = 1.66666f; //output height = output width / aspect
 	
-	protected VertexBufferFloat m_color_data;
+	protected float m_color[] = new float[4];
 	protected VertexBufferFloat m_position_data;
 	
 	private Texture m_background_texture;
@@ -37,8 +37,7 @@ public class PopupBase extends GameMenuBase {
 		
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat
-				(VertexBufferFloat.sprite_color_data_white, 4);
+		RenderHelper.initColorArray(0xffffffff, m_color);
 		
 		m_background_texture = tex_manager.get(R.raw.texture_popup_bg);
 		
@@ -72,9 +71,9 @@ public class PopupBase extends GameMenuBase {
 		if(position_handle != -1)
 			m_position_data.apply(position_handle);
         // color
-		int color_handle = renderer.shaderManager().a_Color_handle;
+		int color_handle = renderer.shaderManager().u_Color_handle;
 		if(color_handle != -1)
-			m_color_data.apply(color_handle);      
+			GLES20.glUniform4fv(color_handle, 1, m_color, 0);
 		renderer.apply();
         // Draw
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);

@@ -22,7 +22,7 @@ public class MenuItemButton extends MenuItem {
 	private boolean m_pressed=false;
 	
 	private boolean m_is_disabled=false;
-	private VertexBufferFloat m_color_data_disabled;
+	private float m_color_disabled[] = new float[4];
 
 	public MenuItemButton(Vector position, Vector size
 			, Font2DSettings font_settings, String font_string
@@ -39,20 +39,11 @@ public class MenuItemButton extends MenuItem {
 		
 		m_position_data = new VertexBufferFloat
 				(VertexBufferFloat.sprite_position_data, 3);
-		m_color_data = new VertexBufferFloat
-				(VertexBufferFloat.sprite_color_data_white, 4);
+		RenderHelper.initColorArray(0xffffffff, m_color);
 		
 		
 		//disabled button color
-		final int color = 0xff888888;
-		float color_data[] = new float[4*4];
-		for(int i=0; i<4; ++i) {
-			color_data[i*4 + 0] = (float)Color.red(color) / 255.f;
-			color_data[i*4 + 1] = (float)Color.green(color) / 255.f;
-			color_data[i*4 + 2] = (float)Color.blue(color) / 255.f;
-			color_data[i*4 + 3] = (float)Color.alpha(color) / 255.f;
-		}
-		m_color_data_disabled = new VertexBufferFloat(color_data, 4);
+		RenderHelper.initColorArray(0xff888888, m_color_disabled);
 	}
 	
 	public void setString(String str) {
@@ -64,7 +55,9 @@ public class MenuItemButton extends MenuItem {
 	public void enable() { m_is_disabled=false; }
 	public void enable(boolean enabled) { m_is_disabled=!enabled; }
 	
-	public boolean isPressed(){return m_pressed;}
+	public boolean isPressed() { return m_pressed; }
+	
+	private float m_tmp_color[] = new float[4];
 
 	public void draw(RenderHelper renderer) {		
 		Texture texture;
@@ -74,11 +67,12 @@ public class MenuItemButton extends MenuItem {
 			texture=m_texture_unpressed;
 		}
 		
-		VertexBufferFloat color_data_tmp = m_color_data;
-		VertexBufferFloat color_data_tmp_font = m_item_font.colorData();
+		float[] default_color = m_color;
 		if(m_is_disabled) {
-			m_color_data = m_color_data_disabled;
-			m_item_font.setColorData(m_color_data_disabled);
+			float[] font_color = m_item_font.getColor();
+			for(int i=0; i<4; ++i) m_tmp_color[i] = font_color[i];
+			m_item_font.setColor(m_color_disabled);
+			m_color = m_color_disabled;
 		}
 		
 		renderer.pushModelMat();
@@ -90,8 +84,10 @@ public class MenuItemButton extends MenuItem {
         // Render font
         m_item_font.draw(renderer);
         
-        m_color_data = color_data_tmp;
-        m_item_font.setColorData(color_data_tmp_font);
+        if(m_is_disabled) {
+        	m_color = default_color;
+        	m_item_font.setColor(m_tmp_color);
+        }
         
         renderer.popModelMat();
 	}
