@@ -201,7 +201,7 @@ public class Game extends GameBase implements UIBase {
 					//we assume that all predicted events (game moves) 
 					//can simply be overwritten by the server update
 
-					Log.v(TAG_GAME, "Network incoming: RTT="+m_last_rtt);
+					//Log.v(TAG_GAME, "Network incoming: RTT="+m_last_rtt);
 
 					generate_events = false;
 					
