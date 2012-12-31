@@ -15,6 +15,7 @@ import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Contact;
 
@@ -345,22 +346,42 @@ public abstract class GameBase implements ContactListener {
 		StaticGameObject obja =(StaticGameObject)contact.m_fixtureA.m_body.m_userData;
 		StaticGameObject objb =(StaticGameObject)contact.m_fixtureB.m_body.m_userData;
 		
+		//whether we must handle this impact, even if it was not newly added
+		//in this step. setting handle_impact always to true would not cause
+		//problems but would only lead to increased network traffic
+		boolean handle_impact = false;
+		
 		if(obja.type == Type.Hole || objb.type == Type.Hole) {
 			GamePlayer player = null;
+			Fixture player_fixture = null;
 			if(obja.type == Type.Player) {
 				player = (GamePlayer) obja;
+				player_fixture = contact.m_fixtureA;
 			} else if(objb.type == Type.Player) {
 				player = (GamePlayer) objb;
+				player_fixture = contact.m_fixtureB;
 			}
-			if(player == null || player.m_item_type != ItemType.DontFall)
+			if(player == null || player.m_item_type != ItemType.DontFall) {
 				contact.setEnabled(false);
+				if(player_fixture != null && player_fixture.m_userData != null) {
+					//at this point we must handle the impact even if this conact
+					//was not newly added. because the player had the DontFall
+					//item, but not anymore.
+					handle_impact = true;
+					player_fixture.m_userData = null;
+				}
+			} else {
+				//we have a player with the DontFall item: we need a flag to
+				//remember this: simply use m_userData and set it to !=null
+				player_fixture.m_userData = player_fixture;
+			}
 		} else if(obja.type == Type.Item || objb.type == Type.Item) {
 			contact.setEnabled(false);
 		}
 		
 		contact.getWorldManifold(m_tmp_world_manifold);
 		Collision.getPointStates(m_tmp_state1, m_tmp_state2, oldManifold, contact.m_manifold);
-		if (m_tmp_state2[0] == PointState.ADD_STATE) {
+		if (m_tmp_state2[0] == PointState.ADD_STATE || handle_impact) {
 			
 			if(m_impact_count >= m_impacts.length) { //need to resize
 				Impact[] new_impacts = new Impact[m_impacts.length*2];
