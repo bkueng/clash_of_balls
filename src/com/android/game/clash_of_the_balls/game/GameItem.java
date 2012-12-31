@@ -31,9 +31,10 @@ public class GameItem extends DynamicGameObject {
 		InvisibleToOthers,
 		IncreaseMaxSpeed,
 		DontFall, //do not fall into holes
+		IncreaseMassAndSize,
 		
 		//negative items
-		MassAndSize, //decrease player mass & size
+		DecreaseMassAndSize, //decrease player mass & size
 		InvertControls, //invert input controls
 		
 		//the logic of applying an item is in GamePlayer.applyItem

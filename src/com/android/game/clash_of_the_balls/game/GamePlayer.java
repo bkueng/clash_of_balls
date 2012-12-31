@@ -226,7 +226,10 @@ public class GamePlayer extends DynamicGameObject {
 			break;
 		case InvisibleToOthers:
 			break;
-		case MassAndSize:
+		case IncreaseMassAndSize:
+			setRadius(LARGE_RADIUS);
+			break;
+		case DecreaseMassAndSize:
 			setRadius(SMALL_RADIUS);
 			break;
 		case DontFall:
@@ -249,7 +252,10 @@ public class GamePlayer extends DynamicGameObject {
 				break;
 			case InvisibleToOthers:
 				break;
-			case MassAndSize:
+			case IncreaseMassAndSize:
+				setRadius(NORMAL_RADIUS);
+				break;
+			case DecreaseMassAndSize:
 				setRadius(NORMAL_RADIUS);
 				break;
 			case DontFall:
