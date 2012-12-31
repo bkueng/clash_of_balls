@@ -192,6 +192,8 @@ public abstract class GameBase implements ContactListener {
 				break;
 			case IncreaseMassAndSize: texture=m_texture_manager.get(R.raw.texture_item_mass_increase);
 				break;
+			case IncreaseRestitution: texture=m_texture_manager.get(R.raw.texture_item_restitution_increase);
+			break;
 			case DecreaseMassAndSize: texture=m_texture_manager.get(R.raw.texture_item_mass_decrease);
 				break;
 			case DontFall: texture=m_texture_manager.get(R.raw.texture_item_dont_fall);

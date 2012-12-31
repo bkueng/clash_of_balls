@@ -32,6 +32,7 @@ public class GameItem extends DynamicGameObject {
 		IncreaseMaxSpeed,
 		DontFall, //do not fall into holes
 		IncreaseMassAndSize,
+		IncreaseRestitution, //increase bouncing off walls & between players
 		
 		//negative items
 		DecreaseMassAndSize, //decrease player mass & size

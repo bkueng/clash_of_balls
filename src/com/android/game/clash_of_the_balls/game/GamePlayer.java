@@ -44,6 +44,9 @@ public class GamePlayer extends DynamicGameObject {
 	private FixtureDef m_radius_fixtures[]=new FixtureDef[m_radiuses.length];
 	private Fixture m_cur_fixture;
 	
+	private static final float normal_restitution = 1.0f;
+	private static final float high_restitution = 2.0f;
+	
 	//item
 	private float m_item_timeout = 0.f;
 	public ItemType m_item_type = ItemType.None;
@@ -105,10 +108,9 @@ public class GamePlayer extends DynamicGameObject {
 		body_def.angle = 0.f;
 		body_def.userData = this;
 		m_body = world.createBody(body_def);
-		final float restitution = 1.0f;
 		
 		for(int i=0; i<m_radiuses.length; ++i) {
-			m_radius_fixtures[i] = createCircleFixtureDef(1.0f, 0.0f, restitution, 
+			m_radius_fixtures[i] = createCircleFixtureDef(1.0f, 0.0f, normal_restitution, 
 					0.f, 0.f, m_radiuses[i]);
 			m_radius_fixtures[i].filter.categoryBits = COLLISION_GROUP_NORMAL;
 			m_radius_fixtures[i].filter.maskBits = COLLISION_GROUP_NORMAL;
@@ -229,6 +231,9 @@ public class GamePlayer extends DynamicGameObject {
 		case IncreaseMassAndSize:
 			setRadius(LARGE_RADIUS);
 			break;
+		case IncreaseRestitution:
+			setRestitution(high_restitution);
+			break;
 		case DecreaseMassAndSize:
 			setRadius(SMALL_RADIUS);
 			break;
@@ -254,6 +259,9 @@ public class GamePlayer extends DynamicGameObject {
 				break;
 			case IncreaseMassAndSize:
 				setRadius(NORMAL_RADIUS);
+				break;
+			case IncreaseRestitution:
+				setRestitution(normal_restitution);
 				break;
 			case DecreaseMassAndSize:
 				setRadius(NORMAL_RADIUS);
