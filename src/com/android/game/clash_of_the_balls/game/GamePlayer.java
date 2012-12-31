@@ -12,6 +12,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.FontNumbers;
 import com.android.game.clash_of_the_balls.ShaderManager.ShaderType;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
@@ -52,7 +53,7 @@ public class GamePlayer extends DynamicGameObject {
 	public ItemType m_item_type = ItemType.None;
 	private GameItem m_overlay_item = null;
 	public static final float overlay_item_height = 0.09f;
-	private Font2D m_overlay_times[];
+	private FontNumbers m_overlay_font_numbers;
 	
 	public float[] color() { return m_color; }
 	
@@ -79,24 +80,24 @@ public class GamePlayer extends DynamicGameObject {
 	public GamePlayer(GameBase owner, short id, Vector position
 			, int color, Texture texture, Texture texture_overlay
 			, Texture texture_glow
-			, Font2D overlay_times[], World world, BodyDef body_def) {
+			, FontNumbers overlay_font_numbers, World world, BodyDef body_def) {
 		super(owner, id, Type.Player, texture);
 		m_overlay_texture = texture_overlay;
 		m_glow_texture = texture_glow;
 		RenderHelper.initColorArray(color, m_color);
-		m_overlay_times = overlay_times;
+		m_overlay_font_numbers = overlay_font_numbers;
 		initPlayerBody(world, position, body_def);
 	}
 	
 	public GamePlayer(PlayerInfo info, GameBase owner, Texture texture_base
 			, Texture texture_overlay, Texture texture_glow
-			, Font2D overlay_times[], World world
+			, FontNumbers overlay_font_numbers, World world
 			, BodyDef body_def) {
 		super(owner, info.id, Type.Player, texture_base);
 		m_overlay_texture = texture_overlay;
 		m_glow_texture = texture_glow;
 		RenderHelper.initColorArray(info.color, m_color);
-		m_overlay_times = overlay_times;
+		m_overlay_font_numbers = overlay_font_numbers;
 		initPlayerBody(world, new Vector(info.pos_x, info.pos_y), body_def);
 	}
 	
@@ -240,7 +241,7 @@ public class GamePlayer extends DynamicGameObject {
 		case DontFall:
 			break;
 		}
-		m_item_timeout = GameItem.item_effect_duration;
+		m_item_timeout = new_duration;
 		Vector position=new Vector(0.f, 0.f);
 		m_overlay_item = m_owner.createItem((short)-1, item.itemType(), position);
 		m_overlay_item.setIsStatic(true);
@@ -323,17 +324,9 @@ public class GamePlayer extends DynamicGameObject {
 			m_overlay_item.draw(renderer);
 			renderer.popModelMat();
 			
-			if(m_overlay_times!=null) {
-				int time_idx = (int)m_item_timeout + 1;
-				if(time_idx < 0) time_idx=0;
-				if(time_idx >= m_overlay_times.length) 
-					time_idx = m_overlay_times.length-1;
-
-				renderer.pushModelMat();
-				renderer.modelMatTranslate(offset*2.f + item_size, offset, 0.f);
-				renderer.modelMatScale(renderer.screenWidth(), item_size, 0.f);
-				m_overlay_times[time_idx].draw(renderer);
-				renderer.popModelMat();
+			if(m_overlay_font_numbers!=null) {
+				m_overlay_font_numbers.draw(renderer, Math.max((int)m_item_timeout + 1, 0)
+						, offset*2.f + item_size, offset, item_size);
 			}
 		}
 	}

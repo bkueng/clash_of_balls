@@ -23,6 +23,7 @@ import android.util.FloatMath;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.FontNumbers;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.Maths;
@@ -78,7 +79,7 @@ public abstract class GameBase implements ContactListener {
 	
 	protected GamePlayer m_own_player = null;
 	public GamePlayer ownPlayer() { return m_own_player; }
-	protected Font2D m_overlay_times[] = null;
+	protected FontNumbers m_overlay_font_numbers = null;
 	
 	public final boolean is_server;
 	
@@ -163,7 +164,7 @@ public abstract class GameBase implements ContactListener {
 				texture_glow = m_texture_manager.get(R.raw.texture_ball_hover);
 			}
 			GamePlayer p = new GamePlayer(players[i], this, texture
-					, texture_overlay, texture_glow, m_overlay_times
+					, texture_overlay, texture_glow, m_overlay_font_numbers
 					, m_world, m_body_def);
 			m_game_objects.put(players[i].id, p);
 			if(players[i].id >= m_next_object_id)

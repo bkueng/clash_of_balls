@@ -10,6 +10,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
+import com.android.game.clash_of_the_balls.FontNumbers;
 import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
@@ -67,18 +68,15 @@ public class Game extends GameBase implements UIBase {
 	}
 	
 	private void initOverlayTimeFonts() {
-		m_overlay_times = new Font2D[(int)GameItem.item_effect_duration+1];
 		Font2DSettings font_settings = new Font2DSettings(m_font_settings.m_typeface
 				, TextAlign.LEFT, m_font_settings.m_color);
-		Vector text_field_size = new Vector((float)m_settings.m_screen_width,
-				((float)m_settings.m_screen_height)*
-				GamePlayer.overlay_item_height);
-		
-		for(int i=0; i<m_overlay_times.length; ++i) {
-			m_overlay_times[i] = new Font2D(m_texture_manager, text_field_size
-					, font_settings, (int)(text_field_size.y*0.8f));
-			m_overlay_times[i].setString(""+i);
-		}
+		final float texture_height = ((float)m_settings.m_screen_height)*
+			GamePlayer.overlay_item_height;
+		m_overlay_font_numbers = new FontNumbers(m_texture_manager, font_settings
+				, new Vector(texture_height*3.f, texture_height));
+		//init the fonts (for caching)
+		for(int i=(int)GameItem.item_effect_duration + 1; i>0; --i)
+			m_overlay_font_numbers.getFont(i);
 	}
 	
 	public void initGame(GameLevel level) {
