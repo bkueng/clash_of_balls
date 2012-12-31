@@ -216,6 +216,12 @@ public class GamePlayer extends DynamicGameObject {
 	}
 	
 	public void applyItem(GameItem item) {
+		float new_duration = GameItem.item_effect_duration;
+		//if we already have this item, we accumulate the time
+		if(item.itemType() == m_item_type) new_duration += m_item_timeout;
+		if(new_duration > GameItem.item_effect_duration*5.f)
+			new_duration = GameItem.item_effect_duration*5.f;
+		
 		//we only allow one item at a time
 		disableItem();
 		
