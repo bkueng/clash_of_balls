@@ -13,6 +13,9 @@ It uses the AllJoyn (Apache license) library for peer-to-peer communication. So
 no server is used, but each player needs to be in the same network to see each
 other. If the device supports it, Clash of Balls should also run via Bluetooth.
 
+For physics simulation, JBox2D is used, a Java implementation of the 2D physics
+engine Box2D. It uses the zlib license.
+
 
 Usage
 -----
