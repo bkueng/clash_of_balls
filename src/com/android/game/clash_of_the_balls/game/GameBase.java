@@ -69,8 +69,8 @@ public abstract class GameBase implements ContactListener {
 	public World m_world;
 	private float m_time_accumulator;
 	private static final float step_in_seconds = 30.f / 1000.0f;
-	private static final int velocityIterations = 10;
-	private static final int positionIterations = 5;
+	private static final int velocityIterations = 6;
+	private static final int positionIterations = 2;
 	protected BodyDef m_body_def = new BodyDef();
 	
 	
