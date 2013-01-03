@@ -24,6 +24,7 @@ import com.android.game.clash_of_the_balls.game.event.EventGameStartNow;
 import com.android.game.clash_of_the_balls.game.event.EventImpact;
 import com.android.game.clash_of_the_balls.game.event.EventItemAdded;
 import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
+import com.android.game.clash_of_the_balls.game.event.EventPool;
 import com.android.game.clash_of_the_balls.network.NetworkServer;
 import com.android.game.clash_of_the_balls.network.Networking;
 import com.android.game.clash_of_the_balls.network.Networking.ConnectedClient;
@@ -79,6 +80,7 @@ public class GameServer extends GameBase implements Runnable {
 					handleTimeout();
 				}
 			}; 
+		m_event_pool = new EventPool(20);
 	}
 	
 	
@@ -264,7 +266,7 @@ public class GameServer extends GameBase implements Runnable {
 		
 		
 		/* first send 'game about to start' event with level information */
-		addEvent(new EventGameInfo(this));
+		addEvent(m_event_pool.getEventGameInfo(this));
 		sendAllEvents();
 		
 		//wait for start: wait_to_start_game seconds
@@ -322,7 +324,7 @@ public class GameServer extends GameBase implements Runnable {
 
 				GameItem item = addItem(getNextItemId(), type, position);
 				if(generate_events) {
-					addEvent(new EventItemAdded(this, item));
+					addEvent(m_event_pool.getEventItemAdded(this, item));
 				}
 			}
 		}
@@ -368,7 +370,7 @@ public class GameServer extends GameBase implements Runnable {
 	
 	public void gameStartNow() {
 		super.gameStartNow();
-		addEvent(new EventGameStartNow());
+		addEvent(m_event_pool.getEventGameStartNow());
 		sendAllEvents();
 		m_is_game_ending=false;
 		IncomingHandler h = m_msg_handler;
@@ -387,7 +389,7 @@ public class GameServer extends GameBase implements Runnable {
 		}
 		m_settings.game_statistics.applyCurrentRoundStatistics();
 		
-		addEvent(new EventGameEnd(m_settings.game_statistics));
+		addEvent(m_event_pool.getEventGameEnd(m_settings.game_statistics));
 		//after here the game stopped & this thread is simply waiting 
 		//for next game initialization & game start (called from UIHandler)
 	}
@@ -406,7 +408,7 @@ public class GameServer extends GameBase implements Runnable {
 		
 		if (generate_events) {
 			//the client will call handleImpact when he receives this event
-			addEvent(new EventImpact(obja.m_id, objb.m_id, normal));
+			addEvent(m_event_pool.getEventImpact(obja.m_id, objb.m_id, normal));
 		}
 		obja.handleImpact(objb, normal);
 		normal.mul(-1.f);
@@ -418,6 +420,7 @@ public class GameServer extends GameBase implements Runnable {
 		Event e;
 		while((e=m_events.poll()) != null) {
 			m_network_server.addOutgoingEvent(e);
+			m_event_pool.recycle(e);
 		}
 		try {
 			m_network_server.sendEvents();

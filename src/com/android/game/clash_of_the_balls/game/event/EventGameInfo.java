@@ -28,31 +28,11 @@ public class EventGameInfo extends Event {
 	private short m_round_count;
 	private short m_current_round;
 
-	public EventGameInfo(DataInputStream s) throws IOException {
+	public EventGameInfo() {
 		super(type_game_info);
-		//players
-		m_player_count = s.readInt();
-		m_players = new PlayerInfo[m_player_count];
-		for(int i=0; i<m_player_count; ++i) {
-			m_players[i] = new PlayerInfo();
-			m_players[i].pos_x = s.readFloat();
-			m_players[i].pos_y = s.readFloat();
-			m_players[i].color = s.readInt();
-			m_players[i].id = s.readShort();
-			short name_len = s.readShort();
-			byte[] buffer = new byte[name_len];
-			if(s.read(buffer) < name_len) throw new IOException();
-			m_players[i].unique_name = new String(buffer);
-		}
-		//round info
-		m_round_count = s.readShort();
-		m_current_round = s.readShort();
-		//game level
-		m_level = new GameLevel(null);
-		m_level.loadLevel(s);
 	}
-	public EventGameInfo(GameBase game) {
-		super(type_game_info);
+	
+	public void init(GameBase game) {
 		//players
 		m_player_count = game.currentPlayerCount();
 		m_players = new PlayerInfo[m_player_count];
@@ -77,6 +57,28 @@ public class EventGameInfo extends Event {
 		m_current_round = (short)game.settings().game_current_round;
 		//level
 		m_level = game.level();
+	}
+	public void init(DataInputStream s) throws IOException {
+		//players
+		m_player_count = s.readInt();
+		m_players = new PlayerInfo[m_player_count];
+		for(int i=0; i<m_player_count; ++i) {
+			m_players[i] = new PlayerInfo();
+			m_players[i].pos_x = s.readFloat();
+			m_players[i].pos_y = s.readFloat();
+			m_players[i].color = s.readInt();
+			m_players[i].id = s.readShort();
+			short name_len = s.readShort();
+			byte[] buffer = new byte[name_len];
+			if(s.read(buffer) < name_len) throw new IOException();
+			m_players[i].unique_name = new String(buffer);
+		}
+		//round info
+		m_round_count = s.readShort();
+		m_current_round = s.readShort();
+		//game level
+		m_level = new GameLevel(null);
+		m_level.loadLevel(s);
 	}
 
 	public void write(DataOutputStream s) throws IOException {

@@ -6,9 +6,11 @@ import java.io.IOException;
 
 import android.util.Log;
 
+import com.android.game.clash_of_the_balls.GameLevel;
 import com.android.game.clash_of_the_balls.game.GameBase;
 import com.android.game.clash_of_the_balls.game.StaticGameObject;
 import com.android.game.clash_of_the_balls.game.Vector;
+import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 
 public class EventImpact extends Event {
 	private static final String TAG = "EventImpact";
@@ -20,23 +22,24 @@ public class EventImpact extends Event {
 	private float m_normal_x;
 	private float m_normal_y;
 
-	public EventImpact(DataInputStream s) throws IOException {
+	public EventImpact() {
 		super(type_impact);
-		m_id_a = s.readShort();
-		m_id_b = s.readShort();
-		
-		m_normal_x = s.readFloat();
-		m_normal_y = s.readFloat();
 	}
 	
-	public EventImpact(short id_a, short id_b, Vector normal) {
-		super(type_impact);
+	public void init(short id_a, short id_b, Vector normal) {
 		m_id_a = id_a;
 		m_id_b = id_b;
 		
 		m_normal_x = normal.x;
 		m_normal_y = normal.y;
 		
+	}
+	public void init(DataInputStream s) throws IOException {
+		m_id_a = s.readShort();
+		m_id_b = s.readShort();
+		
+		m_normal_x = s.readFloat();
+		m_normal_y = s.readFloat();
 	}
 
 	public void write(DataOutputStream s) throws IOException {

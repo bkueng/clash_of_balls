@@ -32,21 +32,12 @@ public abstract class Event {
 	
 	//Network conversion
 	//returns new Event or null if end of stream
-	public static Event read(DataInputStream s) {
+	public static Event read(DataInputStream s, EventPool pool) {
 		try {
 			if(s.available() <= 0) return null;
 			
 			byte b=s.readByte();
-			switch(b) {
-			case type_game_start: return new EventGameStartNow();
-			case type_game_end: return new EventGameEnd(s);
-			case type_game_info: return new EventGameInfo(s);
-			case type_item_removed: return new EventItemRemoved(s);
-			case type_item_added: return new EventItemAdded(s);
-			case type_item_update: return new EventItemUpdate(s);
-			case type_impact: return new EventImpact(s);
-			default: throw new IOException("unknown Event type");
-			}
+			return pool.getEventFromStream(s, b);
 			
 		} catch (IOException e) {
 			Log.e(TAG, "Failed to read event ("+e.getMessage()+")");
@@ -54,6 +45,9 @@ public abstract class Event {
 		
 		return null;
 	}
+	
+	public abstract void init(DataInputStream s) throws IOException;
+	
 	public abstract void write(DataOutputStream s) throws IOException;
 	
 	//apply this event to the game

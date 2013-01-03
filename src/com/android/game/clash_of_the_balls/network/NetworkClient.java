@@ -12,6 +12,7 @@ import org.alljoyn.bus.BusException;
 import android.util.Log;
 
 import com.android.game.clash_of_the_balls.game.event.Event;
+import com.android.game.clash_of_the_balls.game.event.EventPool;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynError;
 import com.android.game.clash_of_the_balls.network.Networking.AllJoynErrorData;
@@ -39,6 +40,7 @@ public class NetworkClient {
 	
 	private Queue<Event> m_available_events = new LinkedList<Event>();
 	
+	public EventPool m_event_pool = new EventPool(20);
 	
 	public NetworkClient(Networking networking) {
 		m_networking = networking;
@@ -119,7 +121,7 @@ public class NetworkClient {
 				ByteArrayInputStream bais = new ByteArrayInputStream(d.data);
 				DataInputStream di = new DataInputStream(bais);
 				Event e;
-				while((e=Event.read(di)) != null) {
+				while((e=Event.read(di, m_event_pool)) != null) {
 					m_available_events.add(e);
 				}
 			}

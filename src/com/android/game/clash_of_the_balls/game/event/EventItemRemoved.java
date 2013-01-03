@@ -14,14 +14,15 @@ public class EventItemRemoved extends Event {
 	
 	private short m_id;
 
-	public EventItemRemoved(DataInputStream s) throws IOException {
+	public EventItemRemoved() {
 		super(type_item_removed);
-		m_id = s.readShort();
 	}
 	
-	public EventItemRemoved(short item_id) {
-		super(type_item_removed);
+	public void init(short item_id) {
 		m_id = item_id;
+	}
+	public void init(DataInputStream s) throws IOException {
+		m_id = s.readShort();
 	}
 
 	public void write(DataOutputStream s) throws IOException {

@@ -20,23 +20,11 @@ public class EventItemAdded extends Event {
 	//item specific stuff
 	private ItemType m_item_type;
 
-	public EventItemAdded(DataInputStream s) throws IOException {
+	public EventItemAdded() {
 		super(type_item_added);
-		m_object_type = Type.values()[s.readByte()];
-		m_id = s.readShort();
-		m_pos_x = s.readFloat();
-		m_pos_y = s.readFloat();
-		
-		switch(m_object_type) {
-		case Item:
-			m_item_type = ItemType.values()[s.readByte()];
-			break;
-		default:
-		}
 	}
 	
-	public EventItemAdded(GameBase game, StaticGameObject obj) {
-		super(type_item_added);
+	public void init(GameBase game, StaticGameObject obj) {
 		m_object_type = obj.type;
 		m_id = obj.m_id;
 		m_pos_x = obj.pos().x;
@@ -48,6 +36,19 @@ public class EventItemAdded extends Event {
 			break;
 		default:
 			throw new RuntimeException("unsupported item type ("+m_object_type+") for EventItemAdd");
+		}
+	}
+	public void init(DataInputStream s) throws IOException {
+		m_object_type = Type.values()[s.readByte()];
+		m_id = s.readShort();
+		m_pos_x = s.readFloat();
+		m_pos_y = s.readFloat();
+		
+		switch(m_object_type) {
+		case Item:
+			m_item_type = ItemType.values()[s.readByte()];
+			break;
+		default:
 		}
 	}
 

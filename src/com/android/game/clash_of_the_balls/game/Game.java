@@ -65,6 +65,7 @@ public class Game extends GameBase implements UIBase {
 		m_network_client = network_client;
 		m_ui_change = UIHandler.UIChange.NO_CHANGE;
 		initOverlayTimeFonts();
+		m_event_pool = network_client.m_event_pool;
 	}
 	
 	private void initOverlayTimeFonts() {
@@ -190,7 +191,10 @@ public class Game extends GameBase implements UIBase {
 				m_bReceived_events = has_network_events;
 				if(has_network_events) {
 					//undo events: simply discard them
-					while(m_events.poll() != null) { }
+					Event e;
+					while((e=m_events.poll()) != null) {
+						m_event_pool.recycle(e);
+					}
 					
 					m_last_rtt = m_time_since_last_data_receive;
 					m_time_since_last_data_receive = 0.f;
@@ -274,6 +278,7 @@ public class Game extends GameBase implements UIBase {
 		Event e;
 		while((e=m_network_client.getNextEvent()) != null) {
 			e.apply(this);
+			m_event_pool.recycle(e);
 		}
 	}
 	

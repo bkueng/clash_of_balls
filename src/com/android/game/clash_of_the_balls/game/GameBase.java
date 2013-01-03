@@ -35,6 +35,7 @@ import com.android.game.clash_of_the_balls.game.StaticGameObject.Type;
 import com.android.game.clash_of_the_balls.game.event.Event;
 import com.android.game.clash_of_the_balls.game.event.EventImpact;
 import com.android.game.clash_of_the_balls.game.event.EventItemRemoved;
+import com.android.game.clash_of_the_balls.game.event.EventPool;
 import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
 import com.android.game.clash_of_the_balls.game.event.EventItemUpdate;
 
@@ -84,6 +85,8 @@ public abstract class GameBase implements ContactListener {
 	public final boolean is_server;
 	
 	public boolean generate_events = false;
+	
+	protected EventPool m_event_pool;
 	
 	//the moveable game objects: key is the object id
 	public Map<Short, DynamicGameObject> m_game_objects;
@@ -265,7 +268,7 @@ public abstract class GameBase implements ContactListener {
 	}
 	protected void handleObjectDied(DynamicGameObject obj) {
 		if(generate_events) {
-			addEvent(new EventItemRemoved(obj.m_id));
+			addEvent(m_event_pool.getEventItemRemoved(obj.m_id));
 		}
 		if(obj.type == Type.Player) --m_current_player_count;
 		else if(obj.type == Type.Item) --m_items_count;
@@ -293,7 +296,7 @@ public abstract class GameBase implements ContactListener {
 		if(generate_events) {
 			for (DynamicGameObject obj : m_game_objects.values()) {
 				if(obj.hasMoved()) {
-					addEvent(new EventItemUpdate(obj));
+					addEvent(m_event_pool.getEventItemUpdate(obj));
 				}
 			}
 		}
