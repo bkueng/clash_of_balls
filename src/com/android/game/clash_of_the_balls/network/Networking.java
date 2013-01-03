@@ -273,7 +273,8 @@ public class Networking {
 	
 	//incoming data
 	public static class NetworkData {
-		public Object arg1;
+		public float pos_x;
+		public float pos_y;
 		public byte[] data;
 		public String sender;
 		
@@ -1307,7 +1308,8 @@ public class Networking {
     }
     private void receivedSensorUpdate(String sender, double pos_x, double pos_y) {
         NetworkData data = new NetworkData();
-        data.arg1 = new Vector((float)pos_x, (float)pos_y);
+        data.pos_x = (float)pos_x;
+        data.pos_y = (float)pos_y;
         data.sender = sender;
         m_sensor_updates.add(data);
         sendEventToListeners(HANDLE_RECEIVED_SIGNAL);

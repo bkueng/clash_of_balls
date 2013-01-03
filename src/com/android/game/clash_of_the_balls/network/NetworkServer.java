@@ -89,7 +89,7 @@ public class NetworkServer {
 	public short getSensorUpdate(Vector pos_out) {
 		NetworkData d=m_networking.receiveSensorUpdate();
 		if(d!=null) {
-			pos_out.set((Vector)d.arg1);
+			pos_out.set(d.pos_x, d.pos_y);
 			return getClientId(d.sender);
 		}
 		return (short)-1;
