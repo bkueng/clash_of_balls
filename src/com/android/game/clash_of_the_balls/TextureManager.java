@@ -36,27 +36,24 @@ public class TextureManager {
 	
 	// this will return a texture with default tex coords (for a sprite)
 	public Texture get(int raw_res_id) {
-		return get(raw_res_id, null, true);
-	}
-	public Texture get(int raw_res_id, boolean use_mipmapping) {
-		return get(raw_res_id, null, use_mipmapping);
+		return get(raw_res_id, true);
 	}
 	
-	public Texture get(int raw_res_id, float[] tex_coords, boolean use_mipmapping) {
+	public Texture get(int raw_res_id, boolean use_mipmapping) {
 		TextureBase texture=m_textures.get(raw_res_id);
 		if(texture == null) {
 			TextureBase tex = new TextureBase(m_activity_context, raw_res_id
 					, use_mipmapping);
-			Texture ret = new Texture(tex, tex_coords);
+			Texture ret = new Texture(tex);
 			m_textures.put(raw_res_id, tex);
 			return ret;
 		}
-		return new Texture(texture, tex_coords);
+		return new Texture(texture);
 	}
 	
-	public Texture get(Bitmap bitmap, float[] tex_coords, boolean use_mipmapping) {
+	public Texture get(Bitmap bitmap, boolean use_mipmapping) {
 		TextureBase tex = new TextureBase(bitmap, use_mipmapping);
-		Texture ret = new Texture(tex, tex_coords);
+		Texture ret = new Texture(tex);
 		return ret;
 	}
 	

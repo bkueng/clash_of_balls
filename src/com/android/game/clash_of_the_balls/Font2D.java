@@ -93,8 +93,7 @@ public class Font2D implements IDrawable {
 		}
 		
 		Bitmap bitmap = createFontBitmap();
-		m_texture = m_texture_manager.get(bitmap, VertexBufferFloat.sprite_tex_coords
-				, false);
+		m_texture = m_texture_manager.get(bitmap, false);
 		bitmap.recycle();
 		
 	}
@@ -165,8 +164,7 @@ public class Font2D implements IDrawable {
 			tmpFont2D = wr.get();
 			if(tmpFont2D != null) {
 				Bitmap b = tmpFont2D.createFontBitmap();
-				tmpFont2D.m_texture = tmpFont2D.m_texture_manager.get(b
-						, VertexBufferFloat.sprite_tex_coords, false);
+				tmpFont2D.m_texture = tmpFont2D.m_texture_manager.get(b, false);
 				b.recycle();
 			}
 		}

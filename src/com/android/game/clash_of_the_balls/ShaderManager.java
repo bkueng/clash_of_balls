@@ -18,6 +18,8 @@ public class ShaderManager {
 	
 	private Context m_activity_context;
 	
+	private VertexBufferFloat m_default_tex_coord_buffer;
+	
 	public enum ShaderType {
 		TypeDefault,
 		TypeWarp,
@@ -41,6 +43,9 @@ public class ShaderManager {
 		m_activity_context = activity_context;
 		m_programs = new int[ShaderType.TypeN.ordinal()];
 		for(int i=0; i<m_programs.length; ++i) m_programs[i]=-1;
+		
+		m_default_tex_coord_buffer = new VertexBufferFloat(
+				VertexBufferFloat.sprite_tex_coords, 2);
 	}
 	
 	public void onSurfaceChanged(int width, int height) {
@@ -97,6 +102,11 @@ public class ShaderManager {
 			break;
 		default:
 		}
+		
+		
+		//apply the default texture coordinates
+        if(a_TexCoordinate_handle != -1)
+        	m_default_tex_coord_buffer.apply(a_TexCoordinate_handle);
 	}
 	
 	//tell the shader to use a texture (which=0 if only 1 texture is used)
