@@ -58,7 +58,7 @@ public class GamePlayer extends DynamicGameObject {
 	public float[] color() { return m_color; }
 	
 	private Vector m_acceleration = new Vector();
-	private float m_sensor_scaling = 5.f; //influences the acceleration
+	private float m_sensor_scaling = 7.f; //influences the acceleration
 	public Vector acceleration() { return m_acceleration; }
 
 	public void applySensorVector(Vector v) {
