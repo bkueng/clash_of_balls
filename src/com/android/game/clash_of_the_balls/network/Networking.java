@@ -97,7 +97,7 @@ public class Networking {
 				//this signal is: client --> server. so don't send to clients
 				//if (mHostChatInterface != null) 
 				//	mHostChatInterface.sensorUpdate(pos);
-				receivedSensorUpdate(mBus.getUniqueName(), pos.x, pos.y); //send to ourself
+				receivedSensorUpdate(m_bus_unique_name, pos.x, pos.y); //send to ourself
 			} else {
 				if(mChatInterface!=null) mChatInterface.sensorUpdate(pos.x, pos.y);
 			}
@@ -112,7 +112,7 @@ public class Networking {
 				//this signal is: server --> clients. so send to all clients
 				if (mHostChatInterface != null)
 					mHostChatInterface.gameCommand(data);
-				receivedGameCommand(mBus.getUniqueName(), data); //send to ourself
+				receivedGameCommand(m_bus_unique_name, data); //send to ourself
 			} else {
 				if(mChatInterface!=null) mChatInterface.gameCommand(data);
 			}
@@ -139,7 +139,7 @@ public class Networking {
     }
     //this is the own unique name
     public String getUniqueName() {
-    	return mBus.getUniqueName();
+    	return m_bus_unique_name;
     }
     
     /* joined clients */
@@ -607,6 +607,7 @@ public class Networking {
      * this obejct.
      */
     private volatile BusAttachment mBus = null;
+    private volatile String m_bus_unique_name = null;
     
     /**
      * The well-known name prefix which all bus attachments hosting a channel
@@ -736,7 +737,8 @@ public class Networking {
     				"Unable to register signal handlers: (" + status + ")");
         	return;
     	}
-        
+    	
+    	m_bus_unique_name = mBus.getUniqueName();
     	mBusAttachmentState = BusAttachmentState.CONNECTED;
     }  
     
@@ -1292,7 +1294,7 @@ public class Networking {
     	 * signal is us, we also filter out the signal since we are going to
     	 * locally echo the signal.
      	 */
-    	String uniqueName = mBus.getUniqueName();
+    	String uniqueName = m_bus_unique_name;
     	MessageContext ctx = mBus.getMessageContext();
         
          // Always drop our own signals which may be echoed back from the system.
@@ -1319,7 +1321,7 @@ public class Networking {
     	 * signal is us, we also filter out the signal since we are going to
     	 * locally echo the signal.
      	 */
-    	String uniqueName = mBus.getUniqueName();
+    	String uniqueName = m_bus_unique_name;
     	MessageContext ctx = mBus.getMessageContext();
         
          // Always drop our own signals which may be echoed back from the system.
@@ -1347,7 +1349,7 @@ public class Networking {
     @BusSignalHandler(iface = "com.android.game.clash_of_the_balls.alljoyn", signal = "clientInfoToServer")
 	public void clientInfoToServer(String well_known_name) {
     	
-    	String uniqueName = mBus.getUniqueName();
+    	String uniqueName = m_bus_unique_name;
     	MessageContext ctx = mBus.getMessageContext();
         
          // Always drop our own signals which may be echoed back from the system.
@@ -1376,7 +1378,7 @@ public class Networking {
 	public void clientInfoToClients(String unique_name,
 			String well_known_name) {
     	
-    	String uniqueName = mBus.getUniqueName();
+    	String uniqueName = m_bus_unique_name;
     	MessageContext ctx = mBus.getMessageContext();
         
          // Always drop our own signals which may be echoed back from the system.
