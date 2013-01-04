@@ -18,3 +18,27 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-optimizationpasses 2 
+
+-dontwarn org.alljoyn.bus.*
+
+-keepclassmembers enum * {
+	public static **[] values();
+	public static ** valueOf(java.lang.String);
+}
+
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
+#we need this for the native alljoyn library
+#this basically tells proguard to keep everything under org.*
+#this could probably be improved a bit...
+-keep class ** { *; }
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+
