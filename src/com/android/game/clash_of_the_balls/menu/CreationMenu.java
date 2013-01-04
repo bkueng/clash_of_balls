@@ -233,6 +233,7 @@ public class CreationMenu extends GameMenuBase {
 		
 		String name =  Networking.toDisplayableName(m_settings.user_name);
 		if(name.length() > 0) m_name_button.setString(name);
+		m_create_button.disable();
 	}
 
 }
