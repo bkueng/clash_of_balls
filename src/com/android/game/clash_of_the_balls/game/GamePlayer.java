@@ -27,7 +27,7 @@ import com.android.game.clash_of_the_balls.game.event.EventGameInfo.PlayerInfo;
  */
 public class GamePlayer extends DynamicGameObject {
 	
-	private float m_max_speed = 5.f;
+	private float m_max_speed = 7.f;
 
 	private float m_color[]=new float[4]; //RGBA
 	
@@ -60,7 +60,7 @@ public class GamePlayer extends DynamicGameObject {
 	public float[] color() { return m_color; }
 	
 	private Vector m_acceleration = new Vector();
-	private float m_sensor_scaling = 7.f; //influences the acceleration
+	private float m_sensor_scaling = 8.f; //influences the acceleration
 	public Vector acceleration() { return m_acceleration; }
 
 	public void applySensorVector(Vector v) {
@@ -236,7 +236,7 @@ public class GamePlayer extends DynamicGameObject {
 		m_item_type = item.itemType();
 		switch(item.itemType()) {
 		case IncreaseMaxSpeed: 
-			m_max_speed *= 2.f;
+			m_max_speed *= 1.6f;
 			m_body.setLinearDamping(m_body.getLinearDamping() / 2.f);
 			break;
 		case InvertControls:
@@ -265,7 +265,7 @@ public class GamePlayer extends DynamicGameObject {
 		if(m_item_type != ItemType.None) {
 			switch(m_item_type) {
 			case IncreaseMaxSpeed: 
-				m_max_speed /= 2.f;
+				m_max_speed /= 1.6f;
 				m_body.setLinearDamping(m_body.getLinearDamping() * 2.f);
 				break;
 			case InvertControls:
