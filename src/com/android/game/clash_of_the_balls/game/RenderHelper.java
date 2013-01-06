@@ -79,6 +79,8 @@ public class RenderHelper {
 		int a = (int)(color[3]*255.f);
 		return (a<<24) | (r<<16) | (g<<8) | b;
 	}
+	public static final float color_white[] = new float[]
+			{ 1.0f, 1.0f, 1.0f, 1.0f }; //RGBA
 	
 	
 	/* projection matrix */

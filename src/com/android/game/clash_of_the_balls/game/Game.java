@@ -51,7 +51,7 @@ public class Game extends GameBase implements UIBase {
 	
 	protected static final VertexBufferFloat m_default_position_data=new VertexBufferFloat(
 			VertexBufferFloat.sprite_position_data, 3); //for all game objects (for drawing)
-	protected static final float m_default_color[]=new float[]{ 1.f, 1.f, 1.f, 1.f };
+	protected static final float m_default_color[]=RenderHelper.color_white;
 	
 	
 	public Game(Context c, GameSettings s, TextureManager texture_manager, 
