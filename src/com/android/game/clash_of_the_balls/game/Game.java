@@ -313,6 +313,9 @@ public class Game extends GameBase implements UIBase {
 
 			m_game_field.draw(renderer);
 			for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
+				entry.getValue().drawBackground(renderer);
+			}
+			for (Map.Entry<Short, DynamicGameObject> entry : m_game_objects.entrySet()) {
 				entry.getValue().draw(renderer);
 			}
 

@@ -160,7 +160,7 @@ public class GameServer extends GameBase implements Runnable {
 			if(client!=null) client.id = id;
 			//create the player (without textures)
 			GamePlayer p = new GamePlayer(this, id, player_pos[indexes[i]]
-					, colors[i], null, null, null, null, m_world, m_body_def);
+					, colors[i], null, null, m_world, m_body_def);
 			m_game_objects.put(id, p);
 		}
 	}

@@ -13,6 +13,8 @@ import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.FontNumbers;
+import com.android.game.clash_of_the_balls.R;
+import com.android.game.clash_of_the_balls.TextureManager;
 import com.android.game.clash_of_the_balls.ShaderManager.ShaderType;
 import com.android.game.clash_of_the_balls.Texture;
 import com.android.game.clash_of_the_balls.VertexBufferFloat;
@@ -72,33 +74,39 @@ public class GamePlayer extends DynamicGameObject {
 	
 	protected Texture m_overlay_texture;
 	protected Texture m_glow_texture;
+	protected Texture m_shadow_texture;
 	private static final float min_glow_scaling = 0.8f;
 	private static final float max_glow_scaling = 1.5f;
 	private float m_glow_scaling=min_glow_scaling;
 	private float m_texture_scaling = 1.f;
 
 	public GamePlayer(GameBase owner, short id, Vector position
-			, int color, Texture texture, Texture texture_overlay
-			, Texture texture_glow
+			, int color, TextureManager tex_manager
 			, FontNumbers overlay_font_numbers, World world, BodyDef body_def) {
-		super(owner, id, Type.Player, texture);
-		m_overlay_texture = texture_overlay;
-		m_glow_texture = texture_glow;
+		super(owner, id, Type.Player,
+			tex_manager!=null ? tex_manager.get(R.raw.texture_ball_base) : null);
+		initTextures(tex_manager);
 		RenderHelper.initColorArray(color, m_color);
 		m_overlay_font_numbers = overlay_font_numbers;
 		initPlayerBody(world, position, body_def);
 	}
 	
-	public GamePlayer(PlayerInfo info, GameBase owner, Texture texture_base
-			, Texture texture_overlay, Texture texture_glow
+	public GamePlayer(PlayerInfo info, GameBase owner, TextureManager tex_manager
 			, FontNumbers overlay_font_numbers, World world
 			, BodyDef body_def) {
-		super(owner, info.id, Type.Player, texture_base);
-		m_overlay_texture = texture_overlay;
-		m_glow_texture = texture_glow;
+		super(owner, info.id, Type.Player
+			, tex_manager!=null ? tex_manager.get(R.raw.texture_ball_base) : null);
+		initTextures(tex_manager);
 		RenderHelper.initColorArray(info.color, m_color);
 		m_overlay_font_numbers = overlay_font_numbers;
 		initPlayerBody(world, new Vector(info.pos_x, info.pos_y), body_def);
+	}
+	private void initTextures(TextureManager tex_manager) {
+		if(tex_manager!=null) {
+			m_overlay_texture = tex_manager.get(R.raw.texture_ball_up);
+			m_glow_texture = tex_manager.get(R.raw.texture_ball_hover);
+			m_shadow_texture = tex_manager.get(R.raw.texture_ball_shadow);
+		}
 	}
 	
 	private void initPlayerBody(World world, Vector position, BodyDef body_def) {
@@ -337,8 +345,24 @@ public class GamePlayer extends DynamicGameObject {
 		}
 	}
 	
-	public void draw(RenderHelper renderer) {
+	public void drawBackground(RenderHelper renderer) {
 		if(!isReallyDead() && !isInvisible()) {
+			
+			if(m_shadow_texture != null) {
+				m_texture_scaling = 1.15f;
+				doModelTransformation(renderer, -0.15f, -0.1f);
+				
+				renderer.shaderManager().activateTexture(0);
+				m_shadow_texture.useTexture(renderer);
+				
+				renderer.apply();
+				
+		        // Draw
+		        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);     
+		        
+		        undoModelTransformation(renderer);
+		        m_texture_scaling = 1.f;
+			}
 			
 			if(m_glow_texture!=null && (m_item_type == ItemType.DontFall 
 					|| m_glow_scaling > min_glow_scaling)) {
@@ -362,6 +386,11 @@ public class GamePlayer extends DynamicGameObject {
 				Game.applyDefaultPosAndColor(renderer);
 				m_texture_scaling = 1.f;
 			}
+		}
+	}
+	
+	public void draw(RenderHelper renderer) {
+		if(!isReallyDead() && !isInvisible()) {
 			
 			doModelTransformation(renderer);
 			
@@ -410,6 +439,15 @@ public class GamePlayer extends DynamicGameObject {
 		renderer.modelMatScale(m_texture_scaling * m_scaling*m_radius*2.f
 				, m_texture_scaling * m_scaling*m_radius*2.f, 0.f);
 		renderer.modelMatTranslate(-0.5f, -0.5f, 0.f);
+	}
+	protected void doModelTransformation(RenderHelper renderer
+			, float offset_x, float offset_y) {
+		//scale & translate
+		renderer.pushModelMat();
+		renderer.modelMatTranslate(m_body.getPosition().x, m_body.getPosition().y, 0.f);
+		renderer.modelMatScale(m_texture_scaling * m_scaling*m_radius*2.f
+				, m_texture_scaling * m_scaling*m_radius*2.f, 0.f);
+		renderer.modelMatTranslate(-0.5f+offset_x, -0.5f+offset_y, 0.f);
 	}
 	protected void undoModelTransformation(RenderHelper renderer) {
 		renderer.popModelMat();

@@ -36,6 +36,10 @@ public class DynamicGameObject extends StaticGameObject {
 		m_owner = owner;
 	}
 
+	//can be used for shadow drawing etc...
+	public void drawBackground(RenderHelper renderer) {
+	}
+	
 	@Override
 	public void draw(RenderHelper renderer) {
 		if(!isReallyDead()) {

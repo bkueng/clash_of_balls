@@ -158,17 +158,8 @@ public abstract class GameBase implements ContactListener {
 		m_initial_player_count = players.length;
 		m_current_player_count = m_initial_player_count;
 		for(int i=0; i<players.length; ++i) {
-			Texture texture=null;
-			Texture texture_overlay=null;
-			Texture texture_glow = null;
-			if(m_texture_manager != null) {
-				texture = m_texture_manager.get(R.raw.texture_ball_base);
-				texture_overlay = m_texture_manager.get(R.raw.texture_ball_up);
-				texture_glow = m_texture_manager.get(R.raw.texture_ball_hover);
-			}
-			GamePlayer p = new GamePlayer(players[i], this, texture
-					, texture_overlay, texture_glow, m_overlay_font_numbers
-					, m_world, m_body_def);
+			GamePlayer p = new GamePlayer(players[i], this, m_texture_manager
+					,m_overlay_font_numbers, m_world, m_body_def);
 			m_game_objects.put(players[i].id, p);
 			if(players[i].id >= m_next_object_id)
 				m_next_object_id = (short) (players[i].id + 1);
