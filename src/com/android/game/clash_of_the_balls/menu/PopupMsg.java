@@ -26,8 +26,8 @@ public class PopupMsg extends PopupBase {
 	
 	private MenuItemButton m_ok_button;
 	
-	private MenuItemStringMultiline m_title;
-	private MenuItemStringMultiline m_msg;
+	protected MenuItemStringMultiline m_title;
+	protected MenuItemStringMultiline m_msg;
 	
 
 	public PopupMsg(Context context, TextureManager tex_manager,
