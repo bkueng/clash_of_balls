@@ -48,6 +48,9 @@ import android.util.Log;
 public class Networking {
 	private static final String TAG = "Networking";
 	
+	public static final int protocol_version = 1; //if another endpoint
+			//uses another version, they cannot communicate with each other
+	
 	private Context m_context;
 	private boolean m_bInit=false;
 	
@@ -255,7 +258,7 @@ public class Networking {
 	}
 	
 	public static String getNameFromServerId(String server_id) {
-		//server id is: NAME_PREFIX.<guid>.server_name
+		//server id is: NAME_PREFIX.g<guid>.v<protocol version>.n<server_name>
     	int lastDot = server_id.lastIndexOf('.');
     	if (lastDot < 0 || lastDot+2 > server_id.length()) {
     		//this is a format error. we could throw an exception.
@@ -263,6 +266,20 @@ public class Networking {
     		return server_id;
     	}
         return server_id.substring(lastDot + 2);
+	}
+	public static int getProtocolVersionFromServerId(String server_id) {
+		int version_idx = server_id.lastIndexOf(".v");
+		int name_idx = server_id.lastIndexOf(".n");
+    	if (version_idx < 0 || version_idx+2 > server_id.length()
+    			|| name_idx < 0) {
+    		return -1;
+    	}
+    	int ret = -1;
+    	try {
+    		ret = Integer.parseInt(server_id.substring(version_idx+2, name_idx));
+    	} catch(NumberFormatException e) {
+    	}
+    	return ret;
 	}
 	public static String toDisplayableName(String server_name) {
 		return server_name.replaceAll("_", " ");
@@ -622,8 +639,9 @@ public class Networking {
     private volatile String m_server_id_to_join; //this is the well-known name
     
     private String getWellKnownName() {
-    	return NAME_PREFIX + ".g" + mBus.getGlobalGUIDString() + ".n"
-    			+ m_host_server_name;
+    	return NAME_PREFIX + ".g" + mBus.getGlobalGUIDString() 
+    			+ ".v" + protocol_version
+    			+ ".n" + m_host_server_name;
     }
     private String getWellKnownNameToJoin() {
     	return m_server_id_to_join;

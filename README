@@ -42,6 +42,15 @@ In GameSettings also other settings can be set to control the behaviour of the
 game.
 
 
+Code
+----
+
+- network protocol
+  whenever the network protocol changes, make sure to increase
+  Networking.protocol_version. This will prevent clients with different protocol
+  versions to connect to each other.
+
+
 Miscellaneous
 -------------
 

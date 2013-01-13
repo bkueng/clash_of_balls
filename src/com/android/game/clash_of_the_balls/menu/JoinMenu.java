@@ -1,10 +1,12 @@
 package com.android.game.clash_of_the_balls.menu;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.game.clash_of_the_balls.Font2D;
 import com.android.game.clash_of_the_balls.GameSettings;
 import com.android.game.clash_of_the_balls.TextureManager;
+import com.android.game.clash_of_the_balls.game.RenderHelper;
 import com.android.game.clash_of_the_balls.game.Vector;
 import com.android.game.clash_of_the_balls.network.NetworkClient;
 import com.android.game.clash_of_the_balls.network.Networking;
@@ -25,6 +27,10 @@ public class JoinMenu extends GameMenuBase {
 	private MenuItemStringMultiline m_game_label;
 	private MenuItemList m_game_list;
 	private float m_item_height;
+	private int m_selected_item_protocol_version = -1;
+	
+	private MenuItemStringMultiline m_older_version_warning;
+	private MenuItemStringMultiline m_newer_version_warning;
 	
 	private TextureManager m_tex_manager;
 	
@@ -106,6 +112,16 @@ public class JoinMenu extends GameMenuBase {
 						m_cancel_button.pos().y+button_height+offset_y),
 				new Vector(button_width, button_height), 
 				font_settings, "Join", tex_manager));
+		
+		Vector warning_size = new Vector(button_width, button_height*1.4f);
+		Vector warning_pos = new Vector(m_join_button.pos().x, 
+				m_join_button.pos().y+button_height+offset_y);
+		m_older_version_warning = new MenuItemStringMultiline(
+				warning_pos, warning_size, label_font_settings, 
+				" Version mismatch:\n You're using an old version!\n Please update", m_tex_manager);
+		m_newer_version_warning = new MenuItemStringMultiline(
+				warning_pos, warning_size, label_font_settings, 
+				" Version mismatch:\n You're using a newer version!\n ", m_tex_manager);
 
 	}
 	
@@ -135,14 +151,20 @@ public class JoinMenu extends GameMenuBase {
 				if(server_id.equals(m_network_client.serverId(k)))
 					found = true;
 			}
-			if(!found)
-				addListItem(Networking.toDisplayableName(
-						Networking.getNameFromServerId(m_network_client.serverId(k)))
+			if(!found) {
+				String server_name = Networking.getNameFromServerId(m_network_client.serverId(k));
+				Log.i(LOG_TAG, "Found a new server: "+server_name
+						+ ", protocol version: "+Networking.getProtocolVersionFromServerId(
+								m_network_client.serverId(k)));
+				addListItem(Networking.toDisplayableName(server_name)
 						, m_network_client.serverId(k));
+			}
 		}
 		
+		m_selected_item_protocol_version = selectedItemGetProtocolVersion();
 		String name = Networking.fromDisplayableName(m_name_button.getString());
 		m_join_button.enable(m_game_list.getSelectedItem() != null 
+				&& m_selected_item_protocol_version == Networking.protocol_version
 				&& name.length() > 0);
 		if(name.length() > 0) m_settings.user_name = new String(name);
 	}
@@ -154,6 +176,30 @@ public class JoinMenu extends GameMenuBase {
 		item.obj = additional;
 		m_game_list.addItem(item);
 		
+	}
+	
+	private int selectedItemGetProtocolVersion() {
+		MenuItem sel_item = m_game_list.getSelectedItem();
+		if(sel_item!=null) {
+			Object obj = ((MenuItemString)sel_item).obj;
+			if(obj != null) {
+				String server_id = (String)obj;
+				return Networking.getProtocolVersionFromServerId(server_id);
+			}
+		}
+		return -1;
+	}
+	
+	public void draw(RenderHelper renderer) {
+		super.draw(renderer);
+		
+		if(m_selected_item_protocol_version!=-1) {
+			if(m_selected_item_protocol_version < Networking.protocol_version) {
+				m_newer_version_warning.draw(renderer);
+			} else if(m_selected_item_protocol_version > Networking.protocol_version) {
+				m_older_version_warning.draw(renderer);
+			}
+		}
 	}
 
 	@Override
