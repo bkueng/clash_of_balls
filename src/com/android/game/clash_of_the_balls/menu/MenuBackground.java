@@ -44,7 +44,6 @@ public class MenuBackground extends GameObject {
 		
 		//translate & scale to fit screen
 		renderer.pushModelMat();
-		renderer.modelMatSetIdentity();
 		renderer.modelMatTranslate(m_position.x, m_position.y, 0.f);
 		renderer.modelMatScale(m_size.x, m_size.y, 0.f);
 		

@@ -104,6 +104,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     		// Draw background color
     		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
+    		m_renderer.modelMatSetIdentity();
     		m_ui_handler.draw(m_renderer);
 
     	} catch(Exception e) {
