@@ -193,6 +193,10 @@ public class GameField extends GameObject {
 						obj=new GameWall(m_owner, object_id++, pos
 								,WallType.Wall_vertical, texture, world, body_def);
 						break;
+					case GameLevel.TYPE_WALL_CROSS:
+						obj=new GameWall(m_owner, object_id++, pos
+								,WallType.Wall_cross, texture, world, body_def);
+						break;
 					case GameLevel.TYPE_WALL_CORNER_UP_RIGHT:
 						obj=new GameWall(m_owner, object_id++, pos
 								,WallType.Wall_Corner_up_right, texture, world, body_def);

@@ -77,13 +77,14 @@ public class GameLevel {
 	//Wall
 	public static final int TYPE_WALL_HOR = 20;
 	public static final int TYPE_WALL_VERT = 21;
+	public static final int TYPE_WALL_CROSS = 26;
 	
 	public static final int TYPE_WALL_CORNER_UP_RIGHT = 22;
 	public static final int TYPE_WALL_CORNER_DOWN_RIGHT = 23;
 	public static final int TYPE_WALL_CORNER_DOWN_LEFT = 24;
 	public static final int TYPE_WALL_CORNER_UP_LEFT = 25;
 	
-	public static final int TYPE_FG_MAX = 25; // max field int value foreground
+	public static final int TYPE_FG_MAX = 26; // max field int value foreground
 	
 	public static int rawResTexIdFromForeground(int fg_field) {
 		switch(fg_field) {
@@ -114,6 +115,8 @@ public class GameLevel {
 		
 		case TYPE_WALL_HOR:;
 		case TYPE_WALL_VERT: return R.raw.texture_wall;
+		
+		case TYPE_WALL_CROSS: return R.raw.texture_wallcross;
 		
 		case TYPE_WALL_CORNER_DOWN_LEFT:;
 		case TYPE_WALL_CORNER_DOWN_RIGHT:;

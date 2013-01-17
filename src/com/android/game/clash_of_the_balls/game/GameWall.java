@@ -12,6 +12,7 @@ public class GameWall extends StaticGameObject {
 	public enum WallType {
 		Wall_horizontal,
 		Wall_vertical,
+		Wall_cross,
 		Wall_Corner_up_right,
 		Wall_Corner_up_left,
 		Wall_Corner_down_right,
@@ -41,6 +42,7 @@ public class GameWall extends StaticGameObject {
 			break;
 		case Wall_Corner_up_right:
 		case Wall_vertical:
+		case Wall_cross:
 			break;
 		}
 	
@@ -62,6 +64,10 @@ public class GameWall extends StaticGameObject {
 		case Wall_horizontal:
 		case Wall_vertical:
 			addWallRectFixture(-0.11f, -0.5f, 0.22f, 1.0f, restitution);
+			break;
+		case Wall_cross:
+			addWallRectFixture(-0.11f, -0.5f, 0.22f, 1.0f, restitution);
+			addWallRectFixture(-0.5f, -0.11f, 1.0f, 0.22f, restitution);
 			break;
 		default:
 			break;
