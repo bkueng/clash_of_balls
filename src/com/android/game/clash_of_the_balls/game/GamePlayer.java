@@ -329,8 +329,8 @@ public class GamePlayer extends DynamicGameObject {
 	//this is called using screen coordinates
 	public void drawOverlay(RenderHelper renderer) {
 		if(m_overlay_item!=null) {
-			final float offset = renderer.screenHeight()*0.02f;
-			final float item_size = renderer.screenHeight()*overlay_item_height;
+			final float offset = renderer.m_screen_width*0.02f;
+			final float item_size = renderer.m_screen_height*overlay_item_height;
 			
 			renderer.pushModelMat();
 			renderer.modelMatTranslate(offset+item_size*0.5f, offset+item_size*0.5f, 0.f);

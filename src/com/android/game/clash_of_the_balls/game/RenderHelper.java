@@ -23,8 +23,8 @@ public class RenderHelper {
 	
 	private ShaderManager m_shader_manager;
 	
-	private float m_screen_width;
-	private float m_screen_height;
+	public float m_screen_width;
+	public float m_screen_height;
 	
 	private float m_time_accumulator = 0.f;
 	
@@ -36,9 +36,6 @@ public class RenderHelper {
 	private float[] m_model_mat;
 	private int m_cur_model_mat_pos;
 	private int m_max_model_mat_pos;
-	
-	public float screenWidth() { return m_screen_width; }
-	public float screenHeight() { return m_screen_height; }
 	
 	public ShaderManager shaderManager() { return m_shader_manager; }
 	

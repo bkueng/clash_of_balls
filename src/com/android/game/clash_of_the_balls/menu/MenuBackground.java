@@ -39,7 +39,7 @@ public class MenuBackground extends GameObject {
 		m_texture.useTexture(renderer);
 		
 		//position & size
-		getViewport(renderer.screenWidth(), renderer.screenHeight()
+		getViewport(renderer.m_screen_width, renderer.m_screen_height
 				, m_position, m_size);
 		
 		//translate & scale to fit screen
