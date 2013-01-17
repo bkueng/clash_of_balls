@@ -27,6 +27,7 @@ public class LevelManager {
 		loadLevel(R.raw.level_3);
 		loadLevel(R.raw.level_test1);
 		loadLevel(R.raw.level_walls);
+		loadLevel(R.raw.level_walls2);
 		//TODO: other levels, also from file system?
 		
 	}
