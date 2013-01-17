@@ -102,6 +102,16 @@ public class Game extends GameBase implements UIBase {
 	}
 	
 	public void initPlayers(PlayerInfo[] players) {
+		//initialize network client id (must be done before super.initPlayers !)
+		for(int i=0; i<players.length; ++i) {
+			for(int k=0; k<m_network_client.getConnectedClientCount(); ++k) {
+				ConnectedClient client=m_network_client.getConnectedClient(k);
+				if(client!=null && client.unique_id.equals(players[i].unique_name)) {
+					client.id = players[i].id;
+				}
+			}
+		}
+		
 		super.initPlayers(players);
 		
 		String own_unique_name = m_network_client.getOwnUniqueName();
@@ -112,13 +122,6 @@ public class Game extends GameBase implements UIBase {
 					
 					Log.d(TAG_GAME, "we got our player at x="+m_own_player.pos().x
 							+", y="+m_own_player.pos().y);
-				}
-				//set network client id
-				for(int k=0; k<m_network_client.getConnectedClientCount(); ++k) {
-					ConnectedClient client=m_network_client.getConnectedClient(k);
-					if(client!=null && client.unique_id.equals(players[i].unique_name)) {
-						client.id = players[i].id;
-					}
 				}
 			}
 		}
