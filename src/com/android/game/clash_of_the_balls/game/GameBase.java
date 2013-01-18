@@ -142,7 +142,6 @@ public abstract class GameBase implements ContactListener {
 		m_time_accumulator = 0.f;
 		m_items_count = 0;
 		
-		System.gc();
 	}
 	
 	public GameLevel level() { return m_level; }
