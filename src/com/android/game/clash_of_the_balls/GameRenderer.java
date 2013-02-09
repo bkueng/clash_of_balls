@@ -38,7 +38,7 @@ public class GameRenderer implements GLSurfaceView.Renderer {
     }
     
     public void onDestroy() {
-    	m_ui_handler.onDestroy();
+    	if(m_ui_handler!=null) m_ui_handler.onDestroy();
     }
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
