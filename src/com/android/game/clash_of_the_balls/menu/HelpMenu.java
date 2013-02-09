@@ -85,6 +85,8 @@ public class HelpMenu extends GameMenuBase {
 
 		addPage("At the beginning, keep your\n phone still to choose\n your equilibrium state",
 				R.raw.img_four);
+		
+		addPage("There are good\n...and bad items", R.raw.img_fifth);
 
 		m_button_next = new MenuItemArrow(new Vector(pos.x + size.x / 2
 				+ img_width / 2+offset_x, 
