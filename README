@@ -1,7 +1,7 @@
                                Clash of Balls
                                ==============
 
-               Copyright 2012 Hans Hardmeier
+               Copyright 2012 Hans Hardmeier <hanshardmeier@gmail.com>
                Copyright 2012 Andrin Jenal
                Copyright 2012 Beat Küng <beat-kueng@gmx.net>
 
@@ -20,10 +20,11 @@ engine Box2D. It uses the zlib license.
 Usage
 -----
 
-The game should be self-explanatory, there is a Help Menu. When the game starts
-and the countdown is shown, hold your device still in a desired position, where
-your ball should not move. During the game, tilt the device to move your player
-to a certain direction.
+The aim of the game is to bounce the other players out of the field by balancing
+your device.The game should be self-explanatory, there is a Help Menu. When the 
+game starts and the countdown is shown, hold your device still in the desired 
+position, where your ball should not move. During the game, tilt the device to 
+move your player to a certain direction.
 
 
 Levels
