@@ -38,7 +38,7 @@ Debugging & Settings
 --------------------
 
 To facilitate debugging, set GameSettings.debug to true. This allows the game to
-be startet on a single phone.
+be started on a single phone.
 In GameSettings also other settings can be set to control the behaviour of the
 game.
 
