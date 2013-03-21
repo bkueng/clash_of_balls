@@ -1,9 +1,10 @@
 /**
- * AllJoyn Chat Android Sample code
- *
  * Implementation of AllJoyn interface.
  *
  * Copyright 2010-2011, Qualcomm Innovation Center, Inc.
+ *
+ * modified by:
+ * 2013 Beat Küng <beat-kueng@gmx.net>
  * 
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
