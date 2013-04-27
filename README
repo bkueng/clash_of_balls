@@ -9,6 +9,9 @@
 Clash of Balls is an Android multiplayer game. Each player controls a ball and
 tries to push the others down into the black nirvana.
 
+It can be found on Google Play:
+https://play.google.com/store/apps/details?id=com.sapos_aplastados.game.clash_of_balls
+
 It uses the AllJoyn (Apache license) library for peer-to-peer communication. So
 no server is used, but each player needs to be in the same network to see each
 other. If the device supports it, Clash of Balls should also run via Bluetooth.
